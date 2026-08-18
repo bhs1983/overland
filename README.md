@@ -40,7 +40,7 @@ First place: **Kilnwalk**. First dungeon: **the Cold Stack** (Checkpoint 2+).
 2. North → **Ashdrift Hall** — puff ash piles with Folded Bellows; open the chest for **Folded Bellows**.
 3. East → **Dead Fan Walk** — puff the dead fan; east door opens.
 
-Cold Stack tiles / Sootling sprites are not staged yet: town tiles + palette PixelSprite stand-ins.
+Cold Stack rooms 1–3 use locked Art under `assets/tiles/cold_stack/` and `assets/sprites/enemies/sootling.png` (`ash_floor.png` pending Art resend — floors fall back to town brick until then).
 
 Rooms 4–10 are **not** in this PR.
 

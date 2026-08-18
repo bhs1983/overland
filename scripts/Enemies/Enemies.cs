@@ -2,16 +2,13 @@ using Godot;
 
 namespace Overland;
 
-/// <summary>
-/// Sootling — 1 hit, rushes, bellows staggers.
-/// Art not on disk for Checkpoint 2: palette PixelSprite stand-in (ash_grey / soot).
-/// </summary>
+/// <summary>Sootling — 1 hit, rushes, bellows staggers.</summary>
 public partial class Sootling : CharacterBody2D, IDamageable
 {
 	public string EnemyId { get; set; } = "sootling_0";
 	public bool IsAlive => _alive;
 
-	private Node2D _body = null!;
+	private CanvasItem _body = null!;
 	private FlashFx _flash = null!;
 	private bool _alive = true;
 	private bool _staggered;
@@ -32,11 +29,8 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		{
 			Shape = new CircleShape2D { Radius = 6 }
 		});
-		_body = PixelSprite.MakeBody(new Vector2(10, 10), Palette.Sootling);
+		_body = Assets.Sprite(Assets.Enemy("sootling"));
 		AddChild(_body);
-		var eye = PixelSprite.MakeBody(new Vector2(3, 2), Palette.Soot);
-		eye.Position = new Vector2(0, -2);
-		AddChild(eye);
 		_flash = new FlashFx();
 		AddChild(_flash);
 	}

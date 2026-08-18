@@ -303,8 +303,15 @@ public partial class WorldRoot : Node2D
 	{
 		for (int y = 1; y < h - 1; y++)
 			for (int x = 1; x < w - 1; x++)
-				PlaceFloor(root, "brick_floor", x, y);
+				PlaceColdFloor(root, x, y);
 		AddBorderWalls(root, w, h);
+	}
+
+	private static void PlaceColdFloor(Node2D root, int x, int y)
+	{
+		var s = Assets.ColdStackFloorSprite();
+		s.Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, y * Tiles.Size + Tiles.Size / 2f);
+		root.AddChild(s);
 	}
 
 	private static void PlaceFloor(Node2D root, string tile, int x, int y)
@@ -340,7 +347,7 @@ public partial class WorldRoot : Node2D
 		{
 			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Size, Tiles.Size) }
 		});
-		body.AddChild(Assets.TileSprite("brick_wall"));
+		body.AddChild(Assets.ColdStackSprite("flue_wall"));
 		root.AddChild(body);
 	}
 

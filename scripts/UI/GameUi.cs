@@ -254,7 +254,7 @@ public partial class GameUi : CanvasLayer
 				$"Folded Bellows: {(gs.HasFoldedBellows ? "yes" : "no")}  Fan: {(gs.FanOpened ? "open" : "dead")}\n" +
 				$"Mouth: {(gs.MouthOpen ? "open" : "sealed")}\n\n" +
 				"Checkpoint 2 — Kilnwalk + Cold Stack rooms 1–3.\n" +
-				"(Cold Stack tiles / Sootling art not staged yet — town tiles + palette stand-ins.)";
+				"(Locked Cold Stack art. ash_floor pending — floors use brick until resend.)";
 			_ = here;
 		}
 	}

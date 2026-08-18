@@ -203,10 +203,7 @@ public partial class AshPile : StaticBody2D, IBellowsTarget
 		{
 			Shape = new RectangleShape2D { Size = new Vector2(14, 14) }
 		});
-		AddChild(PixelSprite.MakeBody(new Vector2(14, 12), Palette.Ash));
-		var tip = PixelSprite.MakeBody(new Vector2(8, 6), Palette.AshDarkColor);
-		tip.Position = new Vector2(0, -2);
-		AddChild(tip);
+		AddChild(Assets.ColdStackSprite("ash_pile"));
 	}
 
 	public void OnBellows(Vector2 fromDirection)
@@ -217,14 +214,14 @@ public partial class AshPile : StaticBody2D, IBellowsTarget
 	}
 }
 
-/// <summary>Chest in Ashdrift Hall — Folded Bellows.</summary>
+/// <summary>Chest in Ashdrift Hall — Folded Bellows (chest art + folded_bellows item).</summary>
 public partial class BellowsChest : Interactable
 {
 	public override void _Ready()
 	{
 		base._Ready();
 		Prompt = "Open";
-		var spr = Assets.Sprite(Assets.Item("folded_bellows"));
+		var spr = Assets.ColdStackSprite("chest");
 		AddChild(spr);
 		if (GameState.Instance.BellowsChestOpened)
 			spr.Modulate = new Color(1, 1, 1, 0.45f);
@@ -247,7 +244,7 @@ public partial class BellowsChest : Interactable
 	}
 }
 
-/// <summary>Dead Fan Walk tool gate — puff bellows into the fan (door.png stand-in).</summary>
+/// <summary>Dead Fan Walk tool gate — puff bellows into the fan.</summary>
 public partial class DeadFan : StaticBody2D, IBellowsTarget
 {
 	private Sprite2D _sprite = null!;
@@ -259,7 +256,7 @@ public partial class DeadFan : StaticBody2D, IBellowsTarget
 		{
 			Shape = new RectangleShape2D { Size = new Vector2(16, 16) }
 		});
-		_sprite = Assets.TileSprite("door");
+		_sprite = Assets.ColdStackSprite("dead_fan");
 		AddChild(_sprite);
 		var label = new Label
 		{
@@ -306,8 +303,7 @@ public partial class FanEastDoor : StaticBody2D
 			Shape = new RectangleShape2D { Size = new Vector2(16, 32) }
 		};
 		AddChild(_col);
-		_sprite = Assets.TileSprite("door");
-		_sprite.Scale = new Vector2(1, 2);
+		_sprite = Assets.ColdStackSprite("iron_door_closed");
 		AddChild(_sprite);
 		AddToGroup("fan_east_door");
 		Refresh();
@@ -318,7 +314,8 @@ public partial class FanEastDoor : StaticBody2D
 		var open = GameState.Instance.FanOpened;
 		_col.Disabled = open;
 		CollisionLayer = open ? 0u : 1u;
-		_sprite.Modulate = open ? new Color(1, 1, 1, 0.35f) : Colors.White;
+		_sprite.Texture = Assets.ColdStack(open ? "iron_door_open" : "iron_door_closed");
+		_sprite.Modulate = Colors.White;
 	}
 }
 
