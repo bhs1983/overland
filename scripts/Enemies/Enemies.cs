@@ -30,6 +30,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 			Shape = new CircleShape2D { Radius = 6 }
 		});
 		_body = Assets.Sprite(Assets.Enemy("sootling"));
+		_body.ZIndex = 10; // draw above player so chase does not vanish under the hero
 		AddChild(_body);
 		_flash = new FlashFx();
 		AddChild(_flash);
