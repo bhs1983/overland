@@ -164,6 +164,7 @@ public partial class RoomTransition : Area2D
 			Shape = new RectangleShape2D { Size = TriggerSize }
 		});
 		BodyEntered += OnBodyEntered;
+		BodyExited += OnBodyExited;
 	}
 
 	private void OnBodyEntered(Node2D body)
@@ -185,7 +186,12 @@ public partial class RoomTransition : Area2D
 		// breaks Area2D setup (e.g. Sootling hurtbox) with "Can't change this state while flushing queries".
 		(GetTree().GetFirstNodeInGroup("world") as WorldRoot)?.CallDeferred(
 			nameof(WorldRoot.GoToRoom), (int)Target, SpawnId);
-		GetTree().CreateTimer(0.5f).Timeout += () => _cooldown = false;
+	}
+
+	private void OnBodyExited(Node2D body)
+	{
+		if (body is PlayerController)
+			_cooldown = false;
 	}
 }
 

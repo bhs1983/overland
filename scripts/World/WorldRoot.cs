@@ -97,7 +97,7 @@ public partial class WorldRoot : Node2D
 
 	private static Vector2 SpawnFor(RoomId room, string spawnId) => room switch
 	{
-		RoomId.StackMouth when spawnId == "from_town" => new Vector2(10 * Tiles.Size, 12 * Tiles.Size),
+		RoomId.StackMouth when spawnId == "from_town" => new Vector2(10 * Tiles.Size, 8 * Tiles.Size),
 		RoomId.StackMouth when spawnId == "from_ash" => new Vector2(10 * Tiles.Size, 2.5f * Tiles.Size),
 		RoomId.StackMouth => new Vector2(10 * Tiles.Size, 10 * Tiles.Size),
 		RoomId.AshdriftHall when spawnId == "from_mouth" => new Vector2(10 * Tiles.Size, 12 * Tiles.Size),
