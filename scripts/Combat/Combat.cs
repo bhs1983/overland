@@ -65,6 +65,9 @@ public partial class AttackArc : Area2D
 		_shape.Disabled = false;
 		Monitoring = true;
 
+		// Wait one physics frame so Area2D overlap queries see enemy bodies (Sootling).
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+
 		foreach (var body in GetOverlappingBodies())
 		{
 			if (body is IDamageable dmg && dmg.IsAlive)
