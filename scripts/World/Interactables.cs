@@ -181,7 +181,10 @@ public partial class RoomTransition : Area2D
 			return;
 		}
 		_cooldown = true;
-		(GetTree().GetFirstNodeInGroup("world") as WorldRoot)?.GoToRoom(Target, SpawnId);
+		// Defer past physics query flush — inline GoToRoom during BodyEntered
+		// breaks Area2D setup (e.g. Sootling hurtbox) with "Can't change this state while flushing queries".
+		(GetTree().GetFirstNodeInGroup("world") as WorldRoot)?.CallDeferred(
+			nameof(WorldRoot.GoToRoom), (int)Target, SpawnId);
 		GetTree().CreateTimer(0.5f).Timeout += () => _cooldown = false;
 	}
 }
