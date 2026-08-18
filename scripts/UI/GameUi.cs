@@ -151,31 +151,25 @@ public partial class GameUi : CanvasLayer
 			if (_toastTime <= 0)
 				_toast.Visible = false;
 		}
-	}
 
-	public override void _Input(InputEvent @event)
-	{
-		// Dialogue close must win over player interact / pause — use _Input so E/Enter/Esc are reliable.
-		if (!_dialogueOpen)
-			return;
-		if (@event.IsActionPressed("interact")
-			|| @event.IsActionPressed("pause_map")
-			|| @event.IsActionPressed("attack")
-			|| (@event is InputEventKey key && key.Pressed && !key.Echo
-				&& (key.Keycode == Key.Enter || key.Keycode == Key.Escape || key.PhysicalKeycode == Key.Enter)))
-		{
+		if (_dialogueOpen && Input.IsActionJustPressed("interact"))
 			CloseDialogue();
-			GetViewport().SetInputAsHandled();
-		}
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (@event.IsActionPressed("pause_map"))
+		if (!@event.IsActionPressed("pause_map"))
+			return;
+
+		if (_dialogueOpen)
 		{
-			TogglePauseMap();
+			CloseDialogue();
 			GetViewport().SetInputAsHandled();
+			return;
 		}
+
+		TogglePauseMap();
+		GetViewport().SetInputAsHandled();
 	}
 
 	public void RefreshHud()
