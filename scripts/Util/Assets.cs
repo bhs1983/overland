@@ -19,6 +19,15 @@ public static class Assets
 
 	public static Texture2D Town(string name) => Tex($"res://assets/tiles/town/{name}.png");
 	public static Texture2D Hero(string name) => Tex($"res://assets/sprites/hero/{name}.png");
+	public static Texture2D? HeroOrNull(string name)
+	{
+		var path = $"res://assets/sprites/hero/{name}.png";
+		if (Cache.TryGetValue(path, out var cached) && cached != null)
+			return cached;
+		if (!ResourceLoader.Exists(path))
+			return null;
+		return Tex(path);
+	}
 	public static Texture2D Item(string name) => Tex($"res://assets/sprites/items/{name}.png");
 	public static Texture2D Ui(string name) => Tex($"res://assets/ui/{name}.png");
 

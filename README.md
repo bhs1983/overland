@@ -20,20 +20,29 @@ First place: **Kilnwalk**. First dungeon: **the Cold Stack** (Checkpoint 2+).
 |---|---|
 | Move | WASD or Arrow keys |
 | Attack (Crackiron) | J or Z |
+| Folded Bellows | K or X |
 | Dodge-step | L or Shift |
 | Interact / talk / save | E or Enter |
 | Pause map | Esc or M |
 
-### Checkpoint 1 — how to play (town QA)
+### Checkpoint 1 — town
 
 1. Walk **Kilnwalk** (ridge street, kiln yard, night-fire, sealed stack mouth).
-2. Talk to **Tamsin Cole** — take the hire (exact line from SLICE-0.md).
-3. Talk to **Holt Vetch** — receive **Crackiron**; swing with J/Z.
-4. Talk to **Wren Quill** after the hire — she marks the mouth on the pause map.
-5. Talk to **Rook Darnel** — mouth stays sealed until hire; after hire he opens it.
-6. Save at the **night fire** (interact). Load from title or pause.
+2. Talk to **Tamsin Cole** — take the hire.
+3. Talk to **Holt Vetch** — receive **Crackiron**.
+4. Talk to **Wren Quill** after the hire — marks the mouth on the pause map.
+5. Talk to **Rook Darnel** — opens the mouth after hire.
+6. Save at the **night fire**.
 
-Dungeon rooms are **not** in this PR (Checkpoint 2).
+### Checkpoint 2 — Cold Stack rooms 1–3
+
+1. Enter the mouth → **Stack Mouth** (save point, one **Sootling** — teach the swing).
+2. North → **Ashdrift Hall** — puff ash piles with Folded Bellows; open the chest for **Folded Bellows**.
+3. East → **Dead Fan Walk** — puff the dead fan; east door opens.
+
+Cold Stack tiles / Sootling sprites are not staged yet: town tiles + palette PixelSprite stand-ins.
+
+Rooms 4–10 are **not** in this PR.
 
 ## Credits
 

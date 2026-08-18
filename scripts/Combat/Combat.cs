@@ -121,7 +121,7 @@ public partial class BellowsCone : Area2D
 		Position = facing.Normalized() * 18f;
 		Rotation = facing.Angle();
 
-		_visual.Visible = true;
+		_visual.Visible = false; // same as AttackArc — no filled puff block
 		_shape.Disabled = false;
 		Monitoring = true;
 

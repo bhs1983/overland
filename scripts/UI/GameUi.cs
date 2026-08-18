@@ -114,7 +114,7 @@ public partial class GameUi : CanvasLayer
 			ContentMarginBottom = 16
 		});
 		var vbox = new VBoxContainer();
-		var title = new Label { Text = "Pause Map — Checkpoint 1" };
+		var title = new Label { Text = "Pause Map — Checkpoint 2" };
 		title.AddThemeFontSizeOverride("font_size", 20);
 		title.AddThemeColorOverride("font_color", Palette.UiAccent);
 		_mapLabel = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart };
@@ -153,23 +153,27 @@ public partial class GameUi : CanvasLayer
 		}
 	}
 
+	public override void _Input(InputEvent @event)
+	{
+		// Dialogue close must win over player interact / pause — use _Input so E/Enter/Esc are reliable.
+		if (!_dialogueOpen)
+			return;
+		if (@event.IsActionPressed("interact")
+			|| @event.IsActionPressed("pause_map")
+			|| @event.IsActionPressed("attack")
+			|| (@event is InputEventKey key && key.Pressed && !key.Echo
+				&& (key.Keycode == Key.Enter || key.Keycode == Key.Escape || key.PhysicalKeycode == Key.Enter)))
+		{
+			CloseDialogue();
+			GetViewport().SetInputAsHandled();
+		}
+	}
+
 	public override void _UnhandledInput(InputEvent @event)
 	{
 		if (@event.IsActionPressed("pause_map"))
 		{
-			if (_dialogueOpen)
-			{
-				CloseDialogue();
-				GetViewport().SetInputAsHandled();
-				return;
-			}
 			TogglePauseMap();
-			GetViewport().SetInputAsHandled();
-			return;
-		}
-		if (_dialogueOpen && (@event.IsActionPressed("interact") || @event.IsActionPressed("attack")))
-		{
-			CloseDialogue();
 			GetViewport().SetInputAsHandled();
 		}
 	}
@@ -193,9 +197,11 @@ public partial class GameUi : CanvasLayer
 		var gs = GameState.Instance;
 		var sb = new StringBuilder();
 		if (gs.HasCrackiron) sb.Append("[Crackiron] ");
+		if (gs.HasFoldedBellows) sb.Append("[Folded Bellows] ");
 		if (gs.HireTaken) sb.Append("Hire taken. ");
 		if (gs.MapMarked) sb.Append("Mouth marked. ");
-		if (gs.MouthOpen) sb.Append("Mouth open.");
+		if (gs.MouthOpen) sb.Append("Mouth open. ");
+		if (gs.FanOpened) sb.Append("Fan open.");
 		_hud.Text = sb.ToString();
 	}
 
@@ -231,15 +237,25 @@ public partial class GameUi : CanvasLayer
 		if (open)
 		{
 			var gs = GameState.Instance;
-			var here = Assets.Ui("map_node_here");
+			var here = RoomNames.Display(gs.CurrentRoom);
+			var rooms = new StringBuilder();
+			rooms.AppendLine($"Kilnwalk{(gs.RoomsEntered.Contains(nameof(RoomId.Kilnwalk)) ? "" : " (locked)")}{(gs.CurrentRoom == RoomId.Kilnwalk ? "  <here>" : "")}");
+			void Line(RoomId id)
+			{
+				var entered = gs.RoomsEntered.Contains(id.ToString());
+				rooms.AppendLine($"{RoomNames.Display(id)}{(entered ? "" : " — not yet")}{(gs.CurrentRoom == id ? "  <here>" : "")}");
+			}
+			Line(RoomId.StackMouth);
+			Line(RoomId.AshdriftHall);
+			Line(RoomId.DeadFanWalk);
 			_mapLabel.Text =
-				$"Kilnwalk  {(gs.MapMarked ? "(mouth marked)" : "")}\n\n" +
-				$"> you are here\n\n" +
-				$"Hire: {(gs.HireTaken ? "yes" : "no")}\n" +
-				$"Crackiron: {(gs.HasCrackiron ? "yes" : "no")}\n" +
+				$"{rooms}\n" +
+				$"Hire: {(gs.HireTaken ? "yes" : "no")}  Crackiron: {(gs.HasCrackiron ? "yes" : "no")}\n" +
+				$"Folded Bellows: {(gs.HasFoldedBellows ? "yes" : "no")}  Fan: {(gs.FanOpened ? "open" : "dead")}\n" +
 				$"Mouth: {(gs.MouthOpen ? "open" : "sealed")}\n\n" +
-				"Checkpoint 1 — town only. Cold Stack comes next.";
-			_ = here; // keep asset referenced for import
+				"Checkpoint 2 — Kilnwalk + Cold Stack rooms 1–3.\n" +
+				"(Cold Stack tiles / Sootling art not staged yet — town tiles + palette stand-ins.)";
+			_ = here;
 		}
 	}
 }
