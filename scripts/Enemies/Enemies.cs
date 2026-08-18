@@ -62,21 +62,22 @@ public partial class Sootling : CharacterBody2D, IDamageable
 			return;
 
 		var to = player.GlobalPosition - GlobalPosition;
-		if (to.LengthSquared() < 1f)
+		var distSq = to.LengthSquared();
+		// Stay in AttackArc range (~3–21px ahead); do not park under the hero.
+		if (distSq < 14f * 14f)
 		{
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
+			if (_hitCd <= 0 && distSq < 14f * 14f)
+			{
+				_hitCd = 0.55f;
+				player.ApplyHit(to.LengthSquared() > 0.0001f ? to : Vector2.Right);
+			}
 			return;
 		}
 
 		Velocity = to.Normalized() * 55f;
 		MoveAndSlide();
-
-		if (_hitCd <= 0 && GlobalPosition.DistanceTo(player.GlobalPosition) < 12f)
-		{
-			_hitCd = 0.55f;
-			player.ApplyHit(to);
-		}
 	}
 
 	public void TakeSwordHit(Vector2 fromDirection, int damage = 1)
