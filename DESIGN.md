@@ -1,9 +1,48 @@
-# DESIGN
+# Overland Slice 0 — DESIGN
 
-Status: **legal bible in progress**. Director is writing the one-page original-IP bible. Do not lock rooms or start a continent until that lands.
+**Status: LOCKED** (Orchestrator + Director, 2026-08-18).
 
-Engine: Godot 4.x, C# only. Desktop Windows. Pixel-art, 16:9, top-down orthogonal camera.
+Working title: **Overland Slice 0**. Do not pick a public commercial title.
+Studio: Overland. Author of record: Brandon Smith. Designed by AI; earnings and ownership accrue to Brandon.
 
-Working title: Overland Slice 0. Public commercial title is not locked.
+## Setting (bible)
 
-When the bible lands, this file gets: setting (4–6 sentences), tone, who the player is, and the approved name list.
+Kilnwalk sits on a ridge of old brick kilns. It is a working town, not a capital, and it still fires clay when the draft runs the right way. Under the ridge, the Cold Stack was sealed after a firing went wrong and the air started pulling down instead of up. The Kilnhands, a small workers’ mutual, pay flue-walkers to crawl the stacks and shut what they cannot repair. You take that hire. You are not a chosen knight. You are someone who goes into bad air for coin, Crackiron at your hip. Something in the Cold Stack learned to keep its own heat.
+
+## Tone
+
+Dry, workmanlike, a little uncanny. Heat, clay, and bad air. English-village industrial folklore, not high fantasy and not cute woodland. Short lines. No prophecy.
+
+## What the player is
+
+A hired **flue-walker**. No destined name. Clothes: canvas, soot, a wrap at the mouth. Silhouette must not read as a green tunic and cap.
+
+## Camera
+
+Top-down orthogonal. 16:9. Pixel art. No first-person. No tilt. Pause map is a flat room graph of the Cold Stack plus Kilnwalk as one node.
+
+## Combat feel
+
+Readable hits or it fails QA.
+
+- **Crackiron**: short front arc, 3–4 frame telegraph, bright hit flash, knockback. 1–2 hits kill small things.
+- **Dodge-step**: one short step, brief iframes. No roll animation required.
+- No lock-on. No combo tree. No magic. No stamina bar in Slice 0.
+- Hitstop is a few frames. Hurt is a flash plus knockback, not a stun lock.
+
+## The one tool — Folded Bellows
+
+A hand bellows. Short cone puff (about one tile past melee).
+
+It does four things, and only these:
+
+1. Pushes **ash piles** off tiles so you can walk.
+2. Spins a **dead fan** to open the east door in Dead Fan Walk.
+3. Staggers **Sootlings** and knocks them off ledges.
+4. Softens a **Claywalker** crust so Crackiron can break it.
+
+It does not fly you, grapple, bomb walls, or light a separate magic meter.
+
+## What is not in this bible
+
+No continent, no second town, no second dungeon, no horses, no shops-as-systems, no crafting, no dialogue trees, no weather, no day/night cycle, no generated rooms. If it is not in SLICE-0.md, it is not in the game yet.
