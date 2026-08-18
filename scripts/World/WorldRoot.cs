@@ -171,6 +171,9 @@ public partial class WorldRoot : Node2D
 		const int W = 20;
 		const int H = 14;
 		FillBrickRoom(root, W, H);
+		PlaceCracked(root, 4, 4);
+		PlaceCracked(root, 15, 8);
+		PlaceCracked(root, 7, 11);
 		ClearWallAt(root, 9, H - 1);
 		ClearWallAt(root, 10, H - 1);
 		ClearWallAt(root, 9, 0);
@@ -212,6 +215,9 @@ public partial class WorldRoot : Node2D
 		const int W = 20;
 		const int H = 14;
 		FillBrickRoom(root, W, H);
+		PlaceCracked(root, 5, 3);
+		PlaceCracked(root, 13, 9);
+		PlaceCracked(root, 16, 5);
 		ClearWallAt(root, 9, H - 1);
 		ClearWallAt(root, 10, H - 1);
 		ClearWallAt(root, W - 1, 6);
@@ -254,6 +260,8 @@ public partial class WorldRoot : Node2D
 		const int W = 18;
 		const int H = 12;
 		FillBrickRoom(root, W, H);
+		PlaceCracked(root, 3, 3);
+		PlaceCracked(root, 14, 8);
 		ClearWallAt(root, 0, 5);
 		ClearWallAt(root, 0, 6);
 		ClearWallAt(root, W - 1, 5);
@@ -311,6 +319,14 @@ public partial class WorldRoot : Node2D
 	{
 		var s = Assets.ColdStackFloorSprite();
 		s.Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, y * Tiles.Size + Tiles.Size / 2f);
+		root.AddChild(s);
+	}
+
+	private static void PlaceCracked(Node2D root, int x, int y)
+	{
+		var s = Assets.ColdStackSprite("cracked_brick");
+		s.Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, y * Tiles.Size + Tiles.Size / 2f);
+		s.ZIndex = 1;
 		root.AddChild(s);
 	}
 
