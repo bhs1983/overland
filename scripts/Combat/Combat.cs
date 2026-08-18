@@ -55,15 +55,13 @@ public partial class AttackArc : Area2D
 		Position = facing.Normalized() * 12f;
 		Rotation = facing.Angle();
 
-		_visual.Color = Palette.Telegraph;
-		_visual.Visible = true;
+		// Keep _visual hidden — filled telegraph rect was the QA cream/orange block.
 		_shape.Disabled = true;
 		Monitoring = false;
 
 		// 3–4 frame telegraph at ~60fps
 		await ToSignal(GetTree().CreateTimer(0.06f), SceneTreeTimer.SignalName.Timeout);
 
-		_visual.Color = Palette.HitFlash;
 		_shape.Disabled = false;
 		Monitoring = true;
 
