@@ -68,10 +68,10 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		{
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
-			if (_hitCd <= 0 && distSq < 14f * 14f)
+			if (_hitCd <= 0)
 			{
 				_hitCd = 0.55f;
-				player.ApplyHit(to.LengthSquared() > 0.0001f ? to : Vector2.Right);
+				player.ApplyHit(distSq > 0.0001f ? to : Vector2.Right);
 			}
 			return;
 		}
