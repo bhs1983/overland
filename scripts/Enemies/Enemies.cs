@@ -34,6 +34,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		AddChild(_body);
 		_flash = new FlashFx();
 		AddChild(_flash);
+		_hitCd = 0.55f; // grace: no first-frame bite on arrive/standoff
 	}
 
 	public override void _PhysicsProcess(double delta)
