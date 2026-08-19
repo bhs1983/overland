@@ -33,6 +33,8 @@ public partial class SaveSystem : Node
 			HasCrackiron = gs.HasCrackiron,
 			HasFoldedBellows = gs.HasFoldedBellows,
 			HasStackKey = gs.HasStackKey,
+			HasBackiron = gs.HasBackiron,
+			BackironTaken = gs.BackironTaken,
 			MouthOpen = gs.MouthOpen,
 			MapMarked = gs.MapMarked,
 			ClinkerDown = gs.ClinkerDown,
@@ -86,6 +88,8 @@ public partial class SaveSystem : Node
 			gs.HasCrackiron = data.HasCrackiron;
 			gs.HasFoldedBellows = data.HasFoldedBellows;
 			gs.HasStackKey = data.HasStackKey;
+			gs.HasBackiron = data.HasBackiron;
+			gs.BackironTaken = data.BackironTaken;
 			gs.MouthOpen = data.MouthOpen;
 			gs.MapMarked = data.MapMarked;
 			gs.ClinkerDown = data.ClinkerDown;
@@ -133,6 +137,8 @@ public partial class SaveSystem : Node
 		public bool HasCrackiron { get; set; }
 		public bool HasFoldedBellows { get; set; }
 		public bool HasStackKey { get; set; }
+		public bool HasBackiron { get; set; }
+		public bool BackironTaken { get; set; }
 		public bool MouthOpen { get; set; }
 		public bool MapMarked { get; set; }
 		public bool ClinkerDown { get; set; }

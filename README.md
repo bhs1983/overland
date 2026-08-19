@@ -43,7 +43,7 @@ First place: **Kilnwalk**. First dungeon: **the Cold Stack** (Checkpoint 2+).
 
 1. East from Dead Fan Walk → **Setter's Alcove** — two **Claywalkers** (bellows then Crackiron); optional heal.
 2. South → **Quench Trench** — water channel, **Brickleeches** drop; side path back to room 3.
-3. East → **Clinker Yard** — miniboss **the Clinker** (bellows opens cracks).
+3. East → **Clinker Yard** — miniboss **the Clinker** (bellows opens cracks). **E** the cooled slag for **Backiron** (J throws it; it comes home).
 4. North after Clinker → **Key Landing** — **Stack Key**.
 5. North → **Sealed Flue** — Stack Key opens the iron door.
 

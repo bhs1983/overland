@@ -15,6 +15,9 @@ public partial class GameState : Node
 	public bool HasCrackiron { get; set; }
 	public bool HasFoldedBellows { get; set; }
 	public bool HasStackKey { get; set; }
+	public bool HasBackiron { get; set; }
+	public bool BackironTaken { get; set; }
+	public bool BackironOut { get; set; }
 	public bool MouthOpen { get; set; }
 	public bool MapMarked { get; set; }
 	public bool ClinkerDown { get; set; }
@@ -53,6 +56,9 @@ public partial class GameState : Node
 		HasCrackiron = false;
 		HasFoldedBellows = false;
 		HasStackKey = false;
+		HasBackiron = false;
+		BackironTaken = false;
+		BackironOut = false;
 		MouthOpen = false;
 		MapMarked = false;
 		ClinkerDown = false;
@@ -117,6 +123,8 @@ public partial class GameState : Node
 		HasStackKey = true;
 		StackKeyTaken = true;
 		ClinkerDown = true;
+		HasBackiron = true;
+		BackironTaken = true;
 		IronDoorOpen = true;
 		CurrentRoom = RoomId.LongDrop;
 		LastSaveRoom = RoomId.LongDrop;

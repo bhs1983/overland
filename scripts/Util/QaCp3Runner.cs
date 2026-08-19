@@ -106,7 +106,7 @@ public partial class QaCp3Runner : Node
 			Must(Godot.FileAccess.FileExists($"res://assets/environment/props/{stem}.png"), $"prop {stem} missing");
 
 		string[] ui = {
-			"crackiron", "folded_bellows", "stack_key", "health_pip",
+			"crackiron", "backiron", "folded_bellows", "stack_key", "health_pip",
 			"map_node_town", "map_node_room", "map_node_here", "save_mark", "pause_frame"
 		};
 		foreach (var stem in ui)
@@ -186,7 +186,7 @@ public partial class QaCp3Runner : Node
 		{
 			"hyrule", "zelda", "triforce", "sheikah", "ganon", "hylia", "korok",
 			"daggerfall", "bethesda", "whiterun", "septim", "nirn", "daedra", "aedra",
-			"whimble", "whimsicle", "master sword"
+			"whimble", "whimsicle", "master sword", "mjolnir", "thor"
 		};
 		var hay = (
 			RoomTalk.Line(RoomId.StackMouth) +
@@ -349,6 +349,7 @@ public partial class QaCp3Runner : Node
 		Must(RoomTalk.Line(RoomId.OverfireChamber) != null, "Overfire talk");
 		Must(SocketCatalog.All.Count == 22, "accept 22 authored sockets");
 		Must(typeof(WorldRoot).BaseType == typeof(Node2D), "accept WorldRoot not RoomModule");
+		Must(ImgSize("res://assets/ui/backiron.png", 32, 32), "accept backiron 32");
 		Must(CountRgb("res://assets/characters/npcs/wren.png", 0xDC, 0x7A, 0x38) == 0, "Wren no kiln_orange");
 		Must(CountRgb("res://assets/characters/npcs/wren.png", 0xF4, 0xB4, 0x64) == 0, "Wren no kiln_bloom");
 		GD.Print("OK accept — leftovers closed, sky 720, legal/tone, rooms 1–10");

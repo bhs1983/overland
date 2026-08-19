@@ -90,7 +90,7 @@ public partial class TitleScreen : Control
 
 		var keys = new Label
 		{
-			Text = "Keys stay on the HUD. WASD move · E use · J attack · K bellows · L dodge · Esc map\nQA: Shift+New Stack Mouth · Ctrl+Shift+New Dead Fan · Alt+Shift+New Long Drop",
+			Text = "Keys stay on the HUD. WASD move · E use · J attack / hammer · K bellows · L dodge · Esc map\nQA: Shift+New Stack Mouth · Ctrl+Shift+New Dead Fan · Alt+Shift+New Long Drop",
 			Position = new Vector2(84, 460),
 			Size = new Vector2(1100, 60)
 		};

@@ -26,6 +26,7 @@ Top-down orthogonal. 16:9. Pixel art. No first-person. No tilt. Pause map is a f
 Readable hits or it fails QA.
 
 - **Crackiron**: short front arc, 3–4 frame telegraph, bright hit flash, knockback. 1–2 hits kill small things.
+- **Backiron** (after the Clinker): thrown iron, flies out and returns to the hand. Not a spell bar. J/Z throws; cannot throw again until it comes home. Hits once each way. Cracked Clinker / Overfire rules still apply.
 - **Dodge-step**: one short step, brief iframes. No roll animation required.
 - No lock-on. No combo tree. No magic. No stamina bar in Slice 0.
 - Hitstop is a few frames. Hurt is a flash plus knockback, not a stun lock.

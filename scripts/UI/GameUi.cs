@@ -61,7 +61,7 @@ public partial class GameUi : CanvasLayer
 		{
 			Color = new Color(Palette.SootVoid, 0.78f),
 			Position = new Vector2(8, 6),
-			Size = new Vector2(430, 50),
+			Size = new Vector2(560, 50),
 			MouseFilter = Control.MouseFilterEnum.Ignore
 		};
 		AddChild(topPlate);
@@ -260,12 +260,19 @@ public partial class GameUi : CanvasLayer
 		foreach (var c in _itemRow.GetChildren())
 			c.QueueFree();
 		var gs = GameState.Instance;
-		_itemRow.AddChild(ItemSlot("crackiron", "J", "Crackiron", gs.HasCrackiron));
+		_itemRow.AddChild(ItemSlot("crackiron", gs.HasBackiron ? "" : "J", "Crackiron", gs.HasCrackiron));
+		if (gs.ClinkerDown || gs.HasBackiron)
+			_itemRow.AddChild(ItemSlot("backiron", "J", gs.BackironOut ? "Backiron…" : "Backiron", gs.HasBackiron && !gs.BackironOut));
 		_itemRow.AddChild(ItemSlot("folded_bellows", "K", "Bellows", gs.HasFoldedBellows));
 		_itemRow.AddChild(ItemSlot("stack_key", "", "Stack Key", gs.HasStackKey));
 
 		if (_bindAttack != null)
-			_bindAttack.Modulate = gs.HasCrackiron ? Colors.White : new Color(1, 1, 1, 0.35f);
+		{
+			_bindAttack.Text = gs.HasBackiron ? "J/Z  Hammer" : "J/Z  Attack";
+			_bindAttack.Modulate = (gs.HasCrackiron || gs.HasBackiron) && !gs.BackironOut
+				? Colors.White
+				: new Color(1, 1, 1, 0.35f);
+		}
 		if (_bindBellows != null)
 			_bindBellows.Modulate = gs.HasFoldedBellows ? Colors.White : new Color(1, 1, 1, 0.35f);
 	}
@@ -456,6 +463,7 @@ public partial class GameUi : CanvasLayer
 			BellowsChest => "[E]  Open chest — Folded Bellows",
 			AlcoveHeal when GameState.Instance.AlcoveHealTaken => "[E]  Cool ash",
 			AlcoveHeal => "[E]  Rest — heal",
+			BackironPickup => "[E]  Take Backiron",
 			StackKeyPickup => "[E]  Take Stack Key",
 			IronDoorUnlock when GameState.Instance.IronDoorOpen => "[E]  Iron door open",
 			IronDoorUnlock => GameState.Instance.HasStackKey

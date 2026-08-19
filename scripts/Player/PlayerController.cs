@@ -116,7 +116,7 @@ public partial class PlayerController : CharacterBody2D
 
 		if (!_attacking)
 		{
-			if (GameState.Instance.HasCrackiron && Input.IsActionJustPressed("attack"))
+			if (Input.IsActionJustPressed("attack") && (GameState.Instance.HasBackiron || GameState.Instance.HasCrackiron))
 				_ = DoAttack();
 			else if (GameState.Instance.HasFoldedBellows && Input.IsActionJustPressed("bellows"))
 				_ = DoBellows();
@@ -159,6 +159,22 @@ public partial class PlayerController : CharacterBody2D
 
 	private async Task DoAttack()
 	{
+		if (GameState.Instance.HasBackiron)
+		{
+			if (GameState.Instance.BackironOut)
+				return;
+			_attacking = true;
+			_animBusy = true;
+			Velocity = Vector2.Zero;
+			PlayAnim($"fluewalker_swing_{_facingName}");
+			BackironShot.Throw(this, _facing);
+			await ToSignal(GetTree().CreateTimer(0.14f), SceneTreeTimer.SignalName.Timeout);
+			PlayAnim($"fluewalker_idle_{_facingName}");
+			_attacking = false;
+			_animBusy = false;
+			return;
+		}
+
 		_attacking = true;
 		_animBusy = true;
 		_sparkSpawned = false;

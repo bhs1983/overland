@@ -480,6 +480,35 @@ public partial class AlcoveHeal : Interactable
 	}
 }
 
+/// <summary>Clinker Yard — Backiron after the miniboss. Throw with J; it comes home.</summary>
+public partial class BackironPickup : Interactable
+{
+	public override void _Ready()
+	{
+		base._Ready();
+		Prompt = "Take";
+		var spr = Assets.Sprite(Assets.Item("backiron"));
+		Assets.ApplyFeetPivot(spr, 32, 32);
+		AddChild(spr);
+		if (GameState.Instance.BackironTaken)
+			Visible = false;
+	}
+
+	public override void Interact(PlayerController player)
+	{
+		if (GameState.Instance.BackironTaken)
+		{
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Already have Backiron.");
+			return;
+		}
+		GameState.Instance.BackironTaken = true;
+		GameState.Instance.HasBackiron = true;
+		Visible = false;
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Backiron — throw with J. It comes home.");
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+	}
+}
+
 /// <summary>Key Landing — Stack Key after Clinker.</summary>
 public partial class StackKeyPickup : Interactable
 {

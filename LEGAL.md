@@ -15,6 +15,7 @@ This is original IP. Genre inspiration only (authored-room lock-and-key adventur
 | Town | Kilnwalk |
 | Dungeon | The Cold Stack |
 | Sword | Crackiron |
+| Hammer | Backiron |
 | Tool | Folded Bellows |
 | Gate item | Stack Key |
 | Faction | The Kilnhands |

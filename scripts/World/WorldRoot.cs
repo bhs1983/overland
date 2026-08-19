@@ -82,6 +82,10 @@ public partial class WorldRoot : Node2D
 
 	private void LoadRoom(RoomId room, Vector2 spawn)
 	{
+		foreach (var n in GetTree().GetNodesInGroup("backiron"))
+			(n as Node)?.QueueFree();
+		GameState.Instance.BackironOut = false;
+
 		foreach (var c in _roomLayer.GetChildren())
 			c.QueueFree();
 		_mouthGate = null;
@@ -527,6 +531,13 @@ public partial class WorldRoot : Node2D
 			Position = new Vector2(8 * Tiles.Size, 7 * Tiles.Size),
 			EnemyId = "clinker_yard"
 		});
+		if (GameState.Instance.ClinkerDown && !GameState.Instance.BackironTaken)
+		{
+			root.AddChild(new BackironPickup
+			{
+				Position = new Vector2(8 * Tiles.Size, 7 * Tiles.Size)
+			});
+		}
 
 		root.AddChild(new RoomTransition
 		{

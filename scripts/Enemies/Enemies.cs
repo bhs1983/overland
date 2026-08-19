@@ -684,8 +684,12 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			_alive = false;
 			GameState.Instance.DefeatedEnemyIds.Add(EnemyId);
 			GameState.Instance.ClinkerDown = true;
-			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Clinker falls. Key Landing opens.");
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Clinker falls. Slag cools into a hammer.");
 			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+			if (!GameState.Instance.BackironTaken)
+			{
+				GetParent()?.AddChild(new BackironPickup { Position = GlobalPosition });
+			}
 			GetTree().CreateTimer(0.15f).Timeout += () => QueueFree();
 		}
 	}

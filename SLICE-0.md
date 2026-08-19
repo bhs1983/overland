@@ -31,7 +31,7 @@ Same ten rooms. Environment talks: ash patterns, broken fans, residual heat, rev
 | 3 | **Dead Fan Walk** | Tool gate. Puff the bellows into the dead fan. East door opens. | Fan blades seized with clinker. Forcing air the old way is the only spin they have left. This is why the draft died. |
 | 4 | **Setter's Alcove** | Two Claywalkers. Soften crust with bellows, then hit. Optional heal. | Half-set bricks. Tools dropped mid-work. Floor tiles still warm. The last crew left when the firing went wrong. |
 | 5 | **Quench Trench** | Water channel. Brickleeches drop from the walls. Side path back to 3. | Quench water never dumped. They tried to kill the heat from here and failed. Same trench, not a second dungeon. |
-| 6 | **Clinker Yard** | Miniboss: **the Clinker**. | A whole charge fused into one slag body. The failed firing, standing. |
+| 6 | **Clinker Yard** | Miniboss: **the Clinker**. Drops **Backiron** (throw, it comes home). | A whole charge fused into one slag body. The failed firing, standing. |
 | 7 | **Key Landing** | After the Clinker: **Stack Key**. | A setter’s ring left on a ledge above warped brick. Heat came from below. The key is a tool, not a relic. |
 | 8 | **Sealed Flue** | Item gate. Stack Key opens the iron door. No other key in the slice. | Iron door bolted from this side after the air turned. Soot handprints point **down**. They sealed it to keep the reverse draft off Kilnwalk. |
 | 9 | **Long Drop** | Last pack of Sootlings. Prep. | Vertical flue. Ash hangs on the upper lip; brick below is clean. Air is sucking down toward room 10. |
