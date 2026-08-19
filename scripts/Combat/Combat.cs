@@ -29,7 +29,7 @@ public partial class AttackArc : Area2D
 
 		_shape = new CollisionShape2D
 		{
-			// Reach Claywalker (18px) and Clinker (22px) standoff, not just Sootling park.
+			// Reach a committed lunge / step-in, not a body-parked enemy.
 			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(2f), Tiles.Px(1.25f)) },
 			Disabled = true
 		};

@@ -2,18 +2,77 @@ using Godot;
 
 namespace Overland;
 
-/// <summary>Sootling — 1 hit, rushes, bellows staggers.</summary>
+/// <summary>Shared steering. Enemies never teleport onto the hero.</summary>
+internal static class EnemySteer
+{
+	public static Vector2 Chase(Vector2 from, Vector2 target, float speed, float stopAt)
+	{
+		var d = target - from;
+		var dist = d.Length();
+		if (dist <= stopAt || dist < 0.5f)
+			return Vector2.Zero;
+		return d * (speed / dist);
+	}
+
+	public static Vector2 Orbit(Vector2 from, Vector2 target, float desired, float speed, float sign)
+	{
+		var d = target - from;
+		var dist = d.Length();
+		if (dist < 0.5f)
+			return new Vector2(sign, 0) * speed;
+		var radial = d / dist;
+		var tangent = new Vector2(-radial.Y, radial.X) * sign;
+		var radialSpeed = Mathf.Clamp((dist - desired) * 3.2f, -speed, speed);
+		return radial * radialSpeed + tangent * speed;
+	}
+
+	public static Vector2 Away(Vector2 from, Vector2 target, float speed)
+	{
+		var d = from - target;
+		if (d.LengthSquared() < 1f)
+			return new Vector2(speed, 0);
+		return d.Normalized() * speed;
+	}
+
+	public static Vector2 Separate(Node2D self, float minDist)
+	{
+		var push = Vector2.Zero;
+		var tree = self.GetTree();
+		if (tree == null)
+			return push;
+		foreach (var n in tree.GetNodesInGroup("enemy"))
+		{
+			if (ReferenceEquals(n, self) || n is not Node2D other)
+				continue;
+			var d = self.GlobalPosition - other.GlobalPosition;
+			var dist = d.Length();
+			if (dist > 0.01f && dist < minDist)
+				push += d / dist * (minDist - dist) * 4f;
+		}
+		return push;
+	}
+
+	public static float SignOf(string id) => (id.GetHashCode() & 1) == 0 ? 1f : -1f;
+}
+
+/// <summary>Sootling — 1 hit, rushes past, bellows staggers. Never parks on the hero.</summary>
 public partial class Sootling : CharacterBody2D, IDamageable
 {
 	public string EnemyId { get; set; } = "sootling_0";
 	public bool IsAlive => _alive;
+
+	private enum Phase { Approach, Telegraph, Lunge, Recover }
 
 	private Sprite2D _body = null!;
 	private FlashFx _flash = null!;
 	private bool _alive = true;
 	private bool _staggered;
 	private float _staggerT;
-	private float _hitCd;
+	private Phase _phase = Phase.Approach;
+	private float _phaseT;
+	private Vector2 _lungeDir = Vector2.Right;
+	private bool _lungedHit;
+	private float _wobble;
 
 	public override void _Ready()
 	{
@@ -24,7 +83,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		}
 
 		CollisionLayer = 1 << 2;
-		CollisionMask = 0;
+		CollisionMask = 1 << 0;
 		AddChild(new CollisionShape2D
 		{
 			Shape = new CircleShape2D { Radius = Tiles.Px(0.375f) }
@@ -36,7 +95,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		_flash = new FlashFx();
 		AddChild(_flash);
 		AddToGroup("enemy");
-		_hitCd = 0.55f;
+		_wobble = (EnemyId.GetHashCode() & 255) * 0.05f;
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -48,14 +107,15 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		}
 
 		var dt = (float)delta;
-		if (_hitCd > 0)
-			_hitCd -= dt;
 		if (_staggered)
 		{
 			_staggerT -= dt;
 			Velocity = Vector2.Zero;
 			if (_staggerT <= 0)
+			{
 				_staggered = false;
+				Enter(Phase.Recover);
+			}
 			MoveAndSlide();
 			return;
 		}
@@ -64,26 +124,88 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		if (player == null)
 			return;
 
+		_phaseT -= dt;
 		var to = player.GlobalPosition - GlobalPosition;
-		var distSq = to.LengthSquared();
-		if (distSq < Tiles.Px(1f) * Tiles.Px(1f))
+		var dist = to.Length();
+
+		switch (_phase)
 		{
-			Velocity = Vector2.Zero;
-			var facing = player.Facing;
-			if (facing.LengthSquared() > 0.0001f)
-				GlobalPosition = player.GlobalPosition + facing.Normalized() * Tiles.Px(0.75f);
-			MoveAndSlide();
-			// Delayed contact bite — skip while the hero is swinging/puffing.
-			if (_hitCd <= 0 && !player.AttackBusy)
-			{
-				_hitCd = 0.85f;
-				player.ApplyHit((player.GlobalPosition - GlobalPosition).Normalized());
-			}
-			return;
+			case Phase.Approach:
+				if (dist < Tiles.Px(0.7f))
+				{
+					Enter(Phase.Recover);
+					break;
+				}
+				if (dist < Tiles.Px(2.2f))
+				{
+					Enter(Phase.Telegraph);
+					break;
+				}
+				{
+					var dir = to / Mathf.Max(dist, 1f);
+					var perp = new Vector2(-dir.Y, dir.X);
+					var w = Mathf.Sin(Time.GetTicksMsec() * 0.007f + _wobble);
+					Velocity = dir * Tiles.Px(3.2f) + perp * w * Tiles.Px(1.5f);
+					Velocity += EnemySteer.Separate(this, Tiles.Px(0.9f));
+				}
+				break;
+
+			case Phase.Telegraph:
+				Velocity = Vector2.Zero;
+				if (_phaseT <= 0)
+					Enter(Phase.Lunge);
+				break;
+
+			case Phase.Lunge:
+				Velocity = _lungeDir * Tiles.Px(8.4f);
+				if (!_lungedHit && dist < Tiles.Px(0.95f) && !player.AttackBusy)
+				{
+					_lungedHit = true;
+					player.ApplyHit(_lungeDir);
+				}
+				if (_phaseT <= 0)
+					Enter(Phase.Recover);
+				break;
+
+			case Phase.Recover:
+				Velocity = EnemySteer.Away(GlobalPosition, player.GlobalPosition, Tiles.Px(2.4f));
+				if (_phaseT <= 0)
+					Enter(Phase.Approach);
+				break;
 		}
 
-		Velocity = to.Normalized() * Tiles.Px(3.4375f);
 		MoveAndSlide();
+	}
+
+	private void Enter(Phase next)
+	{
+		_phase = next;
+		var player = PlayerController.Instance;
+		switch (next)
+		{
+			case Phase.Approach:
+				_phaseT = 0;
+				_body.Modulate = Colors.White;
+				break;
+			case Phase.Telegraph:
+				_phaseT = 0.16f;
+				_body.Modulate = Palette.Ember;
+				if (player != null)
+				{
+					var d = player.GlobalPosition - GlobalPosition;
+					_lungeDir = d.LengthSquared() > 1f ? d.Normalized() : Vector2.Right;
+				}
+				break;
+			case Phase.Lunge:
+				_phaseT = 0.26f;
+				_lungedHit = false;
+				_body.Modulate = Palette.KilnBloom;
+				break;
+			case Phase.Recover:
+				_phaseT = 0.42f;
+				_body.Modulate = Colors.White;
+				break;
+		}
 	}
 
 	public void TakeSwordHit(Vector2 fromDirection, int damage = 1)
@@ -114,11 +236,17 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 	public string EnemyId { get; set; } = "claywalker_0";
 	public bool IsAlive => _alive;
 
+	private enum Phase { Stalk, Windup, StepIn, Recoil }
+
 	private Sprite2D _body = null!;
 	private FlashFx _flash = null!;
 	private bool _alive = true;
 	private bool _softened;
-	private float _hitCd = 0.6f;
+	private Phase _phase = Phase.Stalk;
+	private float _phaseT;
+	private float _holdDist;
+	private Vector2 _stepDir = Vector2.Right;
+	private bool _stepHit;
 
 	public override void _Ready()
 	{
@@ -128,7 +256,7 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 			return;
 		}
 		CollisionLayer = 1 << 2;
-		CollisionMask = 0;
+		CollisionMask = 1 << 0;
 		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.5f) } });
 		_body = Assets.Sprite(Assets.Enemy("claywalker"));
 		Assets.ApplyFeetPivot(_body, 32, 40);
@@ -137,6 +265,7 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		_flash = new FlashFx();
 		AddChild(_flash);
 		AddToGroup("enemy");
+		_holdDist = Tiles.Px(EnemySteer.SignOf(EnemyId) > 0 ? 1.7f : 2.15f);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -146,27 +275,80 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 			Velocity = Vector2.Zero;
 			return;
 		}
-		_hitCd -= (float)delta;
+		var dt = (float)delta;
+		_phaseT -= dt;
 		var player = PlayerController.Instance;
 		if (player == null)
 			return;
 		var to = player.GlobalPosition - GlobalPosition;
-		if (to.LengthSquared() < Tiles.Px(1.125f) * Tiles.Px(1.125f))
+		var dist = to.Length();
+		var walk = _softened ? Tiles.Px(2.15f) : Tiles.Px(1.55f);
+
+		switch (_phase)
 		{
-			Velocity = Vector2.Zero;
-			MoveAndSlide();
-			var busy = player.AttackBusy
-				|| Input.IsActionJustPressed("attack")
-				|| Input.IsActionJustPressed("bellows");
-			if (_hitCd <= 0 && !busy)
-			{
-				_hitCd = 0.9f;
-				player.ApplyHit(to.Normalized());
-			}
-			return;
+			case Phase.Stalk:
+				Velocity = EnemySteer.Chase(GlobalPosition, player.GlobalPosition, walk, _holdDist);
+				Velocity += EnemySteer.Separate(this, Tiles.Px(1.1f));
+				if (_phaseT <= 0 && dist < _holdDist + Tiles.Px(0.35f) && dist > Tiles.Px(0.5f))
+					Enter(Phase.Windup);
+				break;
+
+			case Phase.Windup:
+				Velocity = Vector2.Zero;
+				if (_phaseT <= 0)
+					Enter(Phase.StepIn);
+				break;
+
+			case Phase.StepIn:
+				Velocity = _stepDir * Tiles.Px(3.6f);
+				if (!_stepHit && dist < Tiles.Px(1.05f) && !player.AttackBusy)
+				{
+					_stepHit = true;
+					player.ApplyHit(_stepDir);
+				}
+				if (_phaseT <= 0)
+					Enter(Phase.Recoil);
+				break;
+
+			case Phase.Recoil:
+				Velocity = EnemySteer.Away(GlobalPosition, player.GlobalPosition, Tiles.Px(2.2f));
+				if (_phaseT <= 0)
+					Enter(Phase.Stalk);
+				break;
 		}
-		Velocity = to.Normalized() * Tiles.Px(1.75f);
+
 		MoveAndSlide();
+	}
+
+	private void Enter(Phase next)
+	{
+		_phase = next;
+		var player = PlayerController.Instance;
+		switch (next)
+		{
+			case Phase.Stalk:
+				_phaseT = 0.5f;
+				_body.Modulate = Colors.White;
+				break;
+			case Phase.Windup:
+				_phaseT = 0.38f;
+				_body.Modulate = Palette.ClayMid;
+				if (player != null)
+				{
+					var d = player.GlobalPosition - GlobalPosition;
+					_stepDir = d.LengthSquared() > 1f ? d.Normalized() : Vector2.Down;
+				}
+				break;
+			case Phase.StepIn:
+				_phaseT = 0.22f;
+				_stepHit = false;
+				_body.Modulate = Palette.TerracottaHot;
+				break;
+			case Phase.Recoil:
+				_phaseT = 0.4f;
+				_body.Modulate = Colors.White;
+				break;
+		}
 	}
 
 	public void TakeSwordHit(Vector2 fromDirection, int damage = 1)
@@ -208,12 +390,18 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 	public Vector2 ClingPos { get; set; }
 	public float DropTriggerX { get; set; }
 
+	private enum Phase { Cling, Strike, Retreat }
+
 	private Sprite2D _body = null!;
 	private FlashFx _flash = null!;
 	private bool _alive = true;
 	private bool _dropped;
 	private int _hp = 2;
-	private float _hitCd = 0.5f;
+	private Phase _phase = Phase.Cling;
+	private float _phaseT;
+	private Vector2 _home;
+	private Vector2 _strikeDir = Vector2.Down;
+	private bool _strikeHit;
 
 	public override void _Ready()
 	{
@@ -223,7 +411,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 			return;
 		}
 		CollisionLayer = 1 << 2;
-		CollisionMask = 0;
+		CollisionMask = 1 << 0;
 		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.375f) } });
 		_body = Assets.Sprite(Assets.Enemy("brickleech"));
 		Assets.ApplyFeetPivot(_body, 32, 32);
@@ -234,6 +422,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		AddToGroup("enemy");
 		if (ClingPos != Vector2.Zero)
 			GlobalPosition = ClingPos;
+		_home = ClingPos != Vector2.Zero ? ClingPos : GlobalPosition;
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -243,9 +432,14 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 			Velocity = Vector2.Zero;
 			return;
 		}
+		var dt = (float)delta;
+		_phaseT -= dt;
 		var player = PlayerController.Instance;
 		if (player == null)
 			return;
+
+		var to = player.GlobalPosition - GlobalPosition;
+		var dist = to.Length();
 
 		if (!_dropped)
 		{
@@ -253,28 +447,71 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 			    && player.GlobalPosition.Y > GlobalPosition.Y - Tiles.Px(0.5f))
 			{
 				_dropped = true;
+				_home = ClingPos != Vector2.Zero ? ClingPos : GlobalPosition;
 				(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Brickleech drops.");
+				Enter(Phase.Strike);
 			}
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
 			return;
 		}
 
-		_hitCd -= (float)delta;
-		var to = player.GlobalPosition - GlobalPosition;
-		if (to.LengthSquared() < Tiles.Px(0.875f) * Tiles.Px(0.875f))
+		switch (_phase)
 		{
-			Velocity = Vector2.Zero;
-			MoveAndSlide();
-			if (_hitCd <= 0)
-			{
-				_hitCd = 0.7f;
-				player.ApplyHit(to.Normalized());
-			}
-			return;
+			case Phase.Strike:
+				Velocity = _strikeDir * Tiles.Px(5.2f);
+				if (!_strikeHit && dist < Tiles.Px(0.9f) && !player.AttackBusy)
+				{
+					_strikeHit = true;
+					player.ApplyHit(_strikeDir);
+				}
+				if (_phaseT <= 0)
+					Enter(Phase.Retreat);
+				break;
+
+			case Phase.Retreat:
+				Velocity = EnemySteer.Chase(GlobalPosition, _home, Tiles.Px(3.4f), Tiles.Px(0.25f));
+				if (dist > Tiles.Px(5.5f) || GlobalPosition.DistanceTo(_home) < Tiles.Px(0.4f))
+				{
+					if (dist > Tiles.Px(5.5f))
+					{
+						_dropped = false;
+						GlobalPosition = _home;
+						_phase = Phase.Cling;
+						_body.Modulate = Colors.White;
+					}
+					else if (_phaseT <= 0)
+						Enter(Phase.Strike);
+				}
+				else if (_phaseT <= 0)
+					Enter(Phase.Strike);
+				break;
 		}
-		Velocity = to.Normalized() * Tiles.Px(3f);
+
 		MoveAndSlide();
+	}
+
+	private void Enter(Phase next)
+	{
+		_phase = next;
+		var player = PlayerController.Instance;
+		switch (next)
+		{
+			case Phase.Strike:
+				_phaseT = 0.24f;
+				_strikeHit = false;
+				_body.Modulate = Palette.FiredClay;
+				if (player != null)
+				{
+					var d = player.GlobalPosition - GlobalPosition;
+					_strikeDir = d.LengthSquared() > 1f ? d.Normalized() : Vector2.Down;
+				}
+				break;
+			case Phase.Retreat:
+				_phaseT = 0.7f;
+				_body.Modulate = Colors.White;
+				break;
+		}
 	}
 
 	public void TakeSwordHit(Vector2 fromDirection, int damage = 1)
@@ -308,13 +545,18 @@ public partial class Clinker : CharacterBody2D, IDamageable
 	public string EnemyId { get; set; } = "clinker_yard";
 	public bool IsAlive => _alive;
 
+	private enum Phase { Trudge, Plant, Slam }
+
 	private Sprite2D _body = null!;
 	private FlashFx _flash = null!;
 	private bool _alive = true;
 	private bool _cracked;
 	private int _hp = 4;
-	private float _hitCd = 0.8f;
 	private float _crackTimer;
+	private Phase _phase = Phase.Trudge;
+	private float _phaseT;
+	private Vector2 _slamDir = Vector2.Down;
+	private bool _slamHit;
 
 	public override void _Ready()
 	{
@@ -324,7 +566,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			return;
 		}
 		CollisionLayer = 1 << 2;
-		CollisionMask = 0;
+		CollisionMask = 1 << 0;
 		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.75f) } });
 		_body = Assets.Sprite(Assets.Enemy("clinker"));
 		Assets.ApplyFeetPivot(_body, 48, 48);
@@ -343,7 +585,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			return;
 		}
 		var dt = (float)delta;
-		_hitCd -= dt;
+		_phaseT -= dt;
 		if (_cracked)
 		{
 			_crackTimer -= dt;
@@ -355,24 +597,73 @@ public partial class Clinker : CharacterBody2D, IDamageable
 					_body.Texture = sealedTex;
 				_body.Modulate = Colors.White;
 			}
+			// Open cracks — stand still so Crackiron can land.
+			Velocity = Vector2.Zero;
+			MoveAndSlide();
+			return;
 		}
+
 		var player = PlayerController.Instance;
 		if (player == null)
 			return;
 		var to = player.GlobalPosition - GlobalPosition;
-		if (to.LengthSquared() < Tiles.Px(1.375f) * Tiles.Px(1.375f))
+		var dist = to.Length();
+
+		switch (_phase)
 		{
-			Velocity = Vector2.Zero;
-			MoveAndSlide();
-			if (_hitCd <= 0)
-			{
-				_hitCd = 1.1f;
-				player.ApplyHit(to.Normalized(), 1);
-			}
-			return;
+			case Phase.Trudge:
+				Velocity = EnemySteer.Chase(GlobalPosition, player.GlobalPosition, Tiles.Px(1.15f), Tiles.Px(2.2f));
+				if (_phaseT <= 0 && dist < Tiles.Px(2.5f))
+					Enter(Phase.Plant);
+				break;
+
+			case Phase.Plant:
+				Velocity = Vector2.Zero;
+				if (_phaseT <= 0)
+					Enter(Phase.Slam);
+				break;
+
+			case Phase.Slam:
+				Velocity = _slamDir * Tiles.Px(3.2f);
+				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy)
+				{
+					_slamHit = true;
+					player.ApplyHit(_slamDir);
+				}
+				if (_phaseT <= 0)
+					Enter(Phase.Trudge);
+				break;
 		}
-		Velocity = to.Normalized() * Tiles.Px(1.375f);
+
 		MoveAndSlide();
+	}
+
+	private void Enter(Phase next)
+	{
+		_phase = next;
+		var player = PlayerController.Instance;
+		switch (next)
+		{
+			case Phase.Trudge:
+				_phaseT = 0.55f;
+				if (!_cracked)
+					_body.Modulate = Colors.White;
+				break;
+			case Phase.Plant:
+				_phaseT = 0.55f;
+				_body.Modulate = Palette.AshWarm;
+				if (player != null)
+				{
+					var d = player.GlobalPosition - GlobalPosition;
+					_slamDir = d.LengthSquared() > 1f ? d.Normalized() : Vector2.Down;
+				}
+				break;
+			case Phase.Slam:
+				_phaseT = 0.22f;
+				_slamHit = false;
+				_body.Modulate = Palette.Ember;
+				break;
+		}
 	}
 
 	public void TakeSwordHit(Vector2 fromDirection, int damage = 1)
@@ -430,6 +721,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 	private float _phaseT;
 	private bool _ashShoved;
 	private float _hitCd = 0.8f;
+	private float _orbitSign = 1f;
 
 	public override void _Ready()
 	{
@@ -439,7 +731,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 			return;
 		}
 		CollisionLayer = 1 << 2;
-		CollisionMask = 0;
+		CollisionMask = 1 << 0;
 		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.875f) } });
 		_body = Assets.Sprite(Assets.Enemy("overfire"));
 		Assets.ApplyFeetPivot(_body, 64, 64);
@@ -448,6 +740,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 		_flash = new FlashFx();
 		AddChild(_flash);
 		AddToGroup("enemy");
+		_orbitSign = EnemySteer.SignOf(EnemyId);
 		Enter(Phase.Idle);
 	}
 
@@ -472,10 +765,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 		switch (_phase)
 		{
 			case Phase.Idle:
-				if (dist > Tiles.Px(1.75f))
-					Velocity = to.Normalized() * Tiles.Px(1.25f);
-				else
-					Velocity = Vector2.Zero;
+				Velocity = EnemySteer.Orbit(GlobalPosition, player.GlobalPosition, Tiles.Px(2.6f), Tiles.Px(1.35f), _orbitSign);
 				MoveAndSlide();
 				if (_phaseT <= 0)
 					Enter(Phase.PulseTele);
@@ -496,7 +786,10 @@ public partial class Overfire : CharacterBody2D, IDamageable
 				break;
 
 			case Phase.SwipeTele:
-				Velocity = Vector2.Zero;
+				if (dist > Tiles.Px(1.5f))
+					Velocity = to.Normalized() * Tiles.Px(2.1f);
+				else
+					Velocity = Vector2.Zero;
 				MoveAndSlide();
 				if (_phaseT <= 0)
 					Enter(Phase.Swipe);
