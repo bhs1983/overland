@@ -74,16 +74,9 @@ public partial class Sootling : CharacterBody2D, IDamageable
 				GlobalPosition = player.GlobalPosition + facing.Normalized() * 8f;
 			MoveAndSlide(); // sync physics body so AttackArc overlap sees the park
 			// AttackArc can miss the parked body — Crackiron J/Z at park range kills directly.
+			// No ApplyHit while parked (J already kills; contact bite was false "Woke at last save").
 			if (GameState.Instance.HasCrackiron && Input.IsActionJustPressed("attack"))
-			{
 				TakeSwordHit(player.Facing);
-				return;
-			}
-			if (_hitCd <= 0)
-			{
-				_hitCd = 0.55f;
-				player.ApplyHit(distSq > 0.0001f ? to : Vector2.Right);
-			}
 			return;
 		}
 
