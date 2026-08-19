@@ -64,8 +64,8 @@ public partial class Sootling : CharacterBody2D, IDamageable
 
 		var to = player.GlobalPosition - GlobalPosition;
 		var distSq = to.LengthSquared();
-		// Stay in AttackArc range (~3–21px ahead); do not park under the hero.
-		if (distSq < 14f * 14f)
+		// Stay inside AttackArc lateral ±7 on diagonal approach; do not park under the hero.
+		if (distSq < 8f * 8f)
 		{
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
