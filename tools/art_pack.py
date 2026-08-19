@@ -7,6 +7,7 @@ No network. No API keys. Reads assets/palette.json (32 v3 colors).
     python tools/art_pack.py --role tile --src inbox/brick_floor_a.png --out assets/environment/town/brick_floor_a.png
     python tools/art_pack.py --role cookie --src inbox/light_lantern.png --out assets/environment/parallax/kilnwalk/light_lantern.png
     python tools/art_pack.py --role parallax --cell 720x144 --src inbox/far_bg.png --out assets/environment/parallax/kilnwalk/far_bg.png
+    python tools/art_pack.py --check-tree
 """
 
 from __future__ import annotations
@@ -371,20 +372,132 @@ def print_stats(out: Path, stats: dict) -> None:
     print(" ".join(parts))
 
 
+SIZE_BY_NAME = {
+    "far_bg": (720, 144),
+    "mid_bg": (720, 192),
+    "fog_wisp": (48, 16),
+    "hero_atlas": (338, 348),
+    "stack_mouth_sealed": (64, 32),
+    "stack_mouth_open": (64, 32),
+    "kiln": (64, 64),
+    "iron_door_closed": (64, 48),
+    "iron_door_open": (64, 48),
+    "stair": (32, 48),
+    "impacts": (124, 16),
+    "palette": (32, 1),
+    "fg_lamp": (32, 64),
+    "fg_pipe": (32, 64),
+    "fg_overhang": (64, 32),
+    "fg_sign": (32, 32),
+    "tall_chimney_top": (32, 32),
+    "tall_flue_top": (32, 32),
+}
+
+
+def infer_tree_role(path: Path) -> tuple[str, tuple[int, int] | None]:
+    rel = path.as_posix().replace("\\", "/").lower()
+    name = path.stem.lower()
+    if name == "palette":
+        return "tile", (32, 1)
+    if "/characters/npcs/" in rel:
+        return "npc", (32, 48)
+    if "/characters/hero/" in rel and name == "hero_atlas":
+        return "hero-atlas", (338, 348)
+    if "/characters/enemies/" in rel:
+        if name.startswith("overfire"):
+            return "enemy", (64, 64)
+        if name.startswith("clinker"):
+            return "enemy", (48, 48)
+        if name.startswith("claywalker"):
+            return "enemy", (32, 40)
+        return "enemy", (32, 32)
+    if "/vfx/" in rel:
+        return "vfx", (16, 16) if name != "impacts" else (124, 16)
+    if name.startswith("light_"):
+        return "cookie", (32, 32)
+    if name in {"far_bg", "mid_bg", "fog_wisp"} or name.startswith("fg_") or name.startswith("tall_"):
+        return "parallax", SIZE_BY_NAME.get(name)
+    if "/ui/" in rel:
+        return "ui", (32, 32)
+    if "/environment/props/" in rel:
+        return "prop", SIZE_BY_NAME.get(name, (32, 32))
+    if "/environment/town/" in rel or "/environment/cold/" in rel:
+        floors = ("brick_floor", "street", "ash_floor", "frost_ash", "quench_water")
+        if any(name == f or name.startswith(f + "_") for f in floors):
+            return "tile", (32, 32)
+        return "prop", SIZE_BY_NAME.get(name, (32, 32))
+    return "tile", SIZE_BY_NAME.get(name)
+
+
+def check_tree(palette: list[tuple[int, int, int]]) -> int:
+    assets = ROOT / "assets"
+    fails = 0
+    checked = 0
+    leftover = ("tiles", "sprites", "v3")
+    for name in leftover:
+        if (assets / name).is_dir():
+            print(f"FAIL leftover assets/{name}", file=sys.stderr)
+            fails += 1
+    for packed in (
+        assets / "environment" / "town_tiles.png",
+        assets / "environment" / "cold_tiles.png",
+        assets / "ui" / "ui.png",
+    ):
+        if packed.is_file():
+            print(f"FAIL packed sheet {packed.relative_to(ROOT)}", file=sys.stderr)
+            fails += 1
+
+    for path in sorted(assets.rglob("*")):
+        if path.suffix.lower() in {".jpg", ".jpeg"}:
+            print(f"FAIL JPEG {path.relative_to(ROOT)}", file=sys.stderr)
+            fails += 1
+            continue
+        if path.suffix.lower() != ".png":
+            continue
+        if path.name.lower() == "palette.png":
+            continue
+        legal_name(path)
+        role, cell = infer_tree_role(path)
+        im = Image.open(path)
+        if im.format == "JPEG":
+            print(f"FAIL JPEG magic {path.relative_to(ROOT)}", file=sys.stderr)
+            fails += 1
+            continue
+        w, h = im.size
+        if cell is not None and (w, h) != cell:
+            print(f"FAIL {path.relative_to(ROOT)} size {w}x{h} expected {cell[0]}x{cell[1]}", file=sys.stderr)
+            fails += 1
+        _, stats = process(path, role, (w, h), palette, allow_jpeg=False, dither="none")
+        checked += 1
+        if stats["off"] > 0:
+            print(f"FAIL {path.relative_to(ROOT)} off-palette {stats['off']}", file=sys.stderr)
+            fails += 1
+    print(f"OK check-tree — {checked} png, {fails} fail")
+    return 1 if fails else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description="Quantize, chroma-key, and size-check Overland PNGs against the locked 32-color palette.",
         epilog="JPEG is an error unless --allow-jpeg. Do not commit JPEG. Signs/glyphs are a human check.",
     )
-    ap.add_argument("--role", required=True, choices=ROLES)
-    ap.add_argument("--src", required=True, help="source PNG (JPEG only with --allow-jpeg)")
-    ap.add_argument("--out", required=True, help="destination PNG under assets/")
+    ap.add_argument("--role", choices=ROLES)
+    ap.add_argument("--src", help="source PNG (JPEG only with --allow-jpeg)")
+    ap.add_argument("--out", help="destination PNG under assets/")
     ap.add_argument("--cell", default=None, help="WxH override")
     ap.add_argument("--palette", default=str(ROOT / "assets" / "palette.json"))
     ap.add_argument("--allow-jpeg", action="store_true", help="never use for a commit")
     ap.add_argument("--dither", choices=("none", "ordered2"), default="none")
     ap.add_argument("--check", action="store_true", help="validate and print stats; do not write --out")
+    ap.add_argument("--check-tree", action="store_true", help="scan assets/ without writing")
     args = ap.parse_args(argv)
+
+    palette = load_palette(Path(args.palette) if Path(args.palette).is_absolute() else resolve(args.palette))
+    if args.check_tree:
+        return check_tree(palette)
+
+    if not args.role or not args.src or not args.out:
+        raise SystemExit("need --role --src --out, or --check-tree")
 
     if args.dither == "ordered2" and args.role != "parallax":
         raise SystemExit("--dither ordered2 is only allowed for --role parallax")
@@ -396,7 +509,6 @@ def main(argv: list[str] | None = None) -> int:
     if not src.is_file():
         raise SystemExit(f"missing --src {src}")
 
-    palette = load_palette(Path(args.palette) if Path(args.palette).is_absolute() else resolve(args.palette))
     cell = infer_cell(args.role, src, args.cell)
     im, stats = process(src, args.role, cell, palette, args.allow_jpeg, args.dither)
 

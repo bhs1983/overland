@@ -6,8 +6,8 @@ using System.Text.RegularExpressions;
 namespace Overland;
 
 /// <summary>
-/// Headless art gate (allowlist). Fail v3 membership / legal / JPEG / magenta.
-/// Warn CP2 tiles/sprites and 16px UI. Skip cookie alpha. Never require packed sheets.
+/// Headless art gate. Fail membership / legal / JPEG / magenta / leftover CP2 dirs.
+/// Skip cookie alpha. Never require packed sheets. Fail-closed leftovers (PR-12).
 /// </summary>
 public partial class QaArtRunner : Node
 {
@@ -68,8 +68,8 @@ public partial class QaArtRunner : Node
 		new() { Glob = "**/characters/**/*.png", Mode = Mode.Fail },
 		new() { Glob = "**/vfx/**/*.png", Mode = Mode.Fail },
 		new() { Glob = "ui/*.png", W = 32, H = 32, Mode = Mode.Fail },
-		new() { Glob = "tiles/**", Mode = Mode.Warn, CheckPalette = true, CheckAlpha = true },
-		new() { Glob = "sprites/**", Mode = Mode.Warn, CheckPalette = true, CheckAlpha = true },
+		new() { Glob = "tiles/**", Mode = Mode.Fail, CheckPalette = true, CheckAlpha = true },
+		new() { Glob = "sprites/**", Mode = Mode.Fail, CheckPalette = true, CheckAlpha = true },
 	};
 
 	private static readonly Dictionary<string, (int W, int H)> SizeOverride = new()
@@ -118,6 +118,11 @@ public partial class QaArtRunner : Node
 				Fail("packed town/cold_tiles.png present — Slice 0 uses individuals");
 			}
 
+			CheckTone();
+
+			if (_warns > 0)
+				Fail($"fail-closed leftovers: {_warns} warn must be 0");
+
 			if (_fails > 0)
 			{
 				GD.PrintErr($"QA ART FAIL ({_fails} fail, {_warns} warn)");
@@ -125,7 +130,7 @@ public partial class QaArtRunner : Node
 				return;
 			}
 
-			GD.Print($"QA ART PASS — {_warns} warn (CP2 tiles/sprites/ui expected)");
+			GD.Print("QA ART PASS — 0 warn (fail-closed leftovers)");
 			GetTree().Quit(0);
 		}
 		catch (System.Exception ex)
@@ -186,6 +191,47 @@ public partial class QaArtRunner : Node
 			Must(got == _palette[x], $"palette.png[{x}] {Hex(got)} != json {Hex(_palette[x])}");
 		}
 		GD.Print("OK palette.png — 32x1 matches json");
+	}
+
+	private void CheckTone()
+	{
+		Must(Godot.FileAccess.FileExists("res://assets/environment/parallax/kilnwalk/far_bg.png"), "tone far_bg");
+		var far = LoadPng("res://assets/environment/parallax/kilnwalk/far_bg.png");
+		Must(far != null && far.GetWidth() == 720 && far.GetHeight() == 144, "kilnwalk far 720x144");
+		var mid = LoadPng("res://assets/environment/parallax/kilnwalk/mid_bg.png");
+		Must(mid != null && mid.GetWidth() == 720 && mid.GetHeight() == 192, "kilnwalk mid 720x192");
+		var cfar = LoadPng("res://assets/environment/parallax/cold_stack/far_bg.png");
+		Must(cfar != null && cfar.GetWidth() == 720 && cfar.GetHeight() == 144, "cold far 720x144");
+		var cmid = LoadPng("res://assets/environment/parallax/cold_stack/mid_bg.png");
+		Must(cmid != null && cmid.GetWidth() == 720 && cmid.GetHeight() == 192, "cold mid 720x192");
+
+		var wren = LoadPng("res://assets/characters/npcs/wren.png");
+		if (wren != null)
+		{
+			Must(CountRgb(wren, 0xDC, 0x7A, 0x38) == 0, "Wren kiln_orange (glow eyes)");
+			Must(CountRgb(wren, 0xF4, 0xB4, 0x64) == 0, "Wren kiln_bloom (glow eyes)");
+		}
+
+		GD.Print("OK tone — sky 720, Wren face kiln-free");
+	}
+
+	private static int CountRgb(Image img, int r, int g, int b)
+	{
+		var n = 0;
+		var w = img.GetWidth();
+		var h = img.GetHeight();
+		for (var y = 0; y < h; y++)
+		{
+			for (var x = 0; x < w; x++)
+			{
+				var p = img.GetPixel(x, y);
+				if (p.A8 == 0)
+					continue;
+				if (p.R8 == r && p.G8 == g && p.B8 == b)
+					n++;
+			}
+		}
+		return n;
 	}
 
 	private void CheckHeroAtlasJson()

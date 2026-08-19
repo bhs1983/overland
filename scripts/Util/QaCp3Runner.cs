@@ -332,17 +332,56 @@ public partial class QaCp3Runner : Node
 
 	private void CheckAcceptChecklist()
 	{
-		// Locked SLICE-0 checklist vs what this slice actually ships.
-		Must(true, "Walk Kilnwalk — coded");
-		Must(true, "Enter Cold Stack — coded");
-		Must(true, "Get Folded Bellows — coded");
-		Must(true, "Open Dead Fan Walk gate — coded");
-		Must(true, "Beat Clinker + Stack Key — coded");
-		Must(true, "Open Sealed Flue — coded");
-		Must(RoomTalk.Line(RoomId.OverfireChamber) != null || true, "Overfire talk exists in bible only");
-		Must(true, "Beat Overfire — coded");
-		Must(true, "Hire payout — coded");
-		GD.Print("OK checklist — Slice 0 rooms 1–10 implemented");
+		Must(DirAccess.Open("res://assets/tiles") == null, "accept leftover tiles");
+		Must(DirAccess.Open("res://assets/sprites") == null, "accept leftover sprites");
+		Must(DirAccess.Open("res://assets/v3") == null, "accept leftover v3");
+		Must(!Godot.FileAccess.FileExists("res://assets/environment/town_tiles.png"), "accept no packed town sheet");
+		Must(!Godot.FileAccess.FileExists("res://assets/environment/cold_tiles.png"), "accept no packed cold sheet");
+		Must(Tiles.Size == 32 && Tiles.Zoom == 2f, "accept 32px / zoom 2");
+		Must(SliceParallax.FarW == 720 && SliceParallax.FarH == 144, "accept far 720x144");
+		Must(SliceParallax.MidW == 720 && SliceParallax.MidH == 192, "accept mid 720x192");
+		Must(ImgSize("res://assets/environment/parallax/kilnwalk/far_bg.png", 720, 144), "kilnwalk far 720");
+		Must(ImgSize("res://assets/environment/parallax/kilnwalk/mid_bg.png", 720, 192), "kilnwalk mid 720");
+		Must(ImgSize("res://assets/environment/parallax/cold_stack/far_bg.png", 720, 144), "cold far 720");
+		Must(ImgSize("res://assets/environment/parallax/cold_stack/mid_bg.png", 720, 192), "cold mid 720");
+		Must(HeroAtlas.Frames.HasAnimation("fluewalker_idle_down"), "accept fluewalker idle");
+		Must(!HeroAtlas.Frames.HasAnimation("whimble_idle_down"), "accept no whimble");
+		Must(RoomTalk.Line(RoomId.OverfireChamber) != null, "Overfire talk");
+		Must(SocketCatalog.All.Count == 22, "accept 22 authored sockets");
+		Must(typeof(WorldRoot).BaseType == typeof(Node2D), "accept WorldRoot not RoomModule");
+		Must(CountRgb("res://assets/characters/npcs/wren.png", 0xDC, 0x7A, 0x38) == 0, "Wren no kiln_orange");
+		Must(CountRgb("res://assets/characters/npcs/wren.png", 0xF4, 0xB4, 0x64) == 0, "Wren no kiln_bloom");
+		GD.Print("OK accept — leftovers closed, sky 720, legal/tone, rooms 1–10");
+	}
+
+	private static bool ImgSize(string path, int w, int h)
+	{
+		if (!Godot.FileAccess.FileExists(path))
+			return false;
+		var img = new Image();
+		if (img.LoadPngFromBuffer(Godot.FileAccess.GetFileAsBytes(path)) != Error.Ok)
+			return false;
+		return img.GetWidth() == w && img.GetHeight() == h;
+	}
+
+	private static int CountRgb(string path, int r, int g, int b)
+	{
+		if (!Godot.FileAccess.FileExists(path))
+			return -1;
+		var img = new Image();
+		if (img.LoadPngFromBuffer(Godot.FileAccess.GetFileAsBytes(path)) != Error.Ok)
+			return -1;
+		var n = 0;
+		for (var y = 0; y < img.GetHeight(); y++)
+		{
+			for (var x = 0; x < img.GetWidth(); x++)
+			{
+				var p = img.GetPixel(x, y);
+				if (p.A8 != 0 && p.R8 == r && p.G8 == g && p.B8 == b)
+					n++;
+			}
+		}
+		return n;
 	}
 
 	private async System.Threading.Tasks.Task Frames(int n)

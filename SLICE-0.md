@@ -86,4 +86,4 @@ Post-accept only: treat these 10 rooms as high-quality modules with consistent d
 - [x] Pause map
 - [x] Save / load
 - [x] Original names only
-- [ ] QA PASS (headless rooms 1–10 green; live play still needed)
+- [x] QA PASS (headless rooms 1–10 green; sky 720; leftovers fail-closed)
