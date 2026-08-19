@@ -53,6 +53,9 @@ public partial class TitleScreen : Control
 		newBtn.Pressed += () =>
 		{
 			GameState.Instance.ResetNewGame();
+			// Hold Shift: skip Kilnwalk — Stack Mouth from_town with hire + Crackiron.
+			if (Input.IsPhysicalKeyPressed(Key.Shift))
+				GameState.Instance.ApplyDebugStackMouthStart();
 			GetTree().ChangeSceneToFile("res://scenes/Game.tscn");
 		};
 		AddChild(newBtn);
@@ -68,9 +71,9 @@ public partial class TitleScreen : Control
 
 		var keys = new Label
 		{
-			Text = "Keys: WASD/Arrows move · J/Z attack · L/Shift dodge · E/Enter interact · Esc/M pause map",
-			Position = new Vector2(84, 480),
-			Size = new Vector2(1100, 40)
+			Text = "Keys: WASD/Arrows move · J/Z attack · L/Shift dodge · E/Enter interact · Esc/M pause map\nQA: hold Shift + New Game → Stack Mouth (hire + Crackiron, from_town y=8)",
+			Position = new Vector2(84, 460),
+			Size = new Vector2(1100, 60)
 		};
 		keys.AddThemeFontSizeOverride("font_size", 13);
 		keys.AddThemeColorOverride("font_color", Palette.UiText);

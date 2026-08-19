@@ -77,6 +77,20 @@ public partial class GameState : Node
 		HitstopActive = false;
 	}
 
+	/// <summary>QA skip: hire + Crackiron, land Stack Mouth from_town (tile y=8).</summary>
+	public void ApplyDebugStackMouthStart()
+	{
+		HireTaken = true;
+		HasCrackiron = true;
+		Hp = MaxHp;
+		MouthOpen = true;
+		MapMarked = true;
+		CurrentRoom = RoomId.StackMouth;
+		LastSaveRoom = RoomId.StackMouth;
+		LastSavePosition = new Vector2(10 * Tiles.Size, 8 * Tiles.Size);
+		RoomsEntered.Add(RoomId.StackMouth.ToString());
+	}
+
 	public void MarkRoomEntered(RoomId room)
 	{
 		RoomsEntered.Add(room.ToString());
