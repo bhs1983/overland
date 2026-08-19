@@ -204,7 +204,8 @@ public partial class WorldRoot : Node2D
 			Position = new Vector2(10 * Tiles.Size, 4),
 			Target = RoomId.AshdriftHall,
 			SpawnId = "from_mouth",
-			TriggerSize = new Vector2(28, 12)
+			// Height 48: DodgeDistance=40 must not tunnel past a 12px trigger.
+			TriggerSize = new Vector2(28, 48)
 		});
 	}
 
