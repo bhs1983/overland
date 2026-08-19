@@ -35,23 +35,12 @@ public partial class NpcInteractable : Interactable
 			"Rook Darnel" => "rook",
 			_ => ""
 		};
-		if (!string.IsNullOrEmpty(file) && Godot.FileAccess.FileExists($"res://assets/v3/characters/npcs/{file}.png"))
+		if (!string.IsNullOrEmpty(file))
 		{
 			var spr = Assets.Sprite(Assets.Npc(file));
 			Assets.ApplyFeetPivot(spr, 32, 48);
 			AddChild(spr);
 		}
-		else
-			AddChild(PixelSprite.MakeBody(new Vector2(12, 14), NpcColor));
-		var label = new Label
-		{
-			Text = NpcName.Split(' ')[0],
-			Position = new Vector2(-20, -28),
-			Size = new Vector2(40, 12)
-		};
-		label.AddThemeColorOverride("font_color", Palette.UiText);
-		label.AddThemeFontSizeOverride("font_size", 8);
-		AddChild(label);
 	}
 
 	public override void Interact(PlayerController player)
@@ -328,15 +317,6 @@ public partial class DeadFan : StaticBody2D, IBellowsTarget
 		_sprite = Assets.Sprite(_frames[0]);
 		Assets.ApplyFeetPivot(_sprite);
 		AddChild(_sprite);
-		var label = new Label
-		{
-			Text = "Dead Fan",
-			Position = new Vector2(-18, -18),
-			Size = new Vector2(48, 12)
-		};
-		label.AddThemeFontSizeOverride("font_size", 8);
-		label.AddThemeColorOverride("font_color", Palette.UiText);
-		AddChild(label);
 		RefreshLook();
 	}
 
@@ -580,15 +560,6 @@ public partial class StairHome : Interactable
 		var stair = Assets.PropSprite("stair");
 		Assets.ApplyFeetPivot(stair, 32, 48);
 		AddChild(stair);
-		var label = new Label
-		{
-			Text = "Stair",
-			Position = new Vector2(-16, -20),
-			Size = new Vector2(40, 12)
-		};
-		label.AddThemeFontSizeOverride("font_size", 8);
-		label.AddThemeColorOverride("font_color", Palette.UiText);
-		AddChild(label);
 	}
 
 	public override void Interact(PlayerController player)

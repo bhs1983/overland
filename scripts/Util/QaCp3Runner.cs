@@ -95,6 +95,14 @@ public partial class QaCp3Runner : Node
 		foreach (var stem in props)
 			Must(Godot.FileAccess.FileExists($"res://assets/environment/props/{stem}.png"), $"prop {stem} missing");
 
+		string[] ui = {
+			"crackiron", "folded_bellows", "stack_key", "health_pip",
+			"map_node_town", "map_node_room", "map_node_here", "save_mark", "pause_frame"
+		};
+		foreach (var stem in ui)
+			Must(Godot.FileAccess.FileExists($"res://assets/ui/{stem}.png"), $"ui {stem} missing");
+		Must(!Godot.FileAccess.FileExists("res://assets/ui/ui.png"), "packed ui.png must be gone");
+
 		Must(ResourceLoader.Exists("res://assets/sprites/enemies/sootling.png"), "CP2 sootling missing");
 		Must(!ResourceLoader.Exists("res://assets/v3/environment/town_tiles.png"),
 			"packed town_tiles.png must stay absent");

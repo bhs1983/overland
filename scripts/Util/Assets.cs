@@ -202,7 +202,8 @@ public static class Assets
 			return null;
 		return Tex(path);
 	}
-	public static Texture2D Item(string name) => Tex($"res://assets/sprites/items/{name}.png");
+	public static Texture2D Item(string name) =>
+		LoadPngNearest($"res://assets/ui/{name}.png");
 	public static Texture2D Enemy(string name) => Tex($"res://assets/sprites/enemies/{name}.png");
 	public static Texture2D EnemyV3(string name) =>
 		LoadPngNearest($"res://assets/v3/characters/enemies/{name}.png");
@@ -222,7 +223,8 @@ public static class Assets
 			repeat: name is "far_bg" or "mid_bg");
 	public static Texture2D ParallaxShared(string name) =>
 		LoadPngNearest($"res://assets/v3/environment/parallax/shared/{name}.png");
-	public static Texture2D Ui(string name) => Tex($"res://assets/ui/{name}.png");
+	public static Texture2D Ui(string name) =>
+		LoadPngNearest($"res://assets/ui/{name}.png");
 
 	public static Sprite2D Sprite(Texture2D? tex, Vector2? centeredOffset = null, bool repeat = false)
 	{

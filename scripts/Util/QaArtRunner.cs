@@ -61,7 +61,7 @@ public partial class QaArtRunner : Node
 		new() { Glob = "environment/props/*.png", W = 32, H = 32, Mode = Mode.Fail },
 		new() { Glob = "**/characters/**/*.png", Mode = Mode.Fail },
 		new() { Glob = "**/vfx/**/*.png", Mode = Mode.Fail },
-		new() { Glob = "ui/*.png", W = 16, H = 16, Mode = Mode.Warn },
+		new() { Glob = "ui/*.png", W = 32, H = 32, Mode = Mode.Fail },
 		new() { Glob = "tiles/**", Mode = Mode.Warn, CheckPalette = true, CheckAlpha = true },
 		new() { Glob = "sprites/**", Mode = Mode.Warn, CheckPalette = true, CheckAlpha = true },
 	};
@@ -265,7 +265,7 @@ public partial class QaArtRunner : Node
 					expectW = 16;
 					expectH = 24;
 				}
-				else if (npath.Contains("/tiles/") || npath.Contains("/sprites/") || npath.Contains("/ui/"))
+				else if (npath.Contains("/tiles/") || npath.Contains("/sprites/"))
 				{
 					expectW = 16;
 					expectH = 16;

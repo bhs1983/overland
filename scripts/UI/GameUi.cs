@@ -1,4 +1,5 @@
 using Godot;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Overland;
@@ -13,9 +14,40 @@ public partial class GameUi : CanvasLayer
 	private Label _dialogueBody = null!;
 	private Label _toast = null!;
 	private Control _pauseMap = null!;
-	private Label _mapLabel = null!;
+	private Control _mapGraph = null!;
+	private Label _mapStatus = null!;
 	private bool _dialogueOpen;
 	private float _toastTime;
+
+	private static readonly (RoomId Id, Vector2 Pos)[] MapNodes =
+	{
+		(RoomId.Kilnwalk, new Vector2(280, 24)),
+		(RoomId.StackMouth, new Vector2(280, 64)),
+		(RoomId.AshdriftHall, new Vector2(280, 104)),
+		(RoomId.DeadFanWalk, new Vector2(400, 104)),
+		(RoomId.SettersAlcove, new Vector2(400, 144)),
+		(RoomId.QuenchTrench, new Vector2(280, 144)),
+		(RoomId.ClinkerYard, new Vector2(400, 184)),
+		(RoomId.KeyLanding, new Vector2(400, 224)),
+		(RoomId.SealedFlue, new Vector2(400, 264)),
+		(RoomId.LongDrop, new Vector2(400, 304)),
+		(RoomId.OverfireChamber, new Vector2(400, 344)),
+	};
+
+	private static readonly (RoomId A, RoomId B)[] MapEdges =
+	{
+		(RoomId.Kilnwalk, RoomId.StackMouth),
+		(RoomId.StackMouth, RoomId.AshdriftHall),
+		(RoomId.AshdriftHall, RoomId.DeadFanWalk),
+		(RoomId.DeadFanWalk, RoomId.SettersAlcove),
+		(RoomId.DeadFanWalk, RoomId.QuenchTrench),
+		(RoomId.SettersAlcove, RoomId.QuenchTrench),
+		(RoomId.QuenchTrench, RoomId.ClinkerYard),
+		(RoomId.ClinkerYard, RoomId.KeyLanding),
+		(RoomId.KeyLanding, RoomId.SealedFlue),
+		(RoomId.SealedFlue, RoomId.LongDrop),
+		(RoomId.LongDrop, RoomId.OverfireChamber),
+	};
 
 	public override void _Ready()
 	{
@@ -23,15 +55,16 @@ public partial class GameUi : CanvasLayer
 		Layer = 10;
 
 		_hpRow = new HBoxContainer { Position = new Vector2(16, 10) };
+		_hpRow.AddThemeConstantOverride("separation", 4);
 		AddChild(_hpRow);
 
-		_itemRow = new HBoxContainer { Position = new Vector2(16, 28) };
+		_itemRow = new HBoxContainer { Position = new Vector2(16, 48) };
 		_itemRow.AddThemeConstantOverride("separation", 4);
 		AddChild(_itemRow);
 
 		_hud = new Label
 		{
-			Position = new Vector2(16, 48),
+			Position = new Vector2(16, 88),
 			Size = new Vector2(900, 24)
 		};
 		_hud.AddThemeFontSizeOverride("font_size", 14);
@@ -100,7 +133,7 @@ public partial class GameUi : CanvasLayer
 		dim.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
 		_pauseMap.AddChild(dim);
 
-		var panel = new PanelContainer
+		var panel = new Panel
 		{
 			Position = new Vector2(320, 120),
 			Size = new Vector2(640, 420)
@@ -112,23 +145,45 @@ public partial class GameUi : CanvasLayer
 			BorderWidthBottom = 2,
 			BorderWidthTop = 2,
 			BorderWidthLeft = 2,
-			BorderWidthRight = 2,
-			ContentMarginLeft = 20,
-			ContentMarginRight = 20,
-			ContentMarginTop = 16,
-			ContentMarginBottom = 16
+			BorderWidthRight = 2
 		});
-		var vbox = new VBoxContainer();
-		var title = new Label { Text = "Pause Map — Slice 0" };
-		title.AddThemeFontSizeOverride("font_size", 20);
+		var title = new Label
+		{
+			Text = "Pause Map — Slice 0",
+			Position = new Vector2(16, 4),
+			Size = new Vector2(400, 20)
+		};
+		title.AddThemeFontSizeOverride("font_size", 16);
 		title.AddThemeColorOverride("font_color", Palette.UiAccent);
-		_mapLabel = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart };
-		_mapLabel.AddThemeFontSizeOverride("font_size", 14);
-		_mapLabel.AddThemeColorOverride("font_color", Palette.UiText);
-		var help = new Label { Text = "[Esc / M] close\nLoad from title screen." };
-		help.AddThemeFontSizeOverride("font_size", 12);
+		panel.AddChild(title);
+
+		_mapGraph = new Control
+		{
+			Position = Vector2.Zero,
+			Size = new Vector2(640, 380)
+		};
+		panel.AddChild(_mapGraph);
+
+		_mapStatus = new Label
+		{
+			Position = new Vector2(16, 372),
+			Size = new Vector2(400, 20)
+		};
+		_mapStatus.AddThemeFontSizeOverride("font_size", 11);
+		_mapStatus.AddThemeColorOverride("font_color", Palette.UiText);
+		panel.AddChild(_mapStatus);
+
+		var help = new Label
+		{
+			Text = "[Esc / M] close",
+			Position = new Vector2(16, 392),
+			Size = new Vector2(200, 20)
+		};
+		help.AddThemeFontSizeOverride("font_size", 11);
 		help.AddThemeColorOverride("font_color", Palette.AshGrey);
-		var loadBtn = new Button { Text = "Load Last Save" };
+		panel.AddChild(help);
+
+		var loadBtn = new Button { Text = "Load Last Save", Position = new Vector2(360, 388), Size = new Vector2(130, 24) };
 		loadBtn.Pressed += () =>
 		{
 			if (SaveSystem.Instance.Load())
@@ -136,14 +191,11 @@ public partial class GameUi : CanvasLayer
 			else
 				ShowToast("No save found.");
 		};
-		var titleBtn = new Button { Text = "Return to Title" };
+		var titleBtn = new Button { Text = "Return to Title", Position = new Vector2(500, 388), Size = new Vector2(130, 24) };
 		titleBtn.Pressed += () => GetTree().ChangeSceneToFile("res://scenes/Title.tscn");
-		vbox.AddChild(title);
-		vbox.AddChild(_mapLabel);
-		vbox.AddChild(help);
-		vbox.AddChild(loadBtn);
-		vbox.AddChild(titleBtn);
-		panel.AddChild(vbox);
+		panel.AddChild(loadBtn);
+		panel.AddChild(titleBtn);
+
 		_pauseMap.AddChild(panel);
 		AddChild(_pauseMap);
 	}
@@ -187,7 +239,7 @@ public partial class GameUi : CanvasLayer
 			{
 				Texture = Assets.Ui("health_pip"),
 				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-				CustomMinimumSize = new Vector2(16, 16),
+				CustomMinimumSize = new Vector2(32, 32),
 				StretchMode = TextureRect.StretchModeEnum.Keep
 			};
 			_hpRow.AddChild(pip);
@@ -202,7 +254,7 @@ public partial class GameUi : CanvasLayer
 			{
 				Texture = Assets.Item(texName),
 				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-				CustomMinimumSize = new Vector2(16, 16),
+				CustomMinimumSize = new Vector2(32, 32),
 				StretchMode = TextureRect.StretchModeEnum.Keep
 			});
 		}
@@ -252,35 +304,76 @@ public partial class GameUi : CanvasLayer
 		_pauseMap.Visible = open;
 		GameState.Instance.Paused = open;
 		if (open)
+			RebuildPauseGraph();
+	}
+
+	private void RebuildPauseGraph()
+	{
+		foreach (var c in _mapGraph.GetChildren())
+			c.QueueFree();
+
+		var gs = GameState.Instance;
+		var pos = new Dictionary<RoomId, Vector2>();
+		foreach (var (id, p) in MapNodes)
+			pos[id] = p;
+
+		foreach (var (a, b) in MapEdges)
 		{
-			var gs = GameState.Instance;
-			var here = RoomNames.Display(gs.CurrentRoom);
-			var rooms = new StringBuilder();
-			rooms.AppendLine($"Kilnwalk{(gs.RoomsEntered.Contains(nameof(RoomId.Kilnwalk)) ? "" : " (locked)")}{(gs.CurrentRoom == RoomId.Kilnwalk ? "  <here>" : "")}");
-			void Line(RoomId id)
+			var line = new Line2D
 			{
-				var entered = gs.RoomsEntered.Contains(id.ToString());
-				rooms.AppendLine($"{RoomNames.Display(id)}{(entered ? "" : " — not yet")}{(gs.CurrentRoom == id ? "  <here>" : "")}");
-			}
-			Line(RoomId.StackMouth);
-			Line(RoomId.AshdriftHall);
-			Line(RoomId.DeadFanWalk);
-			Line(RoomId.SettersAlcove);
-			Line(RoomId.QuenchTrench);
-			Line(RoomId.ClinkerYard);
-			Line(RoomId.KeyLanding);
-			Line(RoomId.SealedFlue);
-			Line(RoomId.LongDrop);
-			Line(RoomId.OverfireChamber);
-			_mapLabel.Text =
-				$"{rooms}\n" +
-				$"Hire: {(gs.HireTaken ? "yes" : "no")}  Crackiron: {(gs.HasCrackiron ? "yes" : "no")}\n" +
-				$"Folded Bellows: {(gs.HasFoldedBellows ? "yes" : "no")}  Fan: {(gs.FanOpened ? "open" : "dead")}\n" +
-				$"Stack Key: {(gs.HasStackKey ? "yes" : "no")}  Iron: {(gs.IronDoorOpen ? "open" : "sealed")}\n" +
-				$"Mouth: {(gs.MouthOpen ? "open" : "sealed")}  Clinker: {(gs.ClinkerDown ? "down" : "up")}\n" +
-				$"Overfire: {(gs.OverfireDown ? "down" : "up")}  Hire paid: {(gs.HirePaid ? "yes" : "no")}\n\n" +
-				"Slice 0 — Kilnwalk + Cold Stack rooms 1–10.";
-			_ = here;
+				Width = 2,
+				DefaultColor = Palette.AshGrey,
+				Antialiased = false
+			};
+			line.AddPoint(pos[a] + new Vector2(16, 16));
+			line.AddPoint(pos[b] + new Vector2(16, 16));
+			_mapGraph.AddChild(line);
 		}
+
+		foreach (var (id, p) in MapNodes)
+		{
+			if (id == RoomId.SideFlue)
+				continue;
+			var entered = gs.RoomsEntered.Contains(id.ToString());
+			var here = gs.CurrentRoom == id;
+			var icon = id == RoomId.Kilnwalk ? "map_node_town" : "map_node_room";
+			var node = new TextureRect
+			{
+				Texture = Assets.Ui(icon),
+				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+				Position = p,
+				CustomMinimumSize = new Vector2(32, 32),
+				Size = new Vector2(32, 32),
+				Modulate = entered || id == RoomId.Kilnwalk ? Colors.White : new Color(1, 1, 1, 0.35f),
+				StretchMode = TextureRect.StretchModeEnum.Keep
+			};
+			_mapGraph.AddChild(node);
+			if (here)
+			{
+				_mapGraph.AddChild(new TextureRect
+				{
+					Texture = Assets.Ui("map_node_here"),
+					TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+					Position = p,
+					CustomMinimumSize = new Vector2(32, 32),
+					Size = new Vector2(32, 32),
+					StretchMode = TextureRect.StretchModeEnum.Keep
+				});
+			}
+			var name = new Label
+			{
+				Text = RoomNames.Display(id),
+				Position = new Vector2(p.X - 120, p.Y + 8),
+				Size = new Vector2(116, 16),
+				HorizontalAlignment = HorizontalAlignment.Right
+			};
+			name.AddThemeFontSizeOverride("font_size", 11);
+			name.AddThemeColorOverride("font_color", here ? Palette.UiAccent : Palette.UiText);
+			_mapGraph.AddChild(name);
+		}
+
+		_mapStatus.Text =
+			$"Hire {(gs.HireTaken ? "yes" : "no")}  Mouth {(gs.MouthOpen ? "open" : "sealed")}  " +
+			$"Fan {(gs.FanOpened ? "open" : "dead")}  Iron {(gs.IronDoorOpen ? "open" : "sealed")}";
 	}
 }

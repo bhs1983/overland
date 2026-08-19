@@ -330,15 +330,6 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		_flash = new FlashFx();
 		AddChild(_flash);
 		AddToGroup("enemy");
-		var label = new Label
-		{
-			Text = "the Clinker",
-			Position = new Vector2(Tiles.Px(-1.75f), Tiles.Px(-2.25f)),
-			Size = new Vector2(Tiles.Px(5f), Tiles.Px(0.75f))
-		};
-		label.AddThemeFontSizeOverride("font_size", 9);
-		label.AddThemeColorOverride("font_color", Palette.ClinkerCrack);
-		AddChild(label);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -448,15 +439,6 @@ public partial class Overfire : CharacterBody2D, IDamageable
 		_flash = new FlashFx();
 		AddChild(_flash);
 		AddToGroup("enemy");
-		var label = new Label
-		{
-			Text = "the Overfire",
-			Position = new Vector2(Tiles.Px(-2f), Tiles.Px(-2.75f)),
-			Size = new Vector2(Tiles.Px(5f), Tiles.Px(0.75f))
-		};
-		label.AddThemeFontSizeOverride("font_size", 9);
-		label.AddThemeColorOverride("font_color", Palette.OverfireHot);
-		AddChild(label);
 		Enter(Phase.Idle);
 	}
 

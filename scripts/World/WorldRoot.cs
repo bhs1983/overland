@@ -204,7 +204,6 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
 
-		AddRoomTitle(root, "Kilnwalk");
 		PlaceTile(root, "kiln", 8, 4);
 		PlaceTile(root, "kiln", 11, 4);
 		PlaceTile(root, "door", 5, 2);
@@ -258,7 +257,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 10, H - 1);
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
-		AddRoomTitle(root, "Stack Mouth");
+
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(4 * Tiles.Size, 1.5f * Tiles.Size)));
 		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(10 * Tiles.Size, 5 * Tiles.Size), 0.7f, 8f));
 
@@ -305,7 +304,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 10, H - 1);
 		ClearWallAt(root, W - 1, 6);
 		ClearWallAt(root, W - 1, 7);
-		AddRoomTitle(root, "Ashdrift Hall");
+
 
 		PlaceAsh(root, "ashdrift_a", 8, 5);
 		PlaceAsh(root, "ashdrift_b", 9, 5);
@@ -348,7 +347,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 0, 6);
 		ClearWallAt(root, W - 1, 5);
 		ClearWallAt(root, W - 1, 6);
-		AddRoomTitle(root, "Dead Fan Walk");
+
 
 		root.AddChild(new DeadFan
 		{
@@ -406,7 +405,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 0, 7);
 		ClearWallAt(root, 9, H - 1);
 		ClearWallAt(root, 10, H - 1);
-		AddRoomTitle(root, "Setter's Alcove");
+
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(12 * Tiles.Size, 1.6f * Tiles.Size)));
 
 		root.AddChild(new Claywalker
@@ -465,7 +464,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, W - 1, 7);
 		ClearWallAt(root, 0, 6);
 		ClearWallAt(root, 0, 7);
-		AddRoomTitle(root, "Quench Trench");
+
 		root.AddChild(SliceParallax.Cookie("cold_stack", "light_quench", new Vector2(10 * Tiles.Size, 6 * Tiles.Size), 1.0f, 6.4f));
 
 		root.AddChild(new Brickleech
@@ -519,7 +518,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 0, 7);
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
-		AddRoomTitle(root, "Clinker Yard");
+
 		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 0.85f, 9f));
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(5 * Tiles.Size, 1.5f * Tiles.Size)));
 
@@ -559,7 +558,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 10, H - 1);
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
-		AddRoomTitle(root, "Key Landing");
+
 
 		// Ledge feel
 		var ledge = Assets.ColdStackSprite("ledge");
@@ -600,7 +599,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 10, H - 1);
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
-		AddRoomTitle(root, "Sealed Flue");
+
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(7 * Tiles.Size, 1.4f * Tiles.Size)));
 
 		var door = new IronDoorGate
@@ -644,7 +643,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 10, H - 1);
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
-		AddRoomTitle(root, "Long Drop");
+
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(5 * Tiles.Size, 1.3f * Tiles.Size)));
 
 		// Ash hangs on the upper lip; brick below is clean.
@@ -696,7 +695,7 @@ public partial class WorldRoot : Node2D
 		PlaceCracked(root, 7, 12);
 		ClearWallAt(root, 9, H - 1);
 		ClearWallAt(root, 10, H - 1);
-		AddRoomTitle(root, "Overfire Chamber");
+
 		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 1.1f, 10f));
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(6 * Tiles.Size, 1.4f * Tiles.Size)));
 
@@ -815,19 +814,6 @@ public partial class WorldRoot : Node2D
 		else if (tile == "door" && s.Texture != null && s.Texture.GetWidth() == 32)
 			Assets.ApplyFeetPivot(s, 32, 32);
 		root.AddChild(s);
-	}
-
-	private static void AddRoomTitle(Node2D root, string text)
-	{
-		var title = new Label
-		{
-			Text = text,
-			Position = new Vector2(Tiles.Px(0.5f), Tiles.Px(0.125f)),
-			Size = new Vector2(Tiles.Px(13.75f), Tiles.Px(0.75f))
-		};
-		title.AddThemeFontSizeOverride("font_size", 10);
-		title.AddThemeColorOverride("font_color", Palette.UiText);
-		root.AddChild(title);
 	}
 
 	private static void AddNpc(Node2D root, Vector2 pos, string name, Color color)
