@@ -29,7 +29,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		{
 			Shape = new CircleShape2D { Radius = 6 }
 		});
-		_body = Assets.Sprite(Assets.Enemy("sootling"));
+		_body = Assets.Sprite(Assets.EnemyV3OrNull("sootling") ?? Assets.Enemy("sootling"));
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();

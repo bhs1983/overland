@@ -27,12 +27,26 @@ public partial class NpcInteractable : Interactable
 	public override void _Ready()
 	{
 		base._Ready();
-		var body = PixelSprite.MakeBody(new Vector2(12, 14), NpcColor);
-		AddChild(body);
+		var file = NpcName switch
+		{
+			"Tamsin Cole" => "tamsin",
+			"Holt Vetch" => "holt",
+			"Wren Quill" => "wren",
+			"Rook Darnel" => "rook",
+			_ => ""
+		};
+		if (!string.IsNullOrEmpty(file) && Godot.FileAccess.FileExists($"res://assets/v3/characters/npcs/{file}.png"))
+		{
+			var spr = Assets.Sprite(Assets.Npc(file));
+			spr.Offset = new Vector2(0, -8);
+			AddChild(spr);
+		}
+		else
+			AddChild(PixelSprite.MakeBody(new Vector2(12, 14), NpcColor));
 		var label = new Label
 		{
 			Text = NpcName.Split(' ')[0],
-			Position = new Vector2(-20, -22),
+			Position = new Vector2(-20, -28),
 			Size = new Vector2(40, 12)
 		};
 		label.AddThemeColorOverride("font_color", Palette.UiText);

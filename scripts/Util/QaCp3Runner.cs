@@ -51,6 +51,11 @@ public partial class QaCp3Runner : Node
 		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/overfire.png"), "v3 overfire missing");
 		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/overfire_pulse.png"), "v3 overfire pulse missing");
 		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/overfire_swipe.png"), "v3 overfire swipe missing");
+		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/sootling.png"), "v3 sootling missing");
+		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/npcs/tamsin.png"), "npc tamsin missing");
+		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/npcs/holt.png"), "npc holt missing");
+		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/npcs/wren.png"), "npc wren missing");
+		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/npcs/rook.png"), "npc rook missing");
 		Must(Godot.FileAccess.FileExists("res://assets/v3/environment/parallax/kilnwalk/far_bg.png"), "v3 kilnwalk far_bg missing");
 		Must(Godot.FileAccess.FileExists("res://assets/v3/vfx/spark.png"), "v3 spark missing");
 

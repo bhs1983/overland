@@ -74,6 +74,15 @@ public static class Assets
 	public static Texture2D Enemy(string name) => Tex($"res://assets/sprites/enemies/{name}.png");
 	public static Texture2D EnemyV3(string name) =>
 		LoadPngNearest($"res://assets/v3/characters/enemies/{name}.png");
+	public static Texture2D? EnemyV3OrNull(string name)
+	{
+		var path = $"res://assets/v3/characters/enemies/{name}.png";
+		if (!Godot.FileAccess.FileExists(path))
+			return null;
+		return LoadPngNearest(path);
+	}
+	public static Texture2D Npc(string name) =>
+		LoadPngNearest($"res://assets/v3/characters/npcs/{name}.png");
 	public static Texture2D Vfx(string name) =>
 		LoadPngNearest($"res://assets/v3/vfx/{name}.png");
 	public static Texture2D Parallax(string theme, string name) =>

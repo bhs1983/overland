@@ -6,6 +6,7 @@ namespace Overland;
 public partial class GameUi : CanvasLayer
 {
 	private HBoxContainer _hpRow = null!;
+	private HBoxContainer _itemRow = null!;
 	private Label _hud = null!;
 	private PanelContainer _dialoguePanel = null!;
 	private Label _dialogueName = null!;
@@ -24,10 +25,14 @@ public partial class GameUi : CanvasLayer
 		_hpRow = new HBoxContainer { Position = new Vector2(16, 10) };
 		AddChild(_hpRow);
 
+		_itemRow = new HBoxContainer { Position = new Vector2(16, 28) };
+		_itemRow.AddThemeConstantOverride("separation", 4);
+		AddChild(_itemRow);
+
 		_hud = new Label
 		{
-			Position = new Vector2(16, 30),
-			Size = new Vector2(700, 24)
+			Position = new Vector2(16, 48),
+			Size = new Vector2(900, 24)
 		};
 		_hud.AddThemeFontSizeOverride("font_size", 14);
 		_hud.AddThemeColorOverride("font_color", Palette.UiText);
@@ -188,15 +193,28 @@ public partial class GameUi : CanvasLayer
 			_hpRow.AddChild(pip);
 		}
 
+		foreach (var c in _itemRow.GetChildren())
+			c.QueueFree();
 		var gs = GameState.Instance;
+		void AddItem(string texName)
+		{
+			_itemRow.AddChild(new TextureRect
+			{
+				Texture = Assets.Item(texName),
+				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+				CustomMinimumSize = new Vector2(16, 16),
+				StretchMode = TextureRect.StretchModeEnum.Keep
+			});
+		}
+		if (gs.HasCrackiron) AddItem("crackiron");
+		if (gs.HasFoldedBellows) AddItem("folded_bellows");
+		if (gs.HasStackKey) AddItem("stack_key");
+
 		var sb = new StringBuilder();
-		if (gs.HasCrackiron) sb.Append("[Crackiron] ");
-		if (gs.HasFoldedBellows) sb.Append("[Folded Bellows] ");
 		if (gs.HireTaken) sb.Append("Hire taken. ");
 		if (gs.MapMarked) sb.Append("Mouth marked. ");
 		if (gs.MouthOpen) sb.Append("Mouth open. ");
 		if (gs.FanOpened) sb.Append("Fan open. ");
-		if (gs.HasStackKey) sb.Append("[Stack Key] ");
 		if (gs.ClinkerDown) sb.Append("Clinker down. ");
 		if (gs.IronDoorOpen) sb.Append("Iron open. ");
 		if (gs.OverfireDown) sb.Append("Overfire down. ");
