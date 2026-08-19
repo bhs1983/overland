@@ -191,7 +191,10 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		if (!_alive)
 			return;
 		_softened = true;
-		_body.Modulate = Palette.ClaywalkerSoft;
+		var soft = Assets.Enemy("claywalker_soft");
+		if (soft != null)
+			_body.Texture = soft;
+		_body.Modulate = Colors.White;
 		_flash.Flash(_body, Palette.BellowsPuff, 0.12f);
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Crust softened.");
 	}
@@ -347,6 +350,9 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			if (_crackTimer <= 0)
 			{
 				_cracked = false;
+				var sealedTex = Assets.Enemy("clinker");
+				if (sealedTex != null)
+					_body.Texture = sealedTex;
 				_body.Modulate = Colors.White;
 			}
 		}
@@ -399,7 +405,10 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			return;
 		_cracked = true;
 		_crackTimer = 2.2f;
-		_body.Modulate = Palette.ClinkerCrack;
+		var cracked = Assets.Enemy("clinker_cracked");
+		if (cracked != null)
+			_body.Texture = cracked;
+		_body.Modulate = Colors.White;
 		_flash.Flash(_body, Palette.BellowsPuff, 0.12f);
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Cracks open. Hit with Crackiron.");
 	}

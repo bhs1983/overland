@@ -74,7 +74,11 @@ public partial class AttackArc : Area2D
 		foreach (var body in GetOverlappingBodies())
 		{
 			if (body is IDamageable dmg && dmg.IsAlive)
+			{
+				if (body is Node2D hit)
+					SparkBurst.SpawnHit(owner.GetParent() ?? owner, hit.GlobalPosition);
 				dmg.TakeSwordHit(facing);
+			}
 		}
 
 		Hitstop.Pulse(owner, 0.04f);
@@ -131,6 +135,7 @@ public partial class BellowsCone : Area2D
 		_visual.Visible = false; // same as AttackArc — no filled puff block
 		_shape.Disabled = false;
 		Monitoring = true;
+		SparkBurst.SpawnBellows(owner.GetParent() ?? owner, owner.GlobalPosition, facing);
 
 		// Wait two physics frames so Area2D overlap queries see StaticBody2D on layer 0 (DeadFan).
 		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);

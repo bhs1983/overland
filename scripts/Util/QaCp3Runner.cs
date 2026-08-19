@@ -46,8 +46,10 @@ public partial class QaCp3Runner : Node
 		Must(ResourceLoader.Exists("res://assets/characters/hero/hero_atlas.png"), "hero atlas missing");
 		Must(ResourceLoader.Exists("res://assets/characters/hero/hero_atlas.json"), "hero atlas json missing");
 		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/claywalker.png"), "claywalker missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/claywalker_soft.png"), "claywalker soft missing");
 		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/brickleech.png"), "brickleech missing");
 		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/clinker.png"), "clinker missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/clinker_cracked.png"), "clinker cracked missing");
 		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/overfire.png"), "overfire missing");
 		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/overfire_pulse.png"), "overfire pulse missing");
 		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/overfire_swipe.png"), "overfire swipe missing");
@@ -58,6 +60,10 @@ public partial class QaCp3Runner : Node
 		Must(Godot.FileAccess.FileExists("res://assets/characters/npcs/rook.png"), "npc rook missing");
 		Must(Godot.FileAccess.FileExists("res://assets/environment/parallax/kilnwalk/far_bg.png"), "kilnwalk far_bg missing");
 		Must(Godot.FileAccess.FileExists("res://assets/vfx/spark.png"), "spark missing");
+		Must(Godot.FileAccess.FileExists("res://assets/vfx/spark_b.png"), "spark_b missing");
+		Must(Godot.FileAccess.FileExists("res://assets/vfx/smoke.png"), "smoke missing");
+		Must(Godot.FileAccess.FileExists("res://assets/vfx/ash_fall.png"), "ash_fall missing");
+		Must(Godot.FileAccess.FileExists("res://assets/vfx/impacts.png"), "impacts missing");
 
 		var frames = HeroAtlas.Frames;
 		Must(frames.HasAnimation("fluewalker_idle_down"), "atlas idle_down");
