@@ -76,14 +76,14 @@ Post-accept only: treat these 10 rooms as high-quality modules with consistent d
 
 ## Accept checklist
 
-- [ ] Walk Kilnwalk
-- [ ] Enter the Cold Stack
-- [ ] Get Folded Bellows
-- [ ] Open the Dead Fan Walk gate
-- [ ] Beat the Clinker, get Stack Key
-- [ ] Open Sealed Flue
-- [ ] Beat the Overfire
-- [ ] Pause map
-- [ ] Save / load
-- [ ] Original names only
-- [ ] QA PASS
+- [x] Walk Kilnwalk
+- [x] Enter the Cold Stack
+- [x] Get Folded Bellows
+- [x] Open the Dead Fan Walk gate
+- [x] Beat the Clinker, get Stack Key
+- [x] Open Sealed Flue
+- [x] Beat the Overfire
+- [x] Pause map
+- [x] Save / load
+- [x] Original names only
+- [ ] QA PASS (headless rooms 1–10 green; live play still needed)

@@ -114,7 +114,7 @@ public partial class GameUi : CanvasLayer
 			ContentMarginBottom = 16
 		});
 		var vbox = new VBoxContainer();
-		var title = new Label { Text = "Pause Map — Checkpoint 3" };
+		var title = new Label { Text = "Pause Map — Slice 0" };
 		title.AddThemeFontSizeOverride("font_size", 20);
 		title.AddThemeColorOverride("font_color", Palette.UiAccent);
 		_mapLabel = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart };
@@ -198,7 +198,9 @@ public partial class GameUi : CanvasLayer
 		if (gs.FanOpened) sb.Append("Fan open. ");
 		if (gs.HasStackKey) sb.Append("[Stack Key] ");
 		if (gs.ClinkerDown) sb.Append("Clinker down. ");
-		if (gs.IronDoorOpen) sb.Append("Iron open.");
+		if (gs.IronDoorOpen) sb.Append("Iron open. ");
+		if (gs.OverfireDown) sb.Append("Overfire down. ");
+		if (gs.SliceComplete) sb.Append("Hire paid.");
 		_hud.Text = sb.ToString();
 	}
 
@@ -250,14 +252,16 @@ public partial class GameUi : CanvasLayer
 			Line(RoomId.ClinkerYard);
 			Line(RoomId.KeyLanding);
 			Line(RoomId.SealedFlue);
+			Line(RoomId.LongDrop);
+			Line(RoomId.OverfireChamber);
 			_mapLabel.Text =
 				$"{rooms}\n" +
 				$"Hire: {(gs.HireTaken ? "yes" : "no")}  Crackiron: {(gs.HasCrackiron ? "yes" : "no")}\n" +
 				$"Folded Bellows: {(gs.HasFoldedBellows ? "yes" : "no")}  Fan: {(gs.FanOpened ? "open" : "dead")}\n" +
 				$"Stack Key: {(gs.HasStackKey ? "yes" : "no")}  Iron: {(gs.IronDoorOpen ? "open" : "sealed")}\n" +
-				$"Mouth: {(gs.MouthOpen ? "open" : "sealed")}  Clinker: {(gs.ClinkerDown ? "down" : "up")}\n\n" +
-				"Checkpoint 3 — Kilnwalk + Cold Stack rooms 1–8.\n" +
-				"v3 fluewalker atlas + parallax. Rooms 9–10 later.";
+				$"Mouth: {(gs.MouthOpen ? "open" : "sealed")}  Clinker: {(gs.ClinkerDown ? "down" : "up")}\n" +
+				$"Overfire: {(gs.OverfireDown ? "down" : "up")}  Hire paid: {(gs.HirePaid ? "yes" : "no")}\n\n" +
+				"Slice 0 — Kilnwalk + Cold Stack rooms 1–10.";
 			_ = here;
 		}
 	}

@@ -52,6 +52,10 @@ public partial class NpcInteractable : Interactable
 		var gs = GameState.Instance;
 		return NpcName switch
 		{
+			"Tamsin Cole" when gs.HirePaid =>
+				"Stack’s still. You earned the coin.",
+			"Tamsin Cole" when gs.OverfireDown =>
+				"You shut it. Coin as promised. Hire’s closed.",
 			"Tamsin Cole" when gs.HireTaken =>
 				"Draft’s running the wrong way. Walk the Cold Stack. Shut what you find. Coin when you come back up.",
 			"Tamsin Cole" =>
@@ -78,7 +82,13 @@ public partial class NpcInteractable : Interactable
 		switch (NpcName)
 		{
 			case "Tamsin Cole":
-				gs.HireTaken = true;
+				if (gs.OverfireDown)
+				{
+					gs.HirePaid = true;
+					gs.SliceComplete = true;
+				}
+				else
+					gs.HireTaken = true;
 				break;
 			case "Holt Vetch":
 				gs.HasCrackiron = true;
@@ -152,6 +162,7 @@ public partial class RoomTransition : Area2D
 	public bool RequiresMouthOpen { get; set; }
 	public bool RequiresFanOpen { get; set; }
 	public bool RequiresClinkerDown { get; set; }
+	public bool RequiresIronOpen { get; set; }
 	public Vector2 TriggerSize { get; set; } = new(20, 12);
 
 	private bool _cooldown;
@@ -188,6 +199,11 @@ public partial class RoomTransition : Area2D
 		if (RequiresClinkerDown && !GameState.Instance.ClinkerDown)
 		{
 			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("The Clinker still blocks the way north.");
+			return;
+		}
+		if (RequiresIronOpen && !GameState.Instance.IronDoorOpen)
+		{
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Iron door sealed. Needs the Stack Key.");
 			return;
 		}
 		_cooldown = true;
@@ -482,7 +498,7 @@ public partial class IronDoorUnlock : Interactable
 		}
 		GameState.Instance.IronDoorOpen = true;
 		GetTree().CallGroup("world", "RefreshGates");
-		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Iron door opens. Checkpoint 3 complete — rooms 9–10 later.");
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Iron door opens. Long Drop ahead.");
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
 	}
 }
@@ -495,5 +511,32 @@ public partial class QuenchWaterTile : Sprite2D
 		Texture = Assets.ColdStack("quench_water");
 		TextureFilter = TextureFilterEnum.Nearest;
 		Centered = true;
+	}
+}
+
+/// <summary>After Overfire — short stair back to Kilnwalk.</summary>
+public partial class StairHome : Interactable
+{
+	public override void _Ready()
+	{
+		base._Ready();
+		Prompt = "Climb";
+		AddChild(Assets.ColdStackSprite("ledge"));
+		var label = new Label
+		{
+			Text = "Stair",
+			Position = new Vector2(-16, -20),
+			Size = new Vector2(40, 12)
+		};
+		label.AddThemeFontSizeOverride("font_size", 8);
+		label.AddThemeColorOverride("font_color", Palette.UiText);
+		AddChild(label);
+	}
+
+	public override void Interact(PlayerController player)
+	{
+		if (!GameState.Instance.OverfireDown)
+			return;
+		(GetTree().GetFirstNodeInGroup("world") as WorldRoot)?.GoToRoom(RoomId.Kilnwalk, "from_boss");
 	}
 }

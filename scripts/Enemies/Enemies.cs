@@ -409,3 +409,203 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Cracks open. Hit with Crackiron.");
 	}
 }
+
+/// <summary>The Overfire — walking kiln. Heat pulse (step out), swipe (hit after). Bellows shoves pulse ash.</summary>
+public partial class Overfire : CharacterBody2D, IDamageable
+{
+	public string EnemyId { get; set; } = "overfire_chamber";
+	public bool IsAlive => _alive;
+
+	private enum Phase { Idle, PulseTele, Pulse, SwipeTele, Swipe }
+
+	private Sprite2D _body = null!;
+	private FlashFx _flash = null!;
+	private bool _alive = true;
+	private int _hp = 8;
+	private Phase _phase = Phase.Idle;
+	private float _phaseT;
+	private bool _ashShoved;
+	private float _hitCd = 0.8f;
+
+	public override void _Ready()
+	{
+		if (GameState.Instance.DefeatedEnemyIds.Contains(EnemyId) || GameState.Instance.OverfireDown)
+		{
+			QueueFree();
+			return;
+		}
+		CollisionLayer = 1 << 2;
+		CollisionMask = 0;
+		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 14 } });
+		_body = Assets.Sprite(Assets.EnemyV3("overfire"));
+		_body.ZIndex = 10;
+		AddChild(_body);
+		_flash = new FlashFx();
+		AddChild(_flash);
+		AddToGroup("enemy");
+		var label = new Label
+		{
+			Text = "the Overfire",
+			Position = new Vector2(-32, -44),
+			Size = new Vector2(80, 12)
+		};
+		label.AddThemeFontSizeOverride("font_size", 9);
+		label.AddThemeColorOverride("font_color", Palette.OverfireHot);
+		AddChild(label);
+		Enter(Phase.Idle);
+	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		if (!_alive || GameState.Instance.Paused || GameState.Instance.InputLocked)
+		{
+			Velocity = Vector2.Zero;
+			return;
+		}
+
+		var dt = (float)delta;
+		_phaseT -= dt;
+		_hitCd -= dt;
+		var player = PlayerController.Instance;
+		if (player == null)
+			return;
+
+		var to = player.GlobalPosition - GlobalPosition;
+		var dist = to.Length();
+
+		switch (_phase)
+		{
+			case Phase.Idle:
+				if (dist > 28f)
+					Velocity = to.Normalized() * 20f;
+				else
+					Velocity = Vector2.Zero;
+				MoveAndSlide();
+				if (_phaseT <= 0)
+					Enter(Phase.PulseTele);
+				break;
+
+			case Phase.PulseTele:
+				Velocity = Vector2.Zero;
+				MoveAndSlide();
+				if (_phaseT <= 0)
+					Enter(Phase.Pulse);
+				break;
+
+			case Phase.Pulse:
+				Velocity = Vector2.Zero;
+				MoveAndSlide();
+				if (_phaseT <= 0)
+					Enter(Phase.SwipeTele);
+				break;
+
+			case Phase.SwipeTele:
+				Velocity = Vector2.Zero;
+				MoveAndSlide();
+				if (_phaseT <= 0)
+					Enter(Phase.Swipe);
+				break;
+
+			case Phase.Swipe:
+				Velocity = Vector2.Zero;
+				MoveAndSlide();
+				if (_phaseT <= 0)
+					Enter(Phase.Idle);
+				break;
+		}
+	}
+
+	private void Enter(Phase next)
+	{
+		_phase = next;
+		var player = PlayerController.Instance;
+		var ui = GetTree().GetFirstNodeInGroup("game_ui") as GameUi;
+		switch (next)
+		{
+			case Phase.Idle:
+				_phaseT = 2.0f;
+				_ashShoved = false;
+				SetSprite("overfire");
+				_body.Modulate = Colors.White;
+				break;
+			case Phase.PulseTele:
+				_phaseT = 0.75f;
+				SetSprite("overfire_pulse");
+				_body.Modulate = Palette.OverfireHot;
+				ui?.ShowToast("Heat pulse — step out.");
+				break;
+			case Phase.Pulse:
+				_phaseT = 0.28f;
+				SetSprite("overfire_pulse");
+				if (player != null)
+				{
+					var d = player.GlobalPosition.DistanceTo(GlobalPosition);
+					if (_ashShoved)
+						ui?.ShowToast("Ash shoved. Pulse misses.");
+					else if (d < 52f)
+						player.ApplyHit((player.GlobalPosition - GlobalPosition).Normalized(), 1);
+				}
+				break;
+			case Phase.SwipeTele:
+				_phaseT = 0.4f;
+				SetSprite("overfire_swipe");
+				_body.Modulate = Colors.White;
+				ui?.ShowToast("Swipe — hit after.");
+				break;
+			case Phase.Swipe:
+				_phaseT = 0.22f;
+				SetSprite("overfire_swipe");
+				if (player != null && player.GlobalPosition.DistanceTo(GlobalPosition) < 30f && _hitCd <= 0)
+				{
+					_hitCd = 0.6f;
+					player.ApplyHit((player.GlobalPosition - GlobalPosition).Normalized(), 1);
+				}
+				break;
+		}
+	}
+
+	private void SetSprite(string name)
+	{
+		var tex = Assets.EnemyV3(name);
+		if (tex != null)
+			_body.Texture = tex;
+	}
+
+	public void TakeSwordHit(Vector2 fromDirection, int damage = 1)
+	{
+		if (!_alive)
+			return;
+		_hp -= damage;
+		_flash.Flash(_body, Palette.HitFlash, 0.1f);
+		Hitstop.Pulse(this, 0.05f);
+		if (_hp <= 0)
+		{
+			_alive = false;
+			GameState.Instance.DefeatedEnemyIds.Add(EnemyId);
+			GameState.Instance.OverfireDown = true;
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Overfire falls. Stair back to Kilnwalk.");
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+			GetParent()?.AddChild(new StairHome
+			{
+				Position = new Vector2(10 * Tiles.Size, 3.2f * Tiles.Size)
+			});
+			GetTree().CreateTimer(0.2f).Timeout += () => QueueFree();
+		}
+	}
+
+	public void TakeBellowsPuff(Vector2 fromDirection)
+	{
+		if (!_alive)
+			return;
+		if (_phase is Phase.PulseTele or Phase.Pulse)
+		{
+			_ashShoved = true;
+			_flash.Flash(_body, Palette.BellowsPuff, 0.12f);
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Ash shoved aside.");
+		}
+		else
+		{
+			_flash.Flash(_body, Palette.BellowsPuff, 0.08f);
+		}
+	}
+}

@@ -46,11 +46,15 @@ First place: **Kilnwalk**. First dungeon: **the Cold Stack** (Checkpoint 2+).
 2. South → **Quench Trench** — water channel, **Brickleeches** drop; side path back to room 3.
 3. East → **Clinker Yard** — miniboss **the Clinker** (bellows opens cracks).
 4. North after Clinker → **Key Landing** — **Stack Key**.
-5. North → **Sealed Flue** — Stack Key opens the iron door. Rooms 9–10 later.
+5. North → **Sealed Flue** — Stack Key opens the iron door.
 
-v3 hero atlas (`fluewalker_*`, pivot 16,47) + parallax layers (far 0.2 / mid 0.5 / FG 1.35 / fog 0.25). No 3D camera.
+### Checkpoint 4 — rooms 9–10 + hire close
 
-Rooms 9–10 (Long Drop, Overfire) are **not built yet**.
+1. North → **Long Drop** — last Sootling pack. Ash on the upper lip.
+2. North → **Overfire Chamber** — heat pulse (step out / bellows shoves ash), then swipe (hit after).
+3. Stair back to **Kilnwalk**. Talk to **Tamsin** — hire paid. Slice ends. Save still works.
+
+v3 hero atlas (`fluewalker_*`, pivot 16,47) + Overfire 64×64 + parallax. No 3D camera.
 
 ## Credits
 

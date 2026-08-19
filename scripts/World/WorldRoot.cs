@@ -2,7 +2,7 @@ using Godot;
 
 namespace Overland;
 
-/// <summary>Checkpoint 3 — Kilnwalk + Cold Stack rooms 1–8. Rooms 9–10 later.</summary>
+/// <summary>Slice 0 — Kilnwalk + Cold Stack rooms 1–10.</summary>
 public partial class WorldRoot : Node2D
 {
 	private Node2D _roomLayer = null!;
@@ -111,6 +111,12 @@ public partial class WorldRoot : Node2D
 			case RoomId.SealedFlue:
 				BuildSealedFlue();
 				break;
+			case RoomId.LongDrop:
+				BuildLongDrop();
+				break;
+			case RoomId.OverfireChamber:
+				BuildOverfireChamber();
+				break;
 			default:
 				BuildKilnwalk();
 				room = RoomId.Kilnwalk;
@@ -163,8 +169,15 @@ public partial class WorldRoot : Node2D
 		RoomId.KeyLanding when spawnId == "from_sealed" => new Vector2(10 * Tiles.Size, 3.5f * Tiles.Size),
 		RoomId.KeyLanding => new Vector2(10 * Tiles.Size, 8 * Tiles.Size),
 		RoomId.SealedFlue when spawnId == "from_key" => new Vector2(10 * Tiles.Size, 9 * Tiles.Size),
+		RoomId.SealedFlue when spawnId == "from_drop" => new Vector2(10 * Tiles.Size, 3.5f * Tiles.Size),
 		RoomId.SealedFlue => new Vector2(10 * Tiles.Size, 8 * Tiles.Size),
+		RoomId.LongDrop when spawnId == "from_sealed" => new Vector2(10 * Tiles.Size, 15 * Tiles.Size),
+		RoomId.LongDrop when spawnId == "from_boss" => new Vector2(10 * Tiles.Size, 3.5f * Tiles.Size),
+		RoomId.LongDrop => new Vector2(10 * Tiles.Size, 12 * Tiles.Size),
+		RoomId.OverfireChamber when spawnId == "from_drop" => new Vector2(10 * Tiles.Size, 13 * Tiles.Size),
+		RoomId.OverfireChamber => new Vector2(10 * Tiles.Size, 12 * Tiles.Size),
 		RoomId.Kilnwalk when spawnId == "from_mouth" => new Vector2(10 * Tiles.Size, 3 * Tiles.Size),
+		RoomId.Kilnwalk when spawnId == "from_boss" => new Vector2(5 * Tiles.Size, 6 * Tiles.Size),
 		_ => new Vector2(10 * Tiles.Size, 11 * Tiles.Size)
 	};
 
@@ -608,13 +621,105 @@ public partial class WorldRoot : Node2D
 			TriggerSize = new Vector2(28, 12)
 		});
 
-		// No rooms 9–10 — toast only past the open iron door
-		root.AddChild(new CheckpointToastZone
+		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, 1.2f * Tiles.Size),
-			Message = "Iron door open. Checkpoint 3 complete — Long Drop / Overfire later.",
+			Position = new Vector2(10 * Tiles.Size, 4),
+			Target = RoomId.LongDrop,
+			SpawnId = "from_sealed",
 			RequiresIronOpen = true,
-			TriggerSize = new Vector2(28, 14)
+			TriggerSize = new Vector2(28, 48)
+		});
+	}
+
+	private void BuildLongDrop()
+	{
+		var root = new Node2D { Name = "LongDrop" };
+		_roomLayer.AddChild(root);
+		const int W = 14;
+		const int H = 18;
+		FillBrickRoom(root, W, H);
+		PlaceCracked(root, 4, 6);
+		PlaceCracked(root, 9, 12);
+		ClearWallAt(root, 9, H - 1);
+		ClearWallAt(root, 10, H - 1);
+		ClearWallAt(root, 9, 0);
+		ClearWallAt(root, 10, 0);
+		AddRoomTitle(root, "Long Drop");
+		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(5 * Tiles.Size, 1.3f * Tiles.Size)));
+
+		// Ash hangs on the upper lip; brick below is clean.
+		PlaceAsh(root, "longdrop_lip_a", 6, 2);
+		PlaceAsh(root, "longdrop_lip_b", 7, 2);
+		PlaceAsh(root, "longdrop_lip_c", 8, 2);
+
+		root.AddChild(new Sootling
+		{
+			Position = new Vector2(5 * Tiles.Size, 8 * Tiles.Size),
+			EnemyId = "sootling_longdrop_a"
+		});
+		root.AddChild(new Sootling
+		{
+			Position = new Vector2(10 * Tiles.Size, 10 * Tiles.Size),
+			EnemyId = "sootling_longdrop_b"
+		});
+		root.AddChild(new Sootling
+		{
+			Position = new Vector2(7 * Tiles.Size, 13 * Tiles.Size),
+			EnemyId = "sootling_longdrop_c"
+		});
+
+		root.AddChild(new RoomTransition
+		{
+			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Target = RoomId.SealedFlue,
+			SpawnId = "from_drop",
+			TriggerSize = new Vector2(28, 12)
+		});
+		root.AddChild(new RoomTransition
+		{
+			Position = new Vector2(10 * Tiles.Size, 4),
+			Target = RoomId.OverfireChamber,
+			SpawnId = "from_drop",
+			TriggerSize = new Vector2(28, 48)
+		});
+	}
+
+	private void BuildOverfireChamber()
+	{
+		var root = new Node2D { Name = "OverfireChamber" };
+		_roomLayer.AddChild(root);
+		const int W = 16;
+		const int H = 16;
+		FillBrickRoom(root, W, H);
+		PlaceCracked(root, 4, 5);
+		PlaceCracked(root, 12, 10);
+		PlaceCracked(root, 7, 12);
+		ClearWallAt(root, 9, H - 1);
+		ClearWallAt(root, 10, H - 1);
+		AddRoomTitle(root, "Overfire Chamber");
+		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 1.1f, 5f));
+		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(6 * Tiles.Size, 1.4f * Tiles.Size)));
+
+		root.AddChild(new Overfire
+		{
+			Position = new Vector2(8 * Tiles.Size, 7 * Tiles.Size),
+			EnemyId = "overfire_chamber"
+		});
+
+		if (GameState.Instance.OverfireDown)
+		{
+			root.AddChild(new StairHome
+			{
+				Position = new Vector2(10 * Tiles.Size, 3.2f * Tiles.Size)
+			});
+		}
+
+		root.AddChild(new RoomTransition
+		{
+			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Target = RoomId.LongDrop,
+			SpawnId = "from_boss",
+			TriggerSize = new Vector2(28, 12)
 		});
 	}
 

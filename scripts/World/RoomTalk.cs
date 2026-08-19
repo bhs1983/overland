@@ -13,6 +13,8 @@ public static class RoomTalk
 		RoomId.ClinkerYard => "A whole charge fused. The failed firing, standing.",
 		RoomId.KeyLanding => "Setter’s ring on the ledge. Heat came from below.",
 		RoomId.SealedFlue => "Bolted from this side. Handprints point down.",
+		RoomId.LongDrop => "Ash on the upper lip. Air sucks down.",
+		RoomId.OverfireChamber => "Residual heat that learned to keep itself.",
 		_ => null
 	};
 }

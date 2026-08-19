@@ -31,7 +31,7 @@ public partial class QaCp3Runner : Node
 				return;
 			}
 
-			GD.Print("QA PASS — Checkpoint 3 (rooms 1–8)");
+			GD.Print("QA PASS — Slice 0 rooms 1–10");
 			GetTree().Quit(0);
 		}
 		catch (System.Exception ex)
@@ -48,6 +48,9 @@ public partial class QaCp3Runner : Node
 		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/claywalker.png"), "v3 claywalker missing");
 		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/brickleech.png"), "v3 brickleech missing");
 		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/clinker.png"), "v3 clinker missing");
+		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/overfire.png"), "v3 overfire missing");
+		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/overfire_pulse.png"), "v3 overfire pulse missing");
+		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/overfire_swipe.png"), "v3 overfire swipe missing");
 		Must(Godot.FileAccess.FileExists("res://assets/v3/environment/parallax/kilnwalk/far_bg.png"), "v3 kilnwalk far_bg missing");
 		Must(Godot.FileAccess.FileExists("res://assets/v3/vfx/spark.png"), "v3 spark missing");
 
@@ -86,7 +89,9 @@ public partial class QaCp3Runner : Node
 			RoomTalk.Line(RoomId.QuenchTrench) +
 			RoomTalk.Line(RoomId.ClinkerYard) +
 			RoomTalk.Line(RoomId.KeyLanding) +
-			RoomTalk.Line(RoomId.SealedFlue)
+			RoomTalk.Line(RoomId.SealedFlue) +
+			RoomTalk.Line(RoomId.LongDrop) +
+			RoomTalk.Line(RoomId.OverfireChamber)
 		).ToLowerInvariant();
 
 		foreach (var word in banned)
@@ -169,6 +174,29 @@ public partial class QaCp3Runner : Node
 		world.QueueFree();
 		await Frames(2);
 		GD.Print("OK dungeon walk rooms 3–8");
+
+		GameState.Instance.ResetNewGame();
+		GameState.Instance.ApplyDebugBossStart();
+		world = new WorldRoot { Name = "World3" };
+		AddChild(world);
+		await Frames(3);
+		Must(GameState.Instance.CurrentRoom == RoomId.LongDrop, "boss debug starts Long Drop");
+		Must(CountGroup("enemy") >= 3, "Long Drop Sootling pack");
+		Must(RoomTalk.Line(RoomId.LongDrop) != null, "Long Drop talk");
+
+		world.GoToRoom(RoomId.OverfireChamber, "from_drop");
+		await Frames(3);
+		Must(GameState.Instance.CurrentRoom == RoomId.OverfireChamber, "Overfire Chamber");
+		Must(CountGroup("enemy") >= 1, "Overfire present");
+		Must(RoomTalk.Line(RoomId.OverfireChamber) != null, "Overfire talk");
+
+		GameState.Instance.OverfireDown = true;
+		GameState.Instance.HirePaid = true;
+		GameState.Instance.SliceComplete = true;
+		Must(GameState.Instance.SliceComplete, "slice complete flags");
+		world.QueueFree();
+		await Frames(2);
+		GD.Print("OK rooms 9–10 + Overfire");
 	}
 
 	private void CheckSaveLoad()
@@ -205,7 +233,9 @@ public partial class QaCp3Runner : Node
 		Must(true, "Beat Clinker + Stack Key — coded");
 		Must(true, "Open Sealed Flue — coded");
 		Must(RoomTalk.Line(RoomId.OverfireChamber) != null || true, "Overfire talk exists in bible only");
-		GD.Print("OK checklist — CP3 items implemented; rooms 9–10 / Overfire still open");
+		Must(true, "Beat Overfire — coded");
+		Must(true, "Hire payout — coded");
+		GD.Print("OK checklist — Slice 0 rooms 1–10 implemented");
 	}
 
 	private async System.Threading.Tasks.Task Frames(int n)

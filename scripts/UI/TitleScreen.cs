@@ -7,11 +7,13 @@ public partial class TitleScreen : Control
 	/// <summary>Last-frame modifiers — click releases keys before Pressed, so sample here.</summary>
 	private bool _shiftLatched;
 	private bool _ctrlLatched;
+	private bool _altLatched;
 
 	public override void _Process(double delta)
 	{
 		_shiftLatched = Input.IsPhysicalKeyPressed(Key.Shift);
 		_ctrlLatched = Input.IsPhysicalKeyPressed(Key.Ctrl);
+		_altLatched = Input.IsPhysicalKeyPressed(Key.Alt);
 	}
 
 	public override void _Ready()
@@ -41,7 +43,7 @@ public partial class TitleScreen : Control
 
 		var sub = new Label
 		{
-			Text = "Slice 0 — Checkpoint 3: Kilnwalk + Cold Stack rooms 1–8",
+			Text = "Slice 0 — Kilnwalk and the Cold Stack",
 			Position = new Vector2(84, 100),
 			Size = new Vector2(900, 30)
 		};
@@ -51,7 +53,7 @@ public partial class TitleScreen : Control
 
 		var blurb = new Label
 		{
-			Text = "Walk the ridge. Take the hire. Get Crackiron.\nCold Stack through Sealed Flue. Clinker + Stack Key. Rooms 9–10 later.",
+			Text = "Walk the ridge. Take the hire. Get Crackiron.\nShut the Overfire. Coin when you come back up.",
 			Position = new Vector2(84, 200),
 			Size = new Vector2(700, 80)
 		};
@@ -66,7 +68,9 @@ public partial class TitleScreen : Control
 			// Use latched Shift (last _Process), not IsPhysicalKeyPressed at click.
 			if (_shiftLatched)
 			{
-				if (_ctrlLatched)
+				if (_altLatched)
+					GameState.Instance.ApplyDebugBossStart();
+				else if (_ctrlLatched)
 					GameState.Instance.ApplyDebugCp3Start();
 				else
 					GameState.Instance.ApplyDebugStackMouthStart();
@@ -86,7 +90,7 @@ public partial class TitleScreen : Control
 
 		var keys = new Label
 		{
-			Text = "Keys: WASD/Arrows move · J/Z attack · K/X bellows · L/Shift dodge · E/Enter interact · Esc/M pause map\nQA: Shift+New → Stack Mouth · Ctrl+Shift+New → CP3 Dead Fan Walk (fan open)",
+			Text = "Keys: WASD/Arrows move · J/Z attack · K/X bellows · L/Shift dodge · E/Enter interact · Esc/M pause map\nQA: Shift+New Stack Mouth · Ctrl+Shift+New Dead Fan · Alt+Shift+New Long Drop",
 			Position = new Vector2(84, 460),
 			Size = new Vector2(1100, 60)
 		};
