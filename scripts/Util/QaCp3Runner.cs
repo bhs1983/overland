@@ -218,10 +218,10 @@ public partial class QaCp3Runner : Node
 		Must(!GameState.Instance.MouthOpen, "mouth starts sealed");
 		Must(!GameState.Instance.HasCrackiron, "no sword at new game");
 
-		GameState.Instance.HireTaken = true;
-		GameState.Instance.MouthOpen = true;
+		GameState.Instance.TakeHire();
 		GameState.Instance.HasCrackiron = true;
 		world.RefreshGates();
+		Must(GameState.Instance.HireTaken, "hire taken");
 		Must(GameState.Instance.MouthOpen, "mouth opens after hire");
 
 		world.GoToRoom(RoomId.StackMouth, "from_town");

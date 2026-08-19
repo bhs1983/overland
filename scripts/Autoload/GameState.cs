@@ -142,6 +142,13 @@ public partial class GameState : Node
 		CurrentRoom = room;
 	}
 
+	/// <summary>Tamsin's hire. Opens the stack mouth — Rook is flavor, not a second key.</summary>
+	public void TakeHire()
+	{
+		HireTaken = true;
+		MouthOpen = true;
+	}
+
 	public void Heal(int amount)
 	{
 		Hp = Mathf.Min(MaxHp, Hp + amount);

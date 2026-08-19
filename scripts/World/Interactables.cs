@@ -91,7 +91,10 @@ public partial class NpcInteractable : Interactable
 					gs.SliceComplete = true;
 				}
 				else
-					gs.HireTaken = true;
+				{
+					gs.TakeHire();
+					(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Mouth's open. Walk north into the stack.");
+				}
 				break;
 			case "Holt Vetch":
 				gs.HasCrackiron = true;
@@ -160,6 +163,7 @@ public partial class MouthGate : StaticBody2D
 			? Vector2.One
 			: new Vector2(2, 1);
 		AddChild(_sprite);
+		AddChild(new MouthHint());
 		Refresh();
 	}
 
@@ -169,6 +173,32 @@ public partial class MouthGate : StaticBody2D
 		_sprite.Texture = Assets.Town(open ? "stack_mouth_open" : "stack_mouth_sealed");
 		_col.Disabled = open;
 		CollisionLayer = open ? 0u : 1u;
+	}
+}
+
+/// <summary>E on the sealed mouth tells you why it will not yield.</summary>
+public partial class MouthHint : Interactable
+{
+	public override void _Ready()
+	{
+		Prompt = "Mouth";
+		base._Ready();
+	}
+
+	public override void Interact(PlayerController player)
+	{
+		var gs = GameState.Instance;
+		var ui = GetTree().GetFirstNodeInGroup("game_ui") as GameUi;
+		if (gs.MouthOpen)
+			ui?.ShowToast("Walk north into the stack.");
+		else if (gs.HireTaken)
+		{
+			gs.MouthOpen = true;
+			GetTree().CallGroup("world", "RefreshGates");
+			ui?.ShowToast("Lock's off. Walk north into the stack.");
+		}
+		else
+			ui?.ShowToast("Sealed. Take the hire from Tamsin.");
 	}
 }
 

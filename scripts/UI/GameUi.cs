@@ -299,7 +299,7 @@ public partial class GameUi : CanvasLayer
 	{
 		_toast.Text = text;
 		_toast.Visible = true;
-		_toastTime = 2.4f;
+		_toastTime = 4.5f;
 	}
 
 	private void TogglePauseMap()

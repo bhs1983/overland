@@ -207,7 +207,7 @@ public partial class WorldRoot : Node2D
 			}
 		}
 
-		AddBorderWalls(root, W, H, town: true, northSprite: false);
+		AddBorderWalls(root, W, H, town: true);
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
 
@@ -235,17 +235,17 @@ public partial class WorldRoot : Node2D
 
 		_mouthGate = new MouthGate
 		{
-			Position = new Vector2(10 * Tiles.Size, 1.5f * Tiles.Size)
+			Position = new Vector2(10 * Tiles.Size, Tiles.Size * 0.5f)
 		};
 		root.AddChild(_mouthGate);
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, 0.5f * Tiles.Size),
+			Position = new Vector2(10 * Tiles.Size, Tiles.Size * 0.5f),
 			Target = RoomId.StackMouth,
 			SpawnId = "from_town",
 			RequiresMouthOpen = true,
-			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
+			TriggerSize = new Vector2(Tiles.Px(2f), Tiles.Px(1.25f))
 		});
 		FrameRoom(W, H, ridgeSky: true);
 	}
