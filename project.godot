@@ -8,7 +8,7 @@ config_version=5
 config/name="Overland Slice 0"
 config/description="Kilnwalk and the Cold Stack. Original IP."
 run/main_scene="res://scenes/Title.tscn"
-config/features=PackedStringArray("4.7", "C#", "Forward Plus")
+config/features=PackedStringArray("4.7", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -97,5 +97,7 @@ pause_map={
 
 [rendering]
 
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
 textures/canvas_textures/default_texture_filter=0
 environment/defaults/default_clear_color=Color(0.12, 0.09, 0.07, 1)
