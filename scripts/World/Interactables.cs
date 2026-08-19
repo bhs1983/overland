@@ -131,9 +131,10 @@ public partial class SavePoint : Interactable
 		base._Ready();
 		if (NightFire)
 		{
-			var fire = Assets.TileSprite("night_fire");
+			var fire = Assets.TileSprite("night_fire_0");
 			Assets.ApplyFeetPivot(fire);
 			AddChild(fire);
+			AddChild(SliceParallax.Cookie("kilnwalk", "light_lantern", Vector2.Zero, 0.9f, 4.4f));
 		}
 		else
 			AddChild(Assets.Sprite(Assets.Ui("save_mark")));
@@ -162,7 +163,9 @@ public partial class MouthGate : StaticBody2D
 		};
 		AddChild(_col);
 		_sprite = Assets.TileSprite("stack_mouth_sealed");
-		_sprite.Scale = new Vector2(2, 1);
+		_sprite.Scale = Assets.HasNativeTown("stack_mouth_sealed") && Assets.HasNativeTown("stack_mouth_open")
+			? Vector2.One
+			: new Vector2(2, 1);
 		AddChild(_sprite);
 		Refresh();
 	}

@@ -757,7 +757,13 @@ public partial class WorldRoot : Node2D
 
 	private static void PlaceFloor(Node2D root, string tile, int x, int y)
 	{
-		var s = Assets.TileSprite(tile);
+		var name = tile switch
+		{
+			"brick_floor" => Assets.Variant("brick_floor", x, y, 6),
+			"street" => Assets.Variant("street", x, y, 4),
+			_ => tile
+		};
+		var s = Assets.TileSprite(name);
 		s.Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, y * Tiles.Size + Tiles.Size / 2f);
 		root.AddChild(s);
 	}
@@ -801,6 +807,10 @@ public partial class WorldRoot : Node2D
 	{
 		var s = Assets.TileSprite(tile);
 		s.Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, y * Tiles.Size + Tiles.Size / 2f);
+		if (tile == "kiln" && s.Texture != null && s.Texture.GetWidth() == 64)
+			Assets.ApplyFeetPivot(s, 64, 64);
+		else if (tile == "door" && s.Texture != null && s.Texture.GetWidth() == 32)
+			Assets.ApplyFeetPivot(s, 32, 32);
 		root.AddChild(s);
 	}
 

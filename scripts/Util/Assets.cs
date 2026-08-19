@@ -49,9 +49,46 @@ public static class Assets
 		return tex;
 	}
 
-	/// <summary>CP2 town tile, nearest-scaled ×2. Do not use for items/UI/VFX/characters.</summary>
-	public static Texture2D Town(string name) =>
-		LoadPngNearestScaled($"res://assets/tiles/town/{name}.png", 2);
+	public static string Variant(string stem, int x, int y, int n) =>
+		$"{stem}_{(char)('a' + Math.Abs(x + y) % n)}";
+
+	public static string LegacyStem(string name)
+	{
+		var i = name.LastIndexOf('_');
+		if (i < 0 || i == name.Length - 1)
+			return name;
+		var suf = name[(i + 1)..];
+		if (suf.Length == 1 && suf[0] is >= 'a' and <= 'f')
+			return name[..i];
+		if (int.TryParse(suf, out _))
+			return name[..i];
+		return name;
+	}
+
+	public static bool HasNativeTown(string name)
+	{
+		var dest = $"res://assets/environment/town/{name}.png";
+		if (!Godot.FileAccess.FileExists(dest))
+			return false;
+		var tex = LoadPngNearest(dest);
+		return tex != null && tex.GetWidth() != 16;
+	}
+
+	/// <summary>
+	/// Dual-read: native <c>environment/town/{name}.png</c> if not 16px, else CP2
+	/// <c>tiles/town/{LegacyStem}.png</c> nearest-scaled ×2.
+	/// </summary>
+	public static Texture2D Town(string name)
+	{
+		var dest = $"res://assets/environment/town/{name}.png";
+		if (Godot.FileAccess.FileExists(dest))
+		{
+			var native = LoadPngNearest(dest);
+			if (native != null && native.GetWidth() != 16)
+				return native;
+		}
+		return LoadPngNearestScaled($"res://assets/tiles/town/{LegacyStem(name)}.png", 2);
+	}
 
 	/// <summary>CP2 cold tile, nearest-scaled ×2. Do not use for items/UI/VFX/characters.</summary>
 	public static Texture2D ColdStack(string name) =>

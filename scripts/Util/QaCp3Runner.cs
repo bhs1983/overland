@@ -69,13 +69,23 @@ public partial class QaCp3Runner : Node
 		Must(HeroAtlas.PivotX == 16 && HeroAtlas.PivotY == 47, "pivot 16,47");
 		Must(HeroAtlas.CellW == 32 && HeroAtlas.CellH == 48, "hero cell 32x48");
 
-		// Dual pipeline: tiles + Sootling still CP2 16px.
-		Must(ResourceLoader.Exists("res://assets/tiles/town/brick_floor.png"), "CP2 town tile missing");
-		Must(ResourceLoader.Exists("res://assets/sprites/enemies/sootling.png"), "CP2 sootling missing");
-		Must(!ResourceLoader.Exists("res://assets/v3/environment/town_tiles.png"),
-			"v3 town_tiles.png unexpectedly present — tiles should stay CP2 until authored");
+		string[] town = {
+			"brick_floor_a", "brick_floor_b", "brick_floor_c", "brick_floor_d", "brick_floor_e", "brick_floor_f",
+			"street_a", "street_b", "street_c", "street_d",
+			"brick_wall", "kiln", "night_fire_0", "night_fire_1", "night_fire_2", "night_fire_3",
+			"stack_mouth_sealed", "stack_mouth_open", "door"
+		};
+		foreach (var stem in town)
+			Must(Godot.FileAccess.FileExists($"res://assets/environment/town/{stem}.png"), $"town {stem} missing");
 
-		GD.Print("OK art — v3 hero/enemies/parallax wired; tiles still CP2 16px");
+		Must(ResourceLoader.Exists("res://assets/sprites/enemies/sootling.png"), "CP2 sootling missing");
+		Must(ResourceLoader.Exists("res://assets/tiles/cold_stack/ash_floor.png"), "CP2 cold tile missing");
+		Must(!ResourceLoader.Exists("res://assets/v3/environment/town_tiles.png"),
+			"packed town_tiles.png must stay absent");
+		Must(!Godot.FileAccess.FileExists("res://assets/environment/town_tiles.png"),
+			"packed town_tiles.png must stay absent at dest");
+
+		GD.Print("OK art — Kilnwalk 32px town wired; cold tiles still CP2; packed sheets absent");
 	}
 
 	private void CheckLegalStrings()
