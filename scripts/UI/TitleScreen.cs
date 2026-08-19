@@ -39,7 +39,7 @@ public partial class TitleScreen : Control
 
 		var sub = new Label
 		{
-			Text = "Slice 0 — Checkpoint 1: Kilnwalk (town only)",
+			Text = "Slice 0 — Checkpoint 3: Kilnwalk + Cold Stack rooms 1–8",
 			Position = new Vector2(84, 100),
 			Size = new Vector2(900, 30)
 		};
@@ -49,7 +49,7 @@ public partial class TitleScreen : Control
 
 		var blurb = new Label
 		{
-			Text = "Walk the ridge. Take the hire. Get Crackiron.\nMouth opens after Tamsin — dungeon is Checkpoint 2.",
+			Text = "Walk the ridge. Take the hire. Get Crackiron.\nCold Stack through Sealed Flue. Clinker + Stack Key. Rooms 9–10 later.",
 			Position = new Vector2(84, 200),
 			Size = new Vector2(700, 80)
 		};
@@ -63,7 +63,12 @@ public partial class TitleScreen : Control
 			GameState.Instance.ResetNewGame();
 			// Use latched Shift (last _Process), not IsPhysicalKeyPressed at click.
 			if (_shiftLatched)
-				GameState.Instance.ApplyDebugStackMouthStart();
+			{
+				if (Input.IsPhysicalKeyPressed(Key.Ctrl))
+					GameState.Instance.ApplyDebugCp3Start();
+				else
+					GameState.Instance.ApplyDebugStackMouthStart();
+			}
 			GetTree().ChangeSceneToFile("res://scenes/Game.tscn");
 		};
 		AddChild(newBtn);
@@ -79,7 +84,7 @@ public partial class TitleScreen : Control
 
 		var keys = new Label
 		{
-			Text = "Keys: WASD/Arrows move · J/Z attack · L/Shift dodge · E/Enter interact · Esc/M pause map\nQA: hold Shift + New Game → Stack Mouth (hire + Crackiron, from_town y=8)",
+			Text = "Keys: WASD/Arrows move · J/Z attack · K/X bellows · L/Shift dodge · E/Enter interact · Esc/M pause map\nQA: Shift+New → Stack Mouth · Ctrl+Shift+New → CP3 Dead Fan Walk (fan open)",
 			Position = new Vector2(84, 460),
 			Size = new Vector2(1100, 60)
 		};

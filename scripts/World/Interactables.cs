@@ -150,6 +150,7 @@ public partial class RoomTransition : Area2D
 	public string SpawnId { get; set; } = "default";
 	public bool RequiresMouthOpen { get; set; }
 	public bool RequiresFanOpen { get; set; }
+	public bool RequiresClinkerDown { get; set; }
 	public Vector2 TriggerSize { get; set; } = new(20, 12);
 
 	private bool _cooldown;
@@ -179,6 +180,11 @@ public partial class RoomTransition : Area2D
 		if (RequiresFanOpen && !GameState.Instance.FanOpened)
 		{
 			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Dead fan blocks the east door. Puff the Folded Bellows.");
+			return;
+		}
+		if (RequiresClinkerDown && !GameState.Instance.ClinkerDown)
+		{
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("The Clinker still blocks the way north.");
 			return;
 		}
 		_cooldown = true;
@@ -328,11 +334,12 @@ public partial class FanEastDoor : StaticBody2D
 	}
 }
 
-/// <summary>Toast-only zone (Checkpoint 2 east exit — no room 4).</summary>
+/// <summary>Toast-only zone (e.g. CP3 end — no rooms 9–10).</summary>
 public partial class CheckpointToastZone : Area2D
 {
 	public string Message { get; set; } = "";
 	public bool RequiresFanOpen { get; set; }
+	public bool RequiresIronOpen { get; set; }
 	public Vector2 TriggerSize { get; set; } = new(16, 16);
 	private bool _cooldown;
 
@@ -354,8 +361,136 @@ public partial class CheckpointToastZone : Area2D
 			return;
 		if (RequiresFanOpen && !GameState.Instance.FanOpened)
 			return;
+		if (RequiresIronOpen && !GameState.Instance.IronDoorOpen)
+			return;
 		_cooldown = true;
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast(Message);
 		GetTree().CreateTimer(1.2f).Timeout += () => _cooldown = false;
+	}
+}
+
+/// <summary>Setter's Alcove optional heal.</summary>
+public partial class AlcoveHeal : Interactable
+{
+	public override void _Ready()
+	{
+		base._Ready();
+		Prompt = "Rest";
+		var s = Assets.ColdStackSprite("ash_pile");
+		s.Modulate = Palette.ColdDraftLight;
+		AddChild(s);
+	}
+
+	public override void Interact(PlayerController player)
+	{
+		if (GameState.Instance.AlcoveHealTaken)
+		{
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Cool ash. Nothing left.");
+			return;
+		}
+		GameState.Instance.AlcoveHealTaken = true;
+		GameState.Instance.Heal(2);
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Warm ash. +2.");
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+	}
+}
+
+/// <summary>Key Landing — Stack Key after Clinker.</summary>
+public partial class StackKeyPickup : Interactable
+{
+	public override void _Ready()
+	{
+		base._Ready();
+		Prompt = "Take";
+		AddChild(Assets.Sprite(Assets.Item("stack_key")));
+		if (GameState.Instance.StackKeyTaken)
+			Visible = false;
+	}
+
+	public override void Interact(PlayerController player)
+	{
+		if (GameState.Instance.StackKeyTaken)
+		{
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Already have the Stack Key.");
+			return;
+		}
+		if (!GameState.Instance.ClinkerDown)
+		{
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Not yet. The Clinker still stands.");
+			return;
+		}
+		GameState.Instance.StackKeyTaken = true;
+		GameState.Instance.HasStackKey = true;
+		Visible = false;
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Stack Key — opens the Sealed Flue.");
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+	}
+}
+
+/// <summary>Sealed Flue iron door — Stack Key gate. No rooms 9–10 in CP3.</summary>
+public partial class IronDoorGate : StaticBody2D
+{
+	private CollisionShape2D _col = null!;
+	private Sprite2D _sprite = null!;
+
+	public override void _Ready()
+	{
+		CollisionLayer = 1 << 0;
+		_col = new CollisionShape2D
+		{
+			Shape = new RectangleShape2D { Size = new Vector2(16, 32) }
+		};
+		AddChild(_col);
+		_sprite = Assets.ColdStackSprite("iron_door_closed");
+		AddChild(_sprite);
+		AddToGroup("iron_door");
+		Refresh();
+	}
+
+	public void Refresh()
+	{
+		var open = GameState.Instance.IronDoorOpen;
+		_col.Disabled = open;
+		CollisionLayer = open ? 0u : 1u;
+		_sprite.Texture = Assets.ColdStack(open ? "iron_door_open" : "iron_door_closed");
+	}
+}
+
+/// <summary>Interact to unlock Sealed Flue with Stack Key.</summary>
+public partial class IronDoorUnlock : Interactable
+{
+	public override void _Ready()
+	{
+		base._Ready();
+		Prompt = "Unlock";
+	}
+
+	public override void Interact(PlayerController player)
+	{
+		if (GameState.Instance.IronDoorOpen)
+		{
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Iron door open.");
+			return;
+		}
+		if (!GameState.Instance.HasStackKey)
+		{
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Needs the Stack Key.");
+			return;
+		}
+		GameState.Instance.IronDoorOpen = true;
+		GetTree().CallGroup("world", "RefreshGates");
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Iron door opens. Checkpoint 3 complete — rooms 9–10 later.");
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+	}
+}
+
+/// <summary>Quench water visual + slight slow (cosmetic channel).</summary>
+public partial class QuenchWaterTile : Sprite2D
+{
+	public override void _Ready()
+	{
+		Texture = Assets.ColdStack("quench_water");
+		TextureFilter = TextureFilterEnum.Nearest;
+		Centered = true;
 	}
 }

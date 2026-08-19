@@ -91,6 +91,25 @@ public partial class GameState : Node
 		RoomsEntered.Add(RoomId.StackMouth.ToString());
 	}
 
+	/// <summary>QA skip: CP3 ready at Dead Fan Walk east — bellows + fan open.</summary>
+	public void ApplyDebugCp3Start()
+	{
+		HireTaken = true;
+		HasCrackiron = true;
+		HasFoldedBellows = true;
+		Hp = MaxHp;
+		MouthOpen = true;
+		MapMarked = true;
+		FanOpened = true;
+		BellowsChestOpened = true;
+		CurrentRoom = RoomId.DeadFanWalk;
+		LastSaveRoom = RoomId.DeadFanWalk;
+		LastSavePosition = new Vector2(14 * Tiles.Size, 6 * Tiles.Size);
+		RoomsEntered.Add(RoomId.StackMouth.ToString());
+		RoomsEntered.Add(RoomId.AshdriftHall.ToString());
+		RoomsEntered.Add(RoomId.DeadFanWalk.ToString());
+	}
+
 	public void MarkRoomEntered(RoomId room)
 	{
 		RoomsEntered.Add(room.ToString());

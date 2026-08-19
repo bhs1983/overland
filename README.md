@@ -40,9 +40,17 @@ First place: **Kilnwalk**. First dungeon: **the Cold Stack** (Checkpoint 2+).
 2. North → **Ashdrift Hall** — puff ash piles with Folded Bellows; open the chest for **Folded Bellows**.
 3. East → **Dead Fan Walk** — puff the dead fan; east door opens.
 
-Cold Stack rooms 1–3 use locked Art under `assets/tiles/cold_stack/` and `assets/sprites/enemies/sootling.png` (`ash_floor.png` pending Art resend — floors fall back to town brick until then).
+### Checkpoint 3 — Cold Stack rooms 4–8
 
-Rooms 4–10 are **not** in this PR.
+1. East from Dead Fan Walk → **Setter's Alcove** — two **Claywalkers** (bellows then Crackiron); optional heal.
+2. South → **Quench Trench** — water channel, **Brickleeches** drop; side path back to room 3.
+3. East → **Clinker Yard** — miniboss **the Clinker** (bellows opens cracks).
+4. North after Clinker → **Key Landing** — **Stack Key**.
+5. North → **Sealed Flue** — Stack Key opens the iron door. Rooms 9–10 later.
+
+v3 hero atlas (`fluewalker_*`, pivot 16,47) + parallax layers (far 0.2 / mid 0.5 / FG 1.35 / fog 0.25). No 3D camera.
+
+Rooms 9–10 are **not** in this PR.
 
 ## Credits
 

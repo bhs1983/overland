@@ -17,6 +17,27 @@ public static class Assets
 		return t;
 	}
 
+	/// <summary>
+	/// Load PNG bytes into ImageTexture (no mipmaps). Filter/Repeat are applied on the CanvasItem.
+	/// Prefer this for v3 assets so Nearest + no-mipmaps hold without editor import.
+	/// </summary>
+	public static Texture2D LoadPngNearest(string path, bool repeat = false)
+	{
+		var key = $"{path}|png|{(repeat ? "r" : "n")}";
+		if (Cache.TryGetValue(key, out var cached) && cached != null)
+			return cached;
+
+		var bytes = Godot.FileAccess.GetFileAsBytes(path);
+		var img = new Image();
+		var err = img.LoadPngFromBuffer(bytes);
+		if (err != Error.Ok)
+			GD.PushError($"LoadPngNearest failed {path}: {err}");
+		var tex = ImageTexture.CreateFromImage(img);
+		Cache[key] = tex;
+		Cache[path] = tex;
+		return tex;
+	}
+
 	public static Texture2D Town(string name) => Tex($"res://assets/tiles/town/{name}.png");
 	public static Texture2D ColdStack(string name) => Tex($"res://assets/tiles/cold_stack/{name}.png");
 	public static Texture2D? ColdStackOrNull(string name)
@@ -40,14 +61,26 @@ public static class Assets
 	}
 	public static Texture2D Item(string name) => Tex($"res://assets/sprites/items/{name}.png");
 	public static Texture2D Enemy(string name) => Tex($"res://assets/sprites/enemies/{name}.png");
+	public static Texture2D EnemyV3(string name) =>
+		LoadPngNearest($"res://assets/v3/characters/enemies/{name}.png");
+	public static Texture2D Vfx(string name) =>
+		LoadPngNearest($"res://assets/v3/vfx/{name}.png");
+	public static Texture2D Parallax(string theme, string name) =>
+		LoadPngNearest($"res://assets/v3/environment/parallax/{theme}/{name}.png",
+			repeat: name is "far_bg" or "mid_bg");
+	public static Texture2D ParallaxShared(string name) =>
+		LoadPngNearest($"res://assets/v3/environment/parallax/shared/{name}.png");
 	public static Texture2D Ui(string name) => Tex($"res://assets/ui/{name}.png");
 
-	public static Sprite2D Sprite(Texture2D? tex, Vector2? centeredOffset = null)
+	public static Sprite2D Sprite(Texture2D? tex, Vector2? centeredOffset = null, bool repeat = false)
 	{
 		var s = new Sprite2D
 		{
 			Texture = tex,
 			TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+			TextureRepeat = repeat
+				? CanvasItem.TextureRepeatEnum.Enabled
+				: CanvasItem.TextureRepeatEnum.Disabled,
 			Centered = true
 		};
 		if (centeredOffset.HasValue)
