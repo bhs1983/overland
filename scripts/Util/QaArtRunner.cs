@@ -35,7 +35,7 @@ public partial class QaArtRunner : Node
 		"whimble", "whimsicle", "master sword", "master_sword", "master-sword", "mastersword"
 	};
 
-	// Specific globs first. **/ so they match assets/v3/... now and assets/... after flatten.
+	// Specific globs first. **/ matches assets/characters/... after flatten.
 	private static readonly Row[] Manifest =
 	{
 		new() { Glob = "**/characters/hero/hero_atlas.png", W = 338, H = 348, Mode = Mode.Fail },
@@ -100,11 +100,16 @@ public partial class QaArtRunner : Node
 			CheckPalettePng();
 			CheckHeroAtlasJson();
 			ScanTree("res://assets");
-			// Packed sheets are not Slice 0 — absence is success.
-			if (Godot.FileAccess.FileExists("res://assets/v3/environment/town_tiles.png")
-				|| Godot.FileAccess.FileExists("res://assets/environment/town_tiles.png"))
+			if (DirAccess.Open("res://assets/tiles") != null)
+				Fail("leftover assets/tiles");
+			if (DirAccess.Open("res://assets/sprites") != null)
+				Fail("leftover assets/sprites");
+			if (DirAccess.Open("res://assets/v3") != null)
+				Fail("leftover assets/v3");
+			if (Godot.FileAccess.FileExists("res://assets/environment/town_tiles.png")
+				|| Godot.FileAccess.FileExists("res://assets/environment/cold_tiles.png"))
 			{
-				Fail("packed town_tiles.png present — Slice 0 uses individuals");
+				Fail("packed town/cold_tiles.png present — Slice 0 uses individuals");
 			}
 
 			if (_fails > 0)

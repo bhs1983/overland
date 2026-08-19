@@ -58,7 +58,7 @@ public static class HeroAtlas
 		if (_atlasTex != null)
 			return;
 		_atlasTex = Assets.LoadPngNearest(
-			"res://assets/v3/characters/hero/hero_atlas.png",
+			"res://assets/characters/hero/hero_atlas.png",
 			repeat: false);
 	}
 
@@ -70,7 +70,7 @@ public static class HeroAtlas
 		if (frames.HasAnimation("default"))
 			frames.RemoveAnimation("default");
 
-		var jsonText = Godot.FileAccess.GetFileAsString("res://assets/v3/characters/hero/hero_atlas.json");
+		var jsonText = Godot.FileAccess.GetFileAsString("res://assets/characters/hero/hero_atlas.json");
 		using var doc = JsonDocument.Parse(jsonText);
 		var root = doc.RootElement.GetProperty("frames");
 

@@ -29,7 +29,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		{
 			Shape = new CircleShape2D { Radius = Tiles.Px(0.375f) }
 		});
-		_body = Assets.Sprite(Assets.EnemyV3OrNull("sootling") ?? Assets.Enemy("sootling"));
+		_body = Assets.Sprite(Assets.Enemy("sootling"));
 		Assets.ApplyFeetPivot(_body);
 		_body.ZIndex = 10;
 		AddChild(_body);
@@ -130,7 +130,7 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
 		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.5f) } });
-		_body = Assets.Sprite(Assets.EnemyV3("claywalker"));
+		_body = Assets.Sprite(Assets.Enemy("claywalker"));
 		Assets.ApplyFeetPivot(_body, 32, 40);
 		_body.ZIndex = 10;
 		AddChild(_body);
@@ -222,7 +222,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
 		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.375f) } });
-		_body = Assets.Sprite(Assets.EnemyV3("brickleech"));
+		_body = Assets.Sprite(Assets.Enemy("brickleech"));
 		Assets.ApplyFeetPivot(_body, 32, 32);
 		_body.ZIndex = 10;
 		AddChild(_body);
@@ -323,7 +323,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
 		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.75f) } });
-		_body = Assets.Sprite(Assets.EnemyV3("clinker"));
+		_body = Assets.Sprite(Assets.Enemy("clinker"));
 		Assets.ApplyFeetPivot(_body, 48, 48);
 		_body.ZIndex = 10;
 		AddChild(_body);
@@ -432,7 +432,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
 		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.875f) } });
-		_body = Assets.Sprite(Assets.EnemyV3("overfire"));
+		_body = Assets.Sprite(Assets.Enemy("overfire"));
 		Assets.ApplyFeetPivot(_body, 64, 64);
 		_body.ZIndex = 10;
 		AddChild(_body);
@@ -553,7 +553,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 
 	private void SetSprite(string name)
 	{
-		var tex = Assets.EnemyV3(name);
+		var tex = Assets.Enemy(name);
 		if (tex != null)
 			_body.Texture = tex;
 	}

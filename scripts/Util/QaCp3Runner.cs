@@ -43,21 +43,21 @@ public partial class QaCp3Runner : Node
 
 	private void CheckArt()
 	{
-		Must(ResourceLoader.Exists("res://assets/v3/characters/hero/hero_atlas.png"), "v3 hero atlas missing");
-		Must(ResourceLoader.Exists("res://assets/v3/characters/hero/hero_atlas.json"), "v3 hero atlas json missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/claywalker.png"), "v3 claywalker missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/brickleech.png"), "v3 brickleech missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/clinker.png"), "v3 clinker missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/overfire.png"), "v3 overfire missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/overfire_pulse.png"), "v3 overfire pulse missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/overfire_swipe.png"), "v3 overfire swipe missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/enemies/sootling.png"), "v3 sootling missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/npcs/tamsin.png"), "npc tamsin missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/npcs/holt.png"), "npc holt missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/npcs/wren.png"), "npc wren missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/characters/npcs/rook.png"), "npc rook missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/environment/parallax/kilnwalk/far_bg.png"), "v3 kilnwalk far_bg missing");
-		Must(Godot.FileAccess.FileExists("res://assets/v3/vfx/spark.png"), "v3 spark missing");
+		Must(ResourceLoader.Exists("res://assets/characters/hero/hero_atlas.png"), "hero atlas missing");
+		Must(ResourceLoader.Exists("res://assets/characters/hero/hero_atlas.json"), "hero atlas json missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/claywalker.png"), "claywalker missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/brickleech.png"), "brickleech missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/clinker.png"), "clinker missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/overfire.png"), "overfire missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/overfire_pulse.png"), "overfire pulse missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/overfire_swipe.png"), "overfire swipe missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/enemies/sootling.png"), "sootling missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/npcs/tamsin.png"), "npc tamsin missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/npcs/holt.png"), "npc holt missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/npcs/wren.png"), "npc wren missing");
+		Must(Godot.FileAccess.FileExists("res://assets/characters/npcs/rook.png"), "npc rook missing");
+		Must(Godot.FileAccess.FileExists("res://assets/environment/parallax/kilnwalk/far_bg.png"), "kilnwalk far_bg missing");
+		Must(Godot.FileAccess.FileExists("res://assets/vfx/spark.png"), "spark missing");
 
 		var frames = HeroAtlas.Frames;
 		Must(frames.HasAnimation("fluewalker_idle_down"), "atlas idle_down");
@@ -102,16 +102,15 @@ public partial class QaCp3Runner : Node
 		foreach (var stem in ui)
 			Must(Godot.FileAccess.FileExists($"res://assets/ui/{stem}.png"), $"ui {stem} missing");
 		Must(!Godot.FileAccess.FileExists("res://assets/ui/ui.png"), "packed ui.png must be gone");
-
-		Must(ResourceLoader.Exists("res://assets/sprites/enemies/sootling.png"), "CP2 sootling missing");
-		Must(!ResourceLoader.Exists("res://assets/v3/environment/town_tiles.png"),
-			"packed town_tiles.png must stay absent");
+		Must(DirAccess.Open("res://assets/tiles") == null, "leftover assets/tiles");
+		Must(DirAccess.Open("res://assets/sprites") == null, "leftover assets/sprites");
+		Must(DirAccess.Open("res://assets/v3") == null, "leftover assets/v3");
 		Must(!Godot.FileAccess.FileExists("res://assets/environment/town_tiles.png"),
-			"packed town_tiles.png must stay absent at dest");
+			"packed town_tiles.png must stay absent");
 		Must(!Godot.FileAccess.FileExists("res://assets/environment/cold_tiles.png"),
 			"packed cold_tiles.png must stay absent");
 
-		GD.Print("OK art — town + cold 32px wired; packed sheets absent");
+		GD.Print("OK art — one tree under assets/; packed sheets and CP2 leftovers absent");
 	}
 
 	private void CheckLegalStrings()

@@ -3,7 +3,7 @@ using Godot;
 namespace Overland;
 
 /// <summary>
-/// Orthographic 2D parallax for Kilnwalk / Cold Stack per assets/v3/ART.md.
+/// Orthographic 2D parallax for Kilnwalk / Cold Stack per assets/ART.md.
 /// Far 0.2 Repeat, mid 0.5 Repeat, fog 0.25, FG 1.35 sparse.
 /// Main plane (hero/tiles) stays at 1.0 — never parented here. No 3D camera.
 /// Uses Godot 4.7 Parallax2D (not 3D).

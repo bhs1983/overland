@@ -2,20 +2,20 @@
 
 Original pixel assets, AI-drawn for Brandon Smith (studio Overland). No third-party packs. `LEGAL.md` is locked: not TES, not Zelda, not a port. Do not use Whimble/Whimsicle. Hero job is flue-walker. Filenames use `fluewalker_*` only.
 
-This file is the **only** art contract. It supersedes the Checkpoint-2 16-color spec (`assets/ART_CP2_HISTORICAL.md`). `assets/v3/ART.md` is a pointer here.
+This file is the **only** art contract. It supersedes the Checkpoint-2 16-color spec (`assets/ART_CP2_HISTORICAL.md`).
 
 Full unification plan (engine PRs, CheckArt lifecycle, risk): `docs/ART_UNIFICATION_PLAN.md`.
 
 ## Transitional vs locked
 
-| | On disk today | Locked destination |
+| | On disk | Locked |
 |---|---|---|
-| Palette | **32 v3 colors** (`palette.json` + `palette.png`) | same — this file |
-| `Palette.cs` hex | v3 table; `Iron` is `#3A4046`, not an AshDark alias | same |
-| World tiles | CP2 16×16 under `assets/tiles/` | 32×32 individuals under `assets/environment/` |
-| Items / UI | 16×16 | 32×32 |
-| Hero / NPCs / enemies | v3 sizes already | same cells / pivots |
-| `Tiles.Size` / camera | 16 / zoom 3 | **32 / zoom 2** (engine PR; do not flip here) |
+| Palette | **32 colors** (`palette.json` + `palette.png`) | same — this file |
+| `Palette.cs` hex | v3 table; `Iron` is `#3A4046` | same |
+| World tiles | 32px individuals under `assets/environment/` | same |
+| Items / UI | 32×32 under `assets/ui/` | same |
+| Hero / NPCs / enemies | `assets/characters/` | same cells / pivots |
+| `Tiles.Size` / camera | **32 / zoom 2** | same |
 | Packed `town_tiles.png` / `cold_tiles.png` / `props.png` / `enemies.png` | **absent — do not add** | still not Slice 0 on-disk |
 
 Slice 0 on-disk world art is **individual PNGs**, one file per name. Packed sheets are an optional packer output **after** Slice 0, never a required game file.
@@ -137,9 +137,9 @@ res://assets/
   ui/                             # crackiron, folded_bellows, stack_key, HUD icons
 ```
 
-There is **no** `ui/items/` subdirectory. Until flatten, live v3 characters / parallax / VFX stay under `assets/v3/`. CP2 tiles stay under `assets/tiles/` and leftover 16px hero frames under `assets/sprites/hero/` (unused).
+There is **no** `ui/items/` subdirectory. There is **no** `assets/v3/`, `assets/tiles/`, or `assets/sprites/`.
 
-Do **not** add `assets/v3/environment/town_tiles.png` (or `cold_tiles.png` / `props.png`). QaCp3 currently asserts those packed sheets are absent.
+Do **not** add packed `town_tiles.png` / `cold_tiles.png` / `props.png`. QaCp3 asserts those sheets are absent.
 
 ## Pivot (sacred)
 
