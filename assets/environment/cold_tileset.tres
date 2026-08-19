@@ -1,0 +1,75 @@
+[gd_resource type="TileSet" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/environment/cold/ash_floor_a.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/environment/cold/ash_floor_b.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/environment/cold/ash_floor_c.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/environment/cold/ash_floor_d.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/environment/cold/ash_floor_e.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/environment/cold/ash_floor_f.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/environment/cold/frost_ash_a.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/environment/cold/frost_ash_b.png" id="8"]
+[ext_resource type="Texture2D" path="res://assets/environment/cold/quench_water_a.png" id="9"]
+[ext_resource type="Texture2D" path="res://assets/environment/cold/quench_water_b.png" id="10"]
+
+[sub_resource type="TileSetAtlasSource" id="s1"]
+texture = ExtResource("1")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="s2"]
+texture = ExtResource("2")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="s3"]
+texture = ExtResource("3")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="s4"]
+texture = ExtResource("4")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="s5"]
+texture = ExtResource("5")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="s6"]
+texture = ExtResource("6")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="s7"]
+texture = ExtResource("7")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="s8"]
+texture = ExtResource("8")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="s9"]
+texture = ExtResource("9")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="s10"]
+texture = ExtResource("10")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[resource]
+tile_size = Vector2i(32, 32)
+sources/0 = SubResource("s1")
+sources/1 = SubResource("s2")
+sources/2 = SubResource("s3")
+sources/3 = SubResource("s4")
+sources/4 = SubResource("s5")
+sources/5 = SubResource("s6")
+sources/6 = SubResource("s7")
+sources/7 = SubResource("s8")
+sources/8 = SubResource("s9")
+sources/9 = SubResource("s10")

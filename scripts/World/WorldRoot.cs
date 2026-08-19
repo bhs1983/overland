@@ -10,6 +10,7 @@ public partial class WorldRoot : Node2D
 	private SliceParallax _parallax = null!;
 	private MouthGate? _mouthGate;
 	private FanEastDoor? _fanEastDoor;
+	private TileMapLayer? _floor;
 	private bool _transitioning;
 	public bool TransitionsReady { get; private set; }
 
@@ -81,6 +82,7 @@ public partial class WorldRoot : Node2D
 			c.QueueFree();
 		_mouthGate = null;
 		_fanEastDoor = null;
+		_floor = null;
 
 		var cold = room != RoomId.Kilnwalk;
 		_parallax.SetTheme(cold ? "cold_stack" : "kilnwalk");
@@ -188,6 +190,7 @@ public partial class WorldRoot : Node2D
 
 		const int W = 20;
 		const int H = 15;
+		AddFloorLayer(root, town: true);
 
 		for (int y = 1; y < H - 1; y++)
 		{
@@ -196,7 +199,7 @@ public partial class WorldRoot : Node2D
 				var tile = (y < 6) ? "brick_floor" : "street";
 				if (x >= 7 && x <= 12 && y >= 3 && y <= 7)
 					tile = "brick_floor";
-				PlaceFloor(root, tile, x, y);
+				PlaceFloor(tile, x, y);
 			}
 		}
 
@@ -447,15 +450,8 @@ public partial class WorldRoot : Node2D
 		const int W = 20;
 		const int H = 12;
 		FillBrickRoom(root, W, H);
-		// Water channel down the middle
 		for (int x = 3; x < W - 3; x++)
-		{
-			var w = new QuenchWaterTile
-			{
-				Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, 6 * Tiles.Size)
-			};
-			root.AddChild(w);
-		}
+			PlaceQuench(x, 6);
 		PlaceCracked(root, 5, 3);
 		PlaceCracked(root, 14, 8);
 		ClearWallAt(root, 9, 0);
@@ -731,22 +727,35 @@ public partial class WorldRoot : Node2D
 		});
 	}
 
-	private static void FillBrickRoom(Node2D root, int w, int h)
+	private void FillBrickRoom(Node2D root, int w, int h)
 	{
+		AddFloorLayer(root, town: false);
 		for (int y = 1; y < h - 1; y++)
 			for (int x = 1; x < w - 1; x++)
-				PlaceColdFloor(root, x, y);
+				PlaceColdFloor(x, y);
 		AddBorderWalls(root, w, h, town: false);
 	}
 
-	private static void PlaceColdFloor(Node2D root, int x, int y)
+	private void AddFloorLayer(Node2D root, bool town)
 	{
-		var name = (x + y) % 8 == 0
-			? Assets.Variant("frost_ash", x, y, 2)
-			: Assets.Variant("ash_floor", x, y, 6);
-		var s = Assets.ColdStackSprite(name);
-		s.Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, y * Tiles.Size + Tiles.Size / 2f);
-		root.AddChild(s);
+		_floor = new TileMapLayer
+		{
+			Name = "Floor",
+			TileSet = town ? FloorTiles.Town : FloorTiles.Cold,
+			TextureFilter = TextureFilterEnum.Nearest,
+			ZIndex = 0
+		};
+		root.AddChild(_floor);
+	}
+
+	private void PlaceColdFloor(int x, int y)
+	{
+		_floor!.SetCell(new Vector2I(x, y), FloorTiles.AshSource(x, y), Vector2I.Zero);
+	}
+
+	private void PlaceQuench(int x, int y)
+	{
+		_floor!.SetCell(new Vector2I(x, y), FloorTiles.QuenchSource(x, y), Vector2I.Zero);
 	}
 
 	private static void PlaceCracked(Node2D root, int x, int y)
@@ -757,17 +766,10 @@ public partial class WorldRoot : Node2D
 		root.AddChild(s);
 	}
 
-	private static void PlaceFloor(Node2D root, string tile, int x, int y)
+	private void PlaceFloor(string tile, int x, int y)
 	{
-		var name = tile switch
-		{
-			"brick_floor" => Assets.Variant("brick_floor", x, y, 6),
-			"street" => Assets.Variant("street", x, y, 4),
-			_ => tile
-		};
-		var s = Assets.TileSprite(name);
-		s.Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, y * Tiles.Size + Tiles.Size / 2f);
-		root.AddChild(s);
+		var source = tile == "street" ? FloorTiles.StreetSource(x, y) : FloorTiles.BrickSource(x, y);
+		_floor!.SetCell(new Vector2I(x, y), source, Vector2I.Zero);
 	}
 
 	private static void AddBorderWalls(Node2D root, int w, int h, bool town)
