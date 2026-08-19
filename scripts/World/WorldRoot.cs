@@ -742,14 +742,17 @@ public partial class WorldRoot : Node2D
 
 	private static void PlaceColdFloor(Node2D root, int x, int y)
 	{
-		var s = Assets.ColdStackFloorSprite();
+		var name = (x + y) % 8 == 0
+			? Assets.Variant("frost_ash", x, y, 2)
+			: Assets.Variant("ash_floor", x, y, 6);
+		var s = Assets.ColdStackSprite(name);
 		s.Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, y * Tiles.Size + Tiles.Size / 2f);
 		root.AddChild(s);
 	}
 
 	private static void PlaceCracked(Node2D root, int x, int y)
 	{
-		var s = Assets.ColdStackSprite("cracked_brick");
+		var s = Assets.ColdStackSprite(Assets.Variant("cracked_brick", x, y, 2));
 		s.Position = new Vector2(x * Tiles.Size + Tiles.Size / 2f, y * Tiles.Size + Tiles.Size / 2f);
 		s.ZIndex = 1;
 		root.AddChild(s);

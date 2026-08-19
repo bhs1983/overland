@@ -261,7 +261,7 @@ public partial class AshPile : StaticBody2D, IBellowsTarget
 		{
 			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(0.875f), Tiles.Px(0.875f)) }
 		});
-		var spr = Assets.ColdStackSprite("ash_pile");
+		var spr = Assets.PropSprite("ash_pile");
 		Assets.ApplyFeetPivot(spr);
 		AddChild(spr);
 	}
@@ -281,11 +281,9 @@ public partial class BellowsChest : Interactable
 	{
 		base._Ready();
 		Prompt = "Open";
-		var spr = Assets.ColdStackSprite("chest");
+		var spr = Assets.PropSprite(GameState.Instance.BellowsChestOpened ? "chest_open" : "chest_closed");
 		Assets.ApplyFeetPivot(spr);
 		AddChild(spr);
-		if (GameState.Instance.BellowsChestOpened)
-			spr.Modulate = new Color(1, 1, 1, 0.45f);
 	}
 
 	public override void Interact(PlayerController player)
@@ -300,8 +298,8 @@ public partial class BellowsChest : Interactable
 		gs.HasFoldedBellows = true;
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Folded Bellows — puff with K / X.");
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
-		if (GetChildCount() > 1 && GetChild(1) is CanvasItem c)
-			c.Modulate = new Color(1, 1, 1, 0.45f);
+		if (GetChildCount() > 1 && GetChild(1) is Sprite2D spr)
+			spr.Texture = Assets.Prop("chest_open");
 	}
 }
 
@@ -309,6 +307,9 @@ public partial class BellowsChest : Interactable
 public partial class DeadFan : StaticBody2D, IBellowsTarget
 {
 	private Sprite2D _sprite = null!;
+	private Texture2D[] _frames = Array.Empty<Texture2D>();
+	private int _frame;
+	private float _animT;
 
 	public override void _Ready()
 	{
@@ -317,7 +318,14 @@ public partial class DeadFan : StaticBody2D, IBellowsTarget
 		{
 			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(1f), Tiles.Px(1f)) }
 		});
-		_sprite = Assets.ColdStackSprite("dead_fan");
+		_frames = new[]
+		{
+			Assets.Prop("dead_fan_0"),
+			Assets.Prop("dead_fan_1"),
+			Assets.Prop("dead_fan_2"),
+			Assets.Prop("dead_fan_3")
+		};
+		_sprite = Assets.Sprite(_frames[0]);
 		Assets.ApplyFeetPivot(_sprite);
 		AddChild(_sprite);
 		var label = new Label
@@ -343,11 +351,27 @@ public partial class DeadFan : StaticBody2D, IBellowsTarget
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
 	}
 
+	public override void _Process(double delta)
+	{
+		if (!GameState.Instance.FanOpened || _frames.Length == 0)
+			return;
+		_animT += (float)delta;
+		if (_animT < 0.12f)
+			return;
+		_animT = 0;
+		_frame = (_frame + 1) % _frames.Length;
+		_sprite.Texture = _frames[_frame];
+	}
+
 	private void RefreshLook()
 	{
-		_sprite.Modulate = GameState.Instance.FanOpened
-			? new Color(Palette.ColdDraftLight)
-			: Colors.White;
+		if (GameState.Instance.FanOpened)
+			_sprite.Modulate = Colors.White;
+		else
+		{
+			_frame = 0;
+			_sprite.Texture = _frames.Length > 0 ? _frames[0] : _sprite.Texture;
+		}
 	}
 }
 
@@ -423,9 +447,8 @@ public partial class AlcoveHeal : Interactable
 	{
 		base._Ready();
 		Prompt = "Rest";
-		var s = Assets.ColdStackSprite("ash_pile");
+		var s = Assets.PropSprite("heal_ash");
 		Assets.ApplyFeetPivot(s);
-		s.Modulate = Palette.ColdDraftLight;
 		AddChild(s);
 	}
 
@@ -539,7 +562,9 @@ public partial class QuenchWaterTile : Sprite2D
 {
 	public override void _Ready()
 	{
-		Texture = Assets.ColdStack("quench_water");
+		var gx = (int)Mathf.Floor(Position.X / Tiles.Size);
+		var gy = (int)Mathf.Floor(Position.Y / Tiles.Size);
+		Texture = Assets.ColdStack(Assets.Variant("quench_water", gx, gy, 2));
 		TextureFilter = TextureFilterEnum.Nearest;
 		Centered = true;
 	}
@@ -552,8 +577,8 @@ public partial class StairHome : Interactable
 	{
 		base._Ready();
 		Prompt = "Climb";
-		var stair = Assets.ColdStackSprite("ledge");
-		Assets.ApplyFeetPivot(stair);
+		var stair = Assets.PropSprite("stair");
+		Assets.ApplyFeetPivot(stair, 32, 48);
 		AddChild(stair);
 		var label = new Label
 		{

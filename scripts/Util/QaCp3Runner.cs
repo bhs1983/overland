@@ -78,14 +78,32 @@ public partial class QaCp3Runner : Node
 		foreach (var stem in town)
 			Must(Godot.FileAccess.FileExists($"res://assets/environment/town/{stem}.png"), $"town {stem} missing");
 
+		string[] cold = {
+			"ash_floor_a", "ash_floor_b", "ash_floor_c", "ash_floor_d", "ash_floor_e", "ash_floor_f",
+			"frost_ash_a", "frost_ash_b", "flue_wall",
+			"iron_door_closed", "iron_door_open",
+			"quench_water_a", "quench_water_b", "ledge", "cracked_brick_a", "cracked_brick_b"
+		};
+		foreach (var stem in cold)
+			Must(Godot.FileAccess.FileExists($"res://assets/environment/cold/{stem}.png"), $"cold {stem} missing");
+
+		string[] props = {
+			"chest_closed", "chest_open",
+			"dead_fan_0", "dead_fan_1", "dead_fan_2", "dead_fan_3",
+			"ash_pile", "heal_ash", "stair"
+		};
+		foreach (var stem in props)
+			Must(Godot.FileAccess.FileExists($"res://assets/environment/props/{stem}.png"), $"prop {stem} missing");
+
 		Must(ResourceLoader.Exists("res://assets/sprites/enemies/sootling.png"), "CP2 sootling missing");
-		Must(ResourceLoader.Exists("res://assets/tiles/cold_stack/ash_floor.png"), "CP2 cold tile missing");
 		Must(!ResourceLoader.Exists("res://assets/v3/environment/town_tiles.png"),
 			"packed town_tiles.png must stay absent");
 		Must(!Godot.FileAccess.FileExists("res://assets/environment/town_tiles.png"),
 			"packed town_tiles.png must stay absent at dest");
+		Must(!Godot.FileAccess.FileExists("res://assets/environment/cold_tiles.png"),
+			"packed cold_tiles.png must stay absent");
 
-		GD.Print("OK art — Kilnwalk 32px town wired; cold tiles still CP2; packed sheets absent");
+		GD.Print("OK art — town + cold 32px wired; packed sheets absent");
 	}
 
 	private void CheckLegalStrings()
