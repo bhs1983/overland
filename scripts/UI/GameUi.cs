@@ -1,6 +1,5 @@
 using Godot;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Overland;
 
@@ -8,7 +7,11 @@ public partial class GameUi : CanvasLayer
 {
 	private HBoxContainer _hpRow = null!;
 	private HBoxContainer _itemRow = null!;
-	private Label _hud = null!;
+	private Label _bindAttack = null!;
+	private Label _bindBellows = null!;
+	private Label _bindUse = null!;
+	private PanelContainer _contextPanel = null!;
+	private Label _contextLabel = null!;
 	private PanelContainer _dialoguePanel = null!;
 	private Label _dialogueName = null!;
 	private Label _dialogueBody = null!;
@@ -54,28 +57,33 @@ public partial class GameUi : CanvasLayer
 		AddToGroup("game_ui");
 		Layer = 10;
 
-		_hpRow = new HBoxContainer { Position = new Vector2(16, 10) };
+		var topPlate = new ColorRect
+		{
+			Color = new Color(Palette.SootVoid, 0.78f),
+			Position = new Vector2(8, 6),
+			Size = new Vector2(430, 50),
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		AddChild(topPlate);
+
+		_hpRow = new HBoxContainer { Position = new Vector2(16, 10), MouseFilter = Control.MouseFilterEnum.Ignore };
 		_hpRow.AddThemeConstantOverride("separation", 2);
 		AddChild(_hpRow);
 
-		_itemRow = new HBoxContainer { Position = new Vector2(16, 30) };
-		_itemRow.AddThemeConstantOverride("separation", 2);
+		_itemRow = new HBoxContainer { Position = new Vector2(16, 30), MouseFilter = Control.MouseFilterEnum.Ignore };
+		_itemRow.AddThemeConstantOverride("separation", 8);
 		AddChild(_itemRow);
 
-		_hud = new Label
-		{
-			Position = new Vector2(16, 50),
-			Size = new Vector2(900, 24)
-		};
-		_hud.AddThemeFontSizeOverride("font_size", 14);
-		_hud.AddThemeColorOverride("font_color", Palette.UiText);
-		AddChild(_hud);
+		BuildContextPrompt();
+		BuildControlBar();
 
 		_toast = new Label
 		{
-			Position = new Vector2(16, 680),
-			Size = new Vector2(900, 24),
-			Visible = false
+			Position = new Vector2(24, 600),
+			Size = new Vector2(1232, 24),
+			HorizontalAlignment = HorizontalAlignment.Center,
+			Visible = false,
+			MouseFilter = Control.MouseFilterEnum.Ignore
 		};
 		_toast.AddThemeFontSizeOverride("font_size", 14);
 		_toast.AddThemeColorOverride("font_color", Palette.Ember);
@@ -211,6 +219,8 @@ public partial class GameUi : CanvasLayer
 
 		if (_dialogueOpen && Input.IsActionJustPressed("interact"))
 			CloseDialogue();
+
+		UpdateContext();
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -235,47 +245,29 @@ public partial class GameUi : CanvasLayer
 			c.QueueFree();
 		for (int i = 0; i < GameState.Instance.Hp; i++)
 		{
-			var pip = new TextureRect
+			_hpRow.AddChild(new TextureRect
 			{
 				Texture = Assets.Ui("health_pip"),
 				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
 				CustomMinimumSize = new Vector2(16, 16),
 				Size = new Vector2(16, 16),
 				ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-				StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
-			};
-			_hpRow.AddChild(pip);
+				StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+				MouseFilter = Control.MouseFilterEnum.Ignore
+			});
 		}
 
 		foreach (var c in _itemRow.GetChildren())
 			c.QueueFree();
 		var gs = GameState.Instance;
-		void AddItem(string texName)
-		{
-			_itemRow.AddChild(new TextureRect
-			{
-				Texture = Assets.Item(texName),
-				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-				CustomMinimumSize = new Vector2(16, 16),
-				Size = new Vector2(16, 16),
-				ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-				StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
-			});
-		}
-		if (gs.HasCrackiron) AddItem("crackiron");
-		if (gs.HasFoldedBellows) AddItem("folded_bellows");
-		if (gs.HasStackKey) AddItem("stack_key");
+		_itemRow.AddChild(ItemSlot("crackiron", "J", "Crackiron", gs.HasCrackiron));
+		_itemRow.AddChild(ItemSlot("folded_bellows", "K", "Bellows", gs.HasFoldedBellows));
+		_itemRow.AddChild(ItemSlot("stack_key", "", "Stack Key", gs.HasStackKey));
 
-		var sb = new StringBuilder();
-		if (gs.HireTaken) sb.Append("Hire taken. ");
-		if (gs.MapMarked) sb.Append("Mouth marked. ");
-		if (gs.MouthOpen) sb.Append("Mouth open. ");
-		if (gs.FanOpened) sb.Append("Fan open. ");
-		if (gs.ClinkerDown) sb.Append("Clinker down. ");
-		if (gs.IronDoorOpen) sb.Append("Iron open. ");
-		if (gs.OverfireDown) sb.Append("Overfire down. ");
-		if (gs.SliceComplete) sb.Append("Hire paid.");
-		_hud.Text = sb.ToString();
+		if (_bindAttack != null)
+			_bindAttack.Modulate = gs.HasCrackiron ? Colors.White : new Color(1, 1, 1, 0.35f);
+		if (_bindBellows != null)
+			_bindBellows.Modulate = gs.HasFoldedBellows ? Colors.White : new Color(1, 1, 1, 0.35f);
 	}
 
 	public void ShowDialogue(string name, string body)
@@ -300,6 +292,178 @@ public partial class GameUi : CanvasLayer
 		_toast.Text = text;
 		_toast.Visible = true;
 		_toastTime = 4.5f;
+	}
+
+	private void BuildContextPrompt()
+	{
+		_contextPanel = new PanelContainer
+		{
+			Visible = false,
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		_contextPanel.SetAnchorsPreset(Control.LayoutPreset.CenterBottom);
+		_contextPanel.AnchorLeft = 0.5f;
+		_contextPanel.AnchorRight = 0.5f;
+		_contextPanel.AnchorTop = 1;
+		_contextPanel.AnchorBottom = 1;
+		_contextPanel.OffsetLeft = -280;
+		_contextPanel.OffsetRight = 280;
+		_contextPanel.OffsetTop = -108;
+		_contextPanel.OffsetBottom = -64;
+		_contextPanel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
+		{
+			BgColor = new Color(Palette.SootVoid, 0.88f),
+			BorderColor = Palette.KilnOrange,
+			BorderWidthBottom = 2,
+			BorderWidthTop = 2,
+			BorderWidthLeft = 2,
+			BorderWidthRight = 2,
+			ContentMarginLeft = 14,
+			ContentMarginRight = 14,
+			ContentMarginTop = 6,
+			ContentMarginBottom = 6
+		});
+		_contextLabel = new Label
+		{
+			HorizontalAlignment = HorizontalAlignment.Center,
+			VerticalAlignment = VerticalAlignment.Center
+		};
+		_contextLabel.AddThemeFontSizeOverride("font_size", 16);
+		_contextLabel.AddThemeColorOverride("font_color", Palette.WrapBone);
+		_contextPanel.AddChild(_contextLabel);
+		AddChild(_contextPanel);
+	}
+
+	private void BuildControlBar()
+	{
+		var bar = new ColorRect
+		{
+			Color = new Color(Palette.SootVoid, 0.86f),
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		bar.SetAnchorsPreset(Control.LayoutPreset.BottomWide);
+		bar.AnchorLeft = 0;
+		bar.AnchorRight = 1;
+		bar.AnchorTop = 1;
+		bar.AnchorBottom = 1;
+		bar.OffsetLeft = 0;
+		bar.OffsetRight = 0;
+		bar.OffsetTop = -48;
+		bar.OffsetBottom = 0;
+		AddChild(bar);
+
+		var row = new HBoxContainer
+		{
+			Alignment = BoxContainer.AlignmentMode.Center,
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		row.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+		row.AddThemeConstantOverride("separation", 18);
+		bar.AddChild(row);
+
+		row.AddChild(BindChip("WASD", "Move"));
+		_bindUse = BindChip("E", "Use");
+		row.AddChild(_bindUse);
+		_bindAttack = BindChip("J/Z", "Attack");
+		row.AddChild(_bindAttack);
+		_bindBellows = BindChip("K/X", "Bellows");
+		row.AddChild(_bindBellows);
+		row.AddChild(BindChip("L", "Dodge"));
+		row.AddChild(BindChip("Esc", "Map"));
+	}
+
+	private static Label BindChip(string key, string action)
+	{
+		var l = new Label
+		{
+			Text = $"{key}  {action}",
+			VerticalAlignment = VerticalAlignment.Center,
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		l.AddThemeFontSizeOverride("font_size", 13);
+		l.AddThemeColorOverride("font_color", Palette.WrapBone);
+		return l;
+	}
+
+	private static Control ItemSlot(string tex, string key, string name, bool owned)
+	{
+		var row = new HBoxContainer { MouseFilter = Control.MouseFilterEnum.Ignore };
+		row.AddThemeConstantOverride("separation", 4);
+		row.Modulate = owned ? Colors.White : new Color(1, 1, 1, 0.32f);
+		row.AddChild(new TextureRect
+		{
+			Texture = Assets.Item(tex),
+			TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+			CustomMinimumSize = new Vector2(16, 16),
+			Size = new Vector2(16, 16),
+			ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+			StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		});
+		var caption = string.IsNullOrEmpty(key) ? name : $"{key}  {name}";
+		var lab = new Label
+		{
+			Text = caption,
+			VerticalAlignment = VerticalAlignment.Center,
+			MouseFilter = Control.MouseFilterEnum.Ignore
+		};
+		lab.AddThemeFontSizeOverride("font_size", 12);
+		lab.AddThemeColorOverride("font_color", owned ? Palette.WrapBone : Palette.AshGrey);
+		row.AddChild(lab);
+		return row;
+	}
+
+	private void UpdateContext()
+	{
+		if (_pauseMap.Visible)
+		{
+			_contextPanel.Visible = false;
+			return;
+		}
+
+		if (_dialogueOpen)
+		{
+			_contextLabel.Text = "[E]  Continue";
+			_contextPanel.Visible = true;
+			_bindUse.AddThemeColorOverride("font_color", Palette.KilnOrange);
+			return;
+		}
+
+		_bindUse.AddThemeColorOverride("font_color", Palette.WrapBone);
+
+		var player = PlayerController.Instance;
+		var target = player?.PeekInteractable();
+		if (target == null)
+		{
+			_contextPanel.Visible = false;
+			return;
+		}
+
+		_contextLabel.Text = FormatPrompt(target);
+		_contextPanel.Visible = true;
+		_bindUse.AddThemeColorOverride("font_color", Palette.KilnOrange);
+	}
+
+	private static string FormatPrompt(Interactable it)
+	{
+		return it switch
+		{
+			NpcInteractable n => $"[E]  Talk · {n.NpcName}",
+			MouthHint when GameState.Instance.MouthOpen => "Walk north into the stack",
+			MouthHint => "[E]  Inspect the mouth",
+			SavePoint s => s.NightFire ? "[E]  Save at the night fire" : "[E]  Save",
+			BellowsChest when GameState.Instance.BellowsChestOpened => "[E]  Empty chest",
+			BellowsChest => "[E]  Open chest — Folded Bellows",
+			AlcoveHeal when GameState.Instance.AlcoveHealTaken => "[E]  Cool ash",
+			AlcoveHeal => "[E]  Rest — heal",
+			StackKeyPickup => "[E]  Take Stack Key",
+			IronDoorUnlock when GameState.Instance.IronDoorOpen => "[E]  Iron door open",
+			IronDoorUnlock => GameState.Instance.HasStackKey
+				? "[E]  Unlock with Stack Key"
+				: "[E]  Locked — needs Stack Key",
+			StairHome => "[E]  Climb back to Kilnwalk",
+			_ => $"[E]  {it.Prompt}"
+		};
 	}
 
 	private void TogglePauseMap()

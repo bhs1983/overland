@@ -220,25 +220,30 @@ public partial class PlayerController : CharacterBody2D
 			PlayAnim($"fluewalker_idle_{_facingName}");
 	}
 
-	private void TryInteract()
+	public Interactable? PeekInteractable()
 	{
-		Node2D? best = null;
+		if (_interactArea == null || !IsInstanceValid(_interactArea))
+			return null;
+		Interactable? best = null;
 		var bestDist = float.MaxValue;
 		foreach (var area in _interactArea.GetOverlappingAreas())
 		{
-			var node = area is Interactable ? area : area.GetParent();
-			if (node is Interactable && node is Node2D n2d)
+			var node = area is Interactable ia ? ia : area.GetParent() as Interactable;
+			if (node is not Node2D n2d)
+				continue;
+			var d = GlobalPosition.DistanceSquaredTo(n2d.GlobalPosition);
+			if (d < bestDist)
 			{
-				var d = GlobalPosition.DistanceSquaredTo(n2d.GlobalPosition);
-				if (d < bestDist)
-				{
-					bestDist = d;
-					best = n2d;
-				}
+				bestDist = d;
+				best = node;
 			}
 		}
-		if (best is Interactable interactable)
-			interactable.Interact(this);
+		return best;
+	}
+
+	private void TryInteract()
+	{
+		PeekInteractable()?.Interact(this);
 	}
 
 	public void ApplyHit(Vector2 fromDirection, int damage = 1)
