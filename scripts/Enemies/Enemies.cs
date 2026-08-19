@@ -8,7 +8,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 	public string EnemyId { get; set; } = "sootling_0";
 	public bool IsAlive => _alive;
 
-	private CanvasItem _body = null!;
+	private Sprite2D _body = null!;
 	private FlashFx _flash = null!;
 	private bool _alive = true;
 	private bool _staggered;
@@ -27,9 +27,10 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		CollisionMask = 0;
 		AddChild(new CollisionShape2D
 		{
-			Shape = new CircleShape2D { Radius = 6 }
+			Shape = new CircleShape2D { Radius = Tiles.Px(0.375f) }
 		});
 		_body = Assets.Sprite(Assets.EnemyV3OrNull("sootling") ?? Assets.Enemy("sootling"));
+		Assets.ApplyFeetPivot(_body);
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();
@@ -65,12 +66,12 @@ public partial class Sootling : CharacterBody2D, IDamageable
 
 		var to = player.GlobalPosition - GlobalPosition;
 		var distSq = to.LengthSquared();
-		if (distSq < 16f * 16f)
+		if (distSq < Tiles.Px(1f) * Tiles.Px(1f))
 		{
 			Velocity = Vector2.Zero;
 			var facing = player.Facing;
 			if (facing.LengthSquared() > 0.0001f)
-				GlobalPosition = player.GlobalPosition + facing.Normalized() * 12f;
+				GlobalPosition = player.GlobalPosition + facing.Normalized() * Tiles.Px(0.75f);
 			MoveAndSlide();
 			// Delayed contact bite — skip while the hero is swinging/puffing.
 			if (_hitCd <= 0 && !player.AttackBusy)
@@ -81,7 +82,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 			return;
 		}
 
-		Velocity = to.Normalized() * 55f;
+		Velocity = to.Normalized() * Tiles.Px(3.4375f);
 		MoveAndSlide();
 	}
 
@@ -103,7 +104,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		_staggered = true;
 		_staggerT = 0.45f;
 		_flash.Flash(_body, Palette.BellowsPuff, 0.12f);
-		GlobalPosition += fromDirection.Normalized() * 10f;
+		GlobalPosition += fromDirection.Normalized() * Tiles.Px(0.625f);
 	}
 }
 
@@ -128,8 +129,9 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		}
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
-		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 8 } });
+		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.5f) } });
 		_body = Assets.Sprite(Assets.EnemyV3("claywalker"));
+		Assets.ApplyFeetPivot(_body, 32, 40);
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();
@@ -149,7 +151,7 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		if (player == null)
 			return;
 		var to = player.GlobalPosition - GlobalPosition;
-		if (to.LengthSquared() < 18f * 18f)
+		if (to.LengthSquared() < Tiles.Px(1.125f) * Tiles.Px(1.125f))
 		{
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
@@ -163,7 +165,7 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 			}
 			return;
 		}
-		Velocity = to.Normalized() * 28f;
+		Velocity = to.Normalized() * Tiles.Px(1.75f);
 		MoveAndSlide();
 	}
 
@@ -219,8 +221,9 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		}
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
-		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 6 } });
+		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.375f) } });
 		_body = Assets.Sprite(Assets.EnemyV3("brickleech"));
+		Assets.ApplyFeetPivot(_body, 32, 32);
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();
@@ -243,8 +246,8 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 
 		if (!_dropped)
 		{
-			if (Mathf.Abs(player.GlobalPosition.X - GlobalPosition.X) < 18f
-			    && player.GlobalPosition.Y > GlobalPosition.Y - 8f)
+			if (Mathf.Abs(player.GlobalPosition.X - GlobalPosition.X) < Tiles.Px(1.125f)
+			    && player.GlobalPosition.Y > GlobalPosition.Y - Tiles.Px(0.5f))
 			{
 				_dropped = true;
 				(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Brickleech drops.");
@@ -256,7 +259,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 
 		_hitCd -= (float)delta;
 		var to = player.GlobalPosition - GlobalPosition;
-		if (to.LengthSquared() < 14f * 14f)
+		if (to.LengthSquared() < Tiles.Px(0.875f) * Tiles.Px(0.875f))
 		{
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
@@ -267,7 +270,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 			}
 			return;
 		}
-		Velocity = to.Normalized() * 48f;
+		Velocity = to.Normalized() * Tiles.Px(3f);
 		MoveAndSlide();
 	}
 
@@ -291,7 +294,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		if (!_alive)
 			return;
 		_dropped = true;
-		GlobalPosition += fromDirection.Normalized() * 8f;
+		GlobalPosition += fromDirection.Normalized() * Tiles.Px(0.5f);
 		_flash.Flash(_body, Palette.BellowsPuff, 0.1f);
 	}
 }
@@ -319,8 +322,9 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		}
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
-		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 12 } });
+		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.75f) } });
 		_body = Assets.Sprite(Assets.EnemyV3("clinker"));
+		Assets.ApplyFeetPivot(_body, 48, 48);
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();
@@ -329,8 +333,8 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		var label = new Label
 		{
 			Text = "the Clinker",
-			Position = new Vector2(-28, -36),
-			Size = new Vector2(80, 12)
+			Position = new Vector2(Tiles.Px(-1.75f), Tiles.Px(-2.25f)),
+			Size = new Vector2(Tiles.Px(5f), Tiles.Px(0.75f))
 		};
 		label.AddThemeFontSizeOverride("font_size", 9);
 		label.AddThemeColorOverride("font_color", Palette.ClinkerCrack);
@@ -359,7 +363,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		if (player == null)
 			return;
 		var to = player.GlobalPosition - GlobalPosition;
-		if (to.LengthSquared() < 22f * 22f)
+		if (to.LengthSquared() < Tiles.Px(1.375f) * Tiles.Px(1.375f))
 		{
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
@@ -370,7 +374,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			}
 			return;
 		}
-		Velocity = to.Normalized() * 22f;
+		Velocity = to.Normalized() * Tiles.Px(1.375f);
 		MoveAndSlide();
 	}
 
@@ -436,8 +440,9 @@ public partial class Overfire : CharacterBody2D, IDamageable
 		}
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
-		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 14 } });
+		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.875f) } });
 		_body = Assets.Sprite(Assets.EnemyV3("overfire"));
+		Assets.ApplyFeetPivot(_body, 64, 64);
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();
@@ -446,8 +451,8 @@ public partial class Overfire : CharacterBody2D, IDamageable
 		var label = new Label
 		{
 			Text = "the Overfire",
-			Position = new Vector2(-32, -44),
-			Size = new Vector2(80, 12)
+			Position = new Vector2(Tiles.Px(-2f), Tiles.Px(-2.75f)),
+			Size = new Vector2(Tiles.Px(5f), Tiles.Px(0.75f))
 		};
 		label.AddThemeFontSizeOverride("font_size", 9);
 		label.AddThemeColorOverride("font_color", Palette.OverfireHot);
@@ -476,8 +481,8 @@ public partial class Overfire : CharacterBody2D, IDamageable
 		switch (_phase)
 		{
 			case Phase.Idle:
-				if (dist > 28f)
-					Velocity = to.Normalized() * 20f;
+				if (dist > Tiles.Px(1.75f))
+					Velocity = to.Normalized() * Tiles.Px(1.25f);
 				else
 					Velocity = Vector2.Zero;
 				MoveAndSlide();
@@ -542,7 +547,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 					var d = player.GlobalPosition.DistanceTo(GlobalPosition);
 					if (_ashShoved)
 						ui?.ShowToast("Ash shoved. Pulse misses.");
-					else if (d < 52f)
+					else if (d < Tiles.Px(3.25f))
 						player.ApplyHit((player.GlobalPosition - GlobalPosition).Normalized(), 1);
 				}
 				break;
@@ -555,7 +560,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 			case Phase.Swipe:
 				_phaseT = 0.22f;
 				SetSprite("overfire_swipe");
-				if (player != null && player.GlobalPosition.DistanceTo(GlobalPosition) < 30f && _hitCd <= 0)
+				if (player != null && player.GlobalPosition.DistanceTo(GlobalPosition) < Tiles.Px(1.875f) && _hitCd <= 0)
 				{
 					_hitCd = 0.6f;
 					player.ApplyHit((player.GlobalPosition - GlobalPosition).Normalized(), 1);

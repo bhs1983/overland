@@ -80,5 +80,14 @@ public static class Palette
 
 public static class Tiles
 {
-	public const int Size = 16;
+	/// <summary>PR-3 bisect: set false to keep Size 16 + zoom 3 while distances still go through Px().</summary>
+	public const bool Use32PxWorld = true;
+	public const int Size = Use32PxWorld ? 32 : 16;
+	public const int SocketTiles = 2;
+	public const int SocketPx = Size * SocketTiles;
+	public const float Zoom = Use32PxWorld ? 2f : 3f;
+
+	public static float Px(float tiles) => tiles * Size;
+	public static Vector2 Cell(int x, int y) =>
+		new((x + 0.5f) * Size, (y + 0.5f) * Size);
 }

@@ -30,7 +30,7 @@ public partial class GameState : Node
 
 	public RoomId CurrentRoom { get; set; } = RoomId.Kilnwalk;
 	public RoomId LastSaveRoom { get; set; } = RoomId.Kilnwalk;
-	public Vector2 LastSavePosition { get; set; } = new(160, 120);
+	public Vector2 LastSavePosition { get; set; } = new(10 * Tiles.Size, 7.5f * Tiles.Size);
 
 	public HashSet<string> RoomsEntered { get; } = new();
 	public HashSet<string> ClearedAsh { get; } = new();
@@ -67,7 +67,7 @@ public partial class GameState : Node
 		SliceComplete = false;
 		CurrentRoom = RoomId.Kilnwalk;
 		LastSaveRoom = RoomId.Kilnwalk;
-		LastSavePosition = new Vector2(160, 120);
+		LastSavePosition = new Vector2(10 * Tiles.Size, 7.5f * Tiles.Size);
 		RoomsEntered.Clear();
 		RoomsEntered.Add(RoomId.Kilnwalk.ToString());
 		ClearedAsh.Clear();

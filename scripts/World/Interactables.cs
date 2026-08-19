@@ -13,7 +13,7 @@ public partial class Interactable : Area2D
 		Monitoring = false;
 		Monitorable = true;
 		if (GetChildCount() == 0)
-			AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 12 } });
+			AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = Tiles.Px(0.75f) } });
 	}
 
 	public virtual void Interact(PlayerController player) { }
@@ -38,7 +38,7 @@ public partial class NpcInteractable : Interactable
 		if (!string.IsNullOrEmpty(file) && Godot.FileAccess.FileExists($"res://assets/v3/characters/npcs/{file}.png"))
 		{
 			var spr = Assets.Sprite(Assets.Npc(file));
-			spr.Offset = new Vector2(0, -8);
+			Assets.ApplyFeetPivot(spr, 32, 48);
 			AddChild(spr);
 		}
 		else
@@ -129,7 +129,14 @@ public partial class SavePoint : Interactable
 	public override void _Ready()
 	{
 		base._Ready();
-		AddChild(NightFire ? Assets.TileSprite("night_fire") : Assets.Sprite(Assets.Ui("save_mark")));
+		if (NightFire)
+		{
+			var fire = Assets.TileSprite("night_fire");
+			Assets.ApplyFeetPivot(fire);
+			AddChild(fire);
+		}
+		else
+			AddChild(Assets.Sprite(Assets.Ui("save_mark")));
 		Prompt = "Save";
 	}
 
@@ -151,7 +158,7 @@ public partial class MouthGate : StaticBody2D
 		CollisionLayer = 1 << 0;
 		_col = new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(32, 16) }
+			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(2f), Tiles.Px(1f)) }
 		};
 		AddChild(_col);
 		_sprite = Assets.TileSprite("stack_mouth_sealed");
@@ -177,7 +184,7 @@ public partial class RoomTransition : Area2D
 	public bool RequiresFanOpen { get; set; }
 	public bool RequiresClinkerDown { get; set; }
 	public bool RequiresIronOpen { get; set; }
-	public Vector2 TriggerSize { get; set; } = new(20, 12);
+	public Vector2 TriggerSize { get; set; } = new(Tiles.Px(1.25f), Tiles.Px(0.75f));
 
 	private bool _cooldown;
 
@@ -249,9 +256,11 @@ public partial class AshPile : StaticBody2D, IBellowsTarget
 		CollisionLayer = 1 << 0;
 		AddChild(new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(14, 14) }
+			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(0.875f), Tiles.Px(0.875f)) }
 		});
-		AddChild(Assets.ColdStackSprite("ash_pile"));
+		var spr = Assets.ColdStackSprite("ash_pile");
+		Assets.ApplyFeetPivot(spr);
+		AddChild(spr);
 	}
 
 	public void OnBellows(Vector2 fromDirection)
@@ -270,6 +279,7 @@ public partial class BellowsChest : Interactable
 		base._Ready();
 		Prompt = "Open";
 		var spr = Assets.ColdStackSprite("chest");
+		Assets.ApplyFeetPivot(spr);
 		AddChild(spr);
 		if (GameState.Instance.BellowsChestOpened)
 			spr.Modulate = new Color(1, 1, 1, 0.45f);
@@ -302,9 +312,10 @@ public partial class DeadFan : StaticBody2D, IBellowsTarget
 		CollisionLayer = 1 << 0;
 		AddChild(new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(16, 16) }
+			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(1f), Tiles.Px(1f)) }
 		});
 		_sprite = Assets.ColdStackSprite("dead_fan");
+		Assets.ApplyFeetPivot(_sprite);
 		AddChild(_sprite);
 		var label = new Label
 		{
@@ -348,7 +359,7 @@ public partial class FanEastDoor : StaticBody2D
 		CollisionLayer = 1 << 0;
 		_col = new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(24, 40) }
+			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(1.5f), Tiles.Px(2.5f)) }
 		};
 		AddChild(_col);
 		_sprite = Assets.ColdStackSprite("iron_door_closed");
@@ -373,7 +384,7 @@ public partial class CheckpointToastZone : Area2D
 	public string Message { get; set; } = "";
 	public bool RequiresFanOpen { get; set; }
 	public bool RequiresIronOpen { get; set; }
-	public Vector2 TriggerSize { get; set; } = new(16, 16);
+	public Vector2 TriggerSize { get; set; } = new(Tiles.Px(1f), Tiles.Px(1f));
 	private bool _cooldown;
 
 	public override void _Ready()
@@ -410,6 +421,7 @@ public partial class AlcoveHeal : Interactable
 		base._Ready();
 		Prompt = "Rest";
 		var s = Assets.ColdStackSprite("ash_pile");
+		Assets.ApplyFeetPivot(s);
 		s.Modulate = Palette.ColdDraftLight;
 		AddChild(s);
 	}
@@ -435,7 +447,9 @@ public partial class StackKeyPickup : Interactable
 	{
 		base._Ready();
 		Prompt = "Take";
-		AddChild(Assets.Sprite(Assets.Item("stack_key")));
+		var key = Assets.Sprite(Assets.Item("stack_key"));
+		Assets.ApplyFeetPivot(key);
+		AddChild(key);
 		if (GameState.Instance.StackKeyTaken)
 			Visible = false;
 	}
@@ -471,7 +485,7 @@ public partial class IronDoorGate : StaticBody2D
 		CollisionLayer = 1 << 0;
 		_col = new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(24, 48) }
+			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(1.5f), Tiles.Px(3f)) }
 		};
 		AddChild(_col);
 		_sprite = Assets.ColdStackSprite("iron_door_closed");
@@ -535,7 +549,9 @@ public partial class StairHome : Interactable
 	{
 		base._Ready();
 		Prompt = "Climb";
-		AddChild(Assets.ColdStackSprite("ledge"));
+		var stair = Assets.ColdStackSprite("ledge");
+		Assets.ApplyFeetPivot(stair);
+		AddChild(stair);
 		var label = new Label
 		{
 			Text = "Stair",

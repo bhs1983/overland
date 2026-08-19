@@ -7,8 +7,8 @@ public partial class PlayerController : CharacterBody2D
 {
 	public static PlayerController? Instance { get; private set; }
 
-	[Export] public float MoveSpeed { get; set; } = 90f;
-	[Export] public float DodgeDistance { get; set; } = 40f;
+	[Export] public float MoveSpeed { get; set; } = Tiles.Px(5.625f);
+	[Export] public float DodgeDistance { get; set; } = Tiles.Px(2.5f);
 	[Export] public float DodgeTime { get; set; } = 0.12f;
 	[Export] public float IFrameTime { get; set; } = 0.22f;
 
@@ -36,8 +36,8 @@ public partial class PlayerController : CharacterBody2D
 
 		AddChild(new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(10, 10) },
-			Position = new Vector2(0, 2)
+			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(0.625f), Tiles.Px(0.625f)) },
+			Position = new Vector2(0, Tiles.Px(0.125f))
 		});
 
 		_sprite = new AnimatedSprite2D
@@ -63,7 +63,7 @@ public partial class PlayerController : CharacterBody2D
 		};
 		_interactArea.AddChild(new CollisionShape2D
 		{
-			Shape = new CircleShape2D { Radius = 14 }
+			Shape = new CircleShape2D { Radius = Tiles.Px(0.875f) }
 		});
 		AddChild(_interactArea);
 
@@ -248,7 +248,7 @@ public partial class PlayerController : CharacterBody2D
 		GameState.Instance.Damage(damage);
 		_flash.Flash(_sprite, Palette.HurtFlash, 0.12f);
 		PlayAnim($"fluewalker_hurt_{_facingName}");
-		_knockbackVel = fromDirection.Normalized() * 120f;
+		_knockbackVel = fromDirection.Normalized() * Tiles.Px(7.5f);
 		_knockbackTime = 0.12f;
 		_iframe = true;
 		GetTree().CreateTimer(0.4f).Timeout += () => _iframe = false;

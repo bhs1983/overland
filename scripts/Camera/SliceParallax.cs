@@ -30,7 +30,7 @@ public partial class SliceParallax : Node2D
 		if (_fogRoot == null)
 			return;
 		_fogDrift += (float)delta * 6f;
-		_fogRoot.Position = new Vector2(Mathf.Sin(_fogDrift * 0.15f) * 12f, Mathf.Cos(_fogDrift * 0.1f) * 4f);
+		_fogRoot.Position = new Vector2(Mathf.Sin(_fogDrift * 0.15f) * Tiles.Px(0.75f), Mathf.Cos(_fogDrift * 0.1f) * Tiles.Px(0.25f));
 	}
 
 	private void Rebuild()
@@ -123,13 +123,13 @@ public partial class SliceParallax : Node2D
 	{
 		var name = theme == "kilnwalk" ? "tall_chimney_top" : "tall_flue_top";
 		var s = Assets.Sprite(Assets.Parallax(theme, name));
-		var yOff = -4f - (Mathf.Abs(basePos.X) % 5);
-		s.Position = basePos + new Vector2(0, Mathf.Clamp(yOff, -8f, -4f));
+		var yOff = Tiles.Px(-0.25f) - (Mathf.Abs(basePos.X) % 5);
+		s.Position = basePos + new Vector2(0, Mathf.Clamp(yOff, Tiles.Px(-0.5f), Tiles.Px(-0.25f)));
 		s.ZIndex = 5;
 		return s;
 	}
 
-	public static PointLight2D Cookie(string theme, string lightName, Vector2 pos, float energy = 1.1f, float scale = 2.5f)
+	public static PointLight2D Cookie(string theme, string lightName, Vector2 pos, float energy = 1.1f, float scale = 5f)
 	{
 		var tex = Assets.Parallax(theme, lightName);
 		return new PointLight2D

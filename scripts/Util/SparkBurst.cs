@@ -9,7 +9,7 @@ public partial class SparkBurst : Node2D
 	{
 		var spark = new SparkBurst();
 		parent.AddChild(spark);
-		spark.GlobalPosition = globalPos + facing.Normalized() * 14f;
+		spark.GlobalPosition = globalPos + facing.Normalized() * Tiles.Px(0.875f);
 	}
 
 	public override void _Ready()
@@ -19,7 +19,7 @@ public partial class SparkBurst : Node2D
 		AddChild(spr);
 		var tween = CreateTween();
 		tween.TweenProperty(spr, "modulate:a", 0f, 0.18f);
-		tween.Parallel().TweenProperty(this, "position", Position + Vector2.Up * 6f, 0.18f);
+		tween.Parallel().TweenProperty(this, "position", Position + Vector2.Up * Tiles.Px(0.375f), 0.18f);
 		tween.TweenCallback(Callable.From(QueueFree));
 	}
 }

@@ -49,16 +49,52 @@ public static class Assets
 		return tex;
 	}
 
-	public static Texture2D Town(string name) => Tex($"res://assets/tiles/town/{name}.png");
-	public static Texture2D ColdStack(string name) => Tex($"res://assets/tiles/cold_stack/{name}.png");
+	/// <summary>CP2 town tile, nearest-scaled ×2. Do not use for items/UI/VFX/characters.</summary>
+	public static Texture2D Town(string name) =>
+		LoadPngNearestScaled($"res://assets/tiles/town/{name}.png", 2);
+
+	/// <summary>CP2 cold tile, nearest-scaled ×2. Do not use for items/UI/VFX/characters.</summary>
+	public static Texture2D ColdStack(string name) =>
+		LoadPngNearestScaled($"res://assets/tiles/cold_stack/{name}.png", 2);
+
 	public static Texture2D? ColdStackOrNull(string name)
 	{
 		var path = $"res://assets/tiles/cold_stack/{name}.png";
-		if (Cache.TryGetValue(path, out var cached) && cached != null)
-			return cached;
 		if (!Godot.FileAccess.FileExists(path))
 			return null;
-		return Tex(path);
+		return LoadPngNearestScaled(path, 2);
+	}
+
+	private static Texture2D LoadPngNearestScaled(string path, int scale)
+	{
+		var key = $"{path}|png|x{scale}";
+		if (Cache.TryGetValue(key, out var cached) && cached != null)
+			return cached;
+
+		var bytes = Godot.FileAccess.GetFileAsBytes(path);
+		var img = new Image();
+		var err = img.LoadPngFromBuffer(bytes);
+		if (err != Error.Ok)
+			GD.PushError($"LoadPngNearestScaled failed {path}: {err}");
+		if (scale != 1)
+			img.Resize(img.GetWidth() * scale, img.GetHeight() * scale, Image.Interpolation.Nearest);
+		var tex = ImageTexture.CreateFromImage(img);
+		Cache[key] = tex;
+		return tex;
+	}
+
+	public static void ApplyFeetPivot(Sprite2D s, int cellW, int cellH)
+	{
+		s.Centered = false;
+		s.Offset = new Vector2(-cellW / 2, -(cellH - 1));
+		s.TextureFilter = CanvasItem.TextureFilterEnum.Nearest;
+	}
+
+	public static void ApplyFeetPivot(Sprite2D s)
+	{
+		var w = s.Texture?.GetWidth() ?? 32;
+		var h = s.Texture?.GetHeight() ?? 32;
+		ApplyFeetPivot(s, w, h);
 	}
 	public static Texture2D Hero(string name) => Tex($"res://assets/sprites/hero/{name}.png");
 	public static Texture2D? HeroOrNull(string name)

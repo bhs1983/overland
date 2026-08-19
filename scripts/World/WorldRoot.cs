@@ -29,7 +29,7 @@ public partial class WorldRoot : Node2D
 		var cam = new Camera2D
 		{
 			Enabled = true,
-			Zoom = new Vector2(3, 3),
+			Zoom = new Vector2(Tiles.Zoom, Tiles.Zoom),
 			PositionSmoothingEnabled = true,
 			PositionSmoothingSpeed = 8f
 		};
@@ -213,9 +213,9 @@ public partial class WorldRoot : Node2D
 		root.AddChild(SliceParallax.TallTop("kilnwalk", new Vector2(8 * Tiles.Size, 3.2f * Tiles.Size)));
 		root.AddChild(SliceParallax.TallTop("kilnwalk", new Vector2(11 * Tiles.Size, 3.2f * Tiles.Size)));
 
-		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(8 * Tiles.Size, 4 * Tiles.Size), 1.2f, 3f));
-		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(11 * Tiles.Size, 4 * Tiles.Size), 1.2f, 3f));
-		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_lantern", new Vector2(10 * Tiles.Size, 9 * Tiles.Size), 0.9f, 2.2f));
+		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(8 * Tiles.Size, 4 * Tiles.Size), 1.2f, 6f));
+		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(11 * Tiles.Size, 4 * Tiles.Size), 1.2f, 6f));
+		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_lantern", new Vector2(10 * Tiles.Size, 9 * Tiles.Size), 0.9f, 4.4f));
 
 		AddNpc(root, new Vector2(4 * Tiles.Size, 5 * Tiles.Size), "Tamsin Cole", Palette.NpcTamsin);
 		AddNpc(root, new Vector2(4 * Tiles.Size, 9 * Tiles.Size), "Holt Vetch", Palette.NpcHolt);
@@ -240,7 +240,7 @@ public partial class WorldRoot : Node2D
 			Target = RoomId.StackMouth,
 			SpawnId = "from_town",
 			RequiresMouthOpen = true,
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 	}
 
@@ -260,7 +260,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 10, 0);
 		AddRoomTitle(root, "Stack Mouth");
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(4 * Tiles.Size, 1.5f * Tiles.Size)));
-		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(10 * Tiles.Size, 5 * Tiles.Size), 0.7f, 4f));
+		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(10 * Tiles.Size, 5 * Tiles.Size), 0.7f, 8f));
 
 		root.AddChild(new SavePoint
 		{
@@ -277,17 +277,17 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + Tiles.Px(0.25f)),
 			Target = RoomId.Kilnwalk,
 			SpawnId = "from_mouth",
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, 4),
+			Position = new Vector2(10 * Tiles.Size, Tiles.Px(0.25f)),
 			Target = RoomId.AshdriftHall,
 			SpawnId = "from_mouth",
-			TriggerSize = new Vector2(28, 48)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(3f))
 		});
 	}
 
@@ -321,17 +321,17 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + Tiles.Px(0.25f)),
 			Target = RoomId.StackMouth,
 			SpawnId = "from_ash",
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2((W - 1) * Tiles.Size + 4, 7 * Tiles.Size),
+			Position = new Vector2((W - 1) * Tiles.Size + Tiles.Px(0.25f), 7 * Tiles.Size),
 			Target = RoomId.DeadFanWalk,
 			SpawnId = "from_ash",
-			TriggerSize = new Vector2(12, 28)
+			TriggerSize = new Vector2(Tiles.Px(0.75f), Tiles.Px(1.75f))
 		});
 	}
 
@@ -363,20 +363,20 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(4, 6 * Tiles.Size),
+			Position = new Vector2(Tiles.Px(0.25f), 6 * Tiles.Size),
 			Target = RoomId.AshdriftHall,
 			SpawnId = "from_fan",
-			TriggerSize = new Vector2(12, 28)
+			TriggerSize = new Vector2(Tiles.Px(0.75f), Tiles.Px(1.75f))
 		});
 
 		// East → Setter's Alcove (CP3) when fan open
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(W * Tiles.Size + 4, 6 * Tiles.Size),
+			Position = new Vector2(W * Tiles.Size + Tiles.Px(0.25f), 6 * Tiles.Size),
 			Target = RoomId.SettersAlcove,
 			SpawnId = "from_fan",
 			RequiresFanOpen = true,
-			TriggerSize = new Vector2(14, 28)
+			TriggerSize = new Vector2(Tiles.Px(0.875f), Tiles.Px(1.75f))
 		});
 
 		// Side path hint toward Quench (via south stub — actual side path is from Quench west)
@@ -384,11 +384,11 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 9, H - 1);
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(9 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Position = new Vector2(9 * Tiles.Size, (H - 1) * Tiles.Size + Tiles.Px(0.25f)),
 			Target = RoomId.QuenchTrench,
 			SpawnId = "from_fan",
 			RequiresFanOpen = true,
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 	}
 
@@ -427,17 +427,17 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(4, 7 * Tiles.Size),
+			Position = new Vector2(Tiles.Px(0.25f), 7 * Tiles.Size),
 			Target = RoomId.DeadFanWalk,
 			SpawnId = "from_alcove",
-			TriggerSize = new Vector2(12, 28)
+			TriggerSize = new Vector2(Tiles.Px(0.75f), Tiles.Px(1.75f))
 		});
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + Tiles.Px(0.25f)),
 			Target = RoomId.QuenchTrench,
 			SpawnId = "from_alcove",
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 	}
 
@@ -466,7 +466,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 0, 6);
 		ClearWallAt(root, 0, 7);
 		AddRoomTitle(root, "Quench Trench");
-		root.AddChild(SliceParallax.Cookie("cold_stack", "light_quench", new Vector2(10 * Tiles.Size, 6 * Tiles.Size), 1.0f, 3.2f));
+		root.AddChild(SliceParallax.Cookie("cold_stack", "light_quench", new Vector2(10 * Tiles.Size, 6 * Tiles.Size), 1.0f, 6.4f));
 
 		root.AddChild(new Brickleech
 		{
@@ -483,25 +483,25 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, 4),
+			Position = new Vector2(10 * Tiles.Size, Tiles.Px(0.25f)),
 			Target = RoomId.SettersAlcove,
 			SpawnId = "from_quench",
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2((W - 1) * Tiles.Size + 4, 7 * Tiles.Size),
+			Position = new Vector2((W - 1) * Tiles.Size + Tiles.Px(0.25f), 7 * Tiles.Size),
 			Target = RoomId.ClinkerYard,
 			SpawnId = "from_quench",
-			TriggerSize = new Vector2(12, 28)
+			TriggerSize = new Vector2(Tiles.Px(0.75f), Tiles.Px(1.75f))
 		});
 		// Side path back to Dead Fan Walk
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(4, 7 * Tiles.Size),
+			Position = new Vector2(Tiles.Px(0.25f), 7 * Tiles.Size),
 			Target = RoomId.DeadFanWalk,
 			SpawnId = "from_quench",
-			TriggerSize = new Vector2(12, 28)
+			TriggerSize = new Vector2(Tiles.Px(0.75f), Tiles.Px(1.75f))
 		});
 	}
 
@@ -520,7 +520,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
 		AddRoomTitle(root, "Clinker Yard");
-		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 0.85f, 4.5f));
+		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 0.85f, 9f));
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(5 * Tiles.Size, 1.5f * Tiles.Size)));
 
 		root.AddChild(new Clinker
@@ -531,18 +531,18 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(4, 7 * Tiles.Size),
+			Position = new Vector2(Tiles.Px(0.25f), 7 * Tiles.Size),
 			Target = RoomId.QuenchTrench,
 			SpawnId = "from_clinker",
-			TriggerSize = new Vector2(12, 28)
+			TriggerSize = new Vector2(Tiles.Px(0.75f), Tiles.Px(1.75f))
 		});
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, 4),
+			Position = new Vector2(10 * Tiles.Size, Tiles.Px(0.25f)),
 			Target = RoomId.KeyLanding,
 			SpawnId = "from_clinker",
 			RequiresClinkerDown = true,
-			TriggerSize = new Vector2(28, 48)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(3f))
 		});
 	}
 
@@ -573,17 +573,17 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + Tiles.Px(0.25f)),
 			Target = RoomId.ClinkerYard,
 			SpawnId = "from_key",
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, 4),
+			Position = new Vector2(10 * Tiles.Size, Tiles.Px(0.25f)),
 			Target = RoomId.SealedFlue,
 			SpawnId = "from_key",
-			TriggerSize = new Vector2(28, 48)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(3f))
 		});
 	}
 
@@ -615,19 +615,19 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + Tiles.Px(0.25f)),
 			Target = RoomId.KeyLanding,
 			SpawnId = "from_sealed",
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, 4),
+			Position = new Vector2(10 * Tiles.Size, Tiles.Px(0.25f)),
 			Target = RoomId.LongDrop,
 			SpawnId = "from_sealed",
 			RequiresIronOpen = true,
-			TriggerSize = new Vector2(28, 48)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(3f))
 		});
 	}
 
@@ -670,17 +670,17 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + Tiles.Px(0.25f)),
 			Target = RoomId.SealedFlue,
 			SpawnId = "from_drop",
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, 4),
+			Position = new Vector2(10 * Tiles.Size, Tiles.Px(0.25f)),
 			Target = RoomId.OverfireChamber,
 			SpawnId = "from_drop",
-			TriggerSize = new Vector2(28, 48)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(3f))
 		});
 	}
 
@@ -697,7 +697,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 9, H - 1);
 		ClearWallAt(root, 10, H - 1);
 		AddRoomTitle(root, "Overfire Chamber");
-		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 1.1f, 5f));
+		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 1.1f, 10f));
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(6 * Tiles.Size, 1.4f * Tiles.Size)));
 
 		root.AddChild(new Overfire
@@ -716,10 +716,10 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + 4),
+			Position = new Vector2(10 * Tiles.Size, (H - 1) * Tiles.Size + Tiles.Px(0.25f)),
 			Target = RoomId.LongDrop,
 			SpawnId = "from_boss",
-			TriggerSize = new Vector2(28, 12)
+			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
 	}
 
@@ -809,8 +809,8 @@ public partial class WorldRoot : Node2D
 		var title = new Label
 		{
 			Text = text,
-			Position = new Vector2(8, 2),
-			Size = new Vector2(220, 12)
+			Position = new Vector2(Tiles.Px(0.5f), Tiles.Px(0.125f)),
+			Size = new Vector2(Tiles.Px(13.75f), Tiles.Px(0.75f))
 		};
 		title.AddThemeFontSizeOverride("font_size", 10);
 		title.AddThemeColorOverride("font_color", Palette.UiText);

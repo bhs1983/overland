@@ -9,6 +9,7 @@ public partial class SaveSystem : Node
 {
 	public static SaveSystem Instance { get; private set; } = null!;
 
+	public const int Version = 2;
 	private const string SavePath = "user://slice0_save.json";
 
 	public override void _Ready()
@@ -26,6 +27,7 @@ public partial class SaveSystem : Node
 		var gs = GameState.Instance;
 		var data = new SaveData
 		{
+			Version = Version,
 			Hp = gs.Hp,
 			HireTaken = gs.HireTaken,
 			HasCrackiron = gs.HasCrackiron,
@@ -71,6 +73,11 @@ public partial class SaveSystem : Node
 			var data = JsonSerializer.Deserialize<SaveData>(file.GetAsText());
 			if (data == null)
 				return false;
+			if (data.Version < Version)
+			{
+				GD.Print("Save version too old, ignoring");
+				return false;
+			}
 
 			var gs = GameState.Instance;
 			gs.ResetNewGame();
@@ -120,6 +127,7 @@ public partial class SaveSystem : Node
 
 	private sealed class SaveData
 	{
+		public int Version { get; set; }
 		public int Hp { get; set; }
 		public bool HireTaken { get; set; }
 		public bool HasCrackiron { get; set; }

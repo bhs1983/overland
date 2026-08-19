@@ -212,7 +212,7 @@ public partial class QaCp3Runner : Node
 		GameState.Instance.HasStackKey = true;
 		GameState.Instance.StackKeyTaken = true;
 		GameState.Instance.IronDoorOpen = true;
-		GameState.Instance.RecordSave(RoomId.SealedFlue, new Vector2(160, 128));
+		GameState.Instance.RecordSave(RoomId.SealedFlue, new Vector2(10 * Tiles.Size, 8 * Tiles.Size));
 		SaveSystem.Instance.Save();
 		Must(SaveSystem.Instance.HasSave(), "save file written");
 

@@ -30,7 +30,7 @@ public partial class AttackArc : Area2D
 		_shape = new CollisionShape2D
 		{
 			// Reach Claywalker (18px) and Clinker (22px) standoff, not just Sootling park.
-			Shape = new RectangleShape2D { Size = new Vector2(32, 20) },
+			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(2f), Tiles.Px(1.25f)) },
 			Disabled = true
 		};
 		AddChild(_shape);
@@ -39,7 +39,8 @@ public partial class AttackArc : Area2D
 		{
 			Polygon = new Vector2[]
 			{
-				new(-4, -7), new(14, -7), new(14, 7), new(-4, 7)
+				new(Tiles.Px(-0.25f), Tiles.Px(-0.4375f)), new(Tiles.Px(0.875f), Tiles.Px(-0.4375f)),
+				new(Tiles.Px(0.875f), Tiles.Px(0.4375f)), new(Tiles.Px(-0.25f), Tiles.Px(0.4375f))
 			},
 			Color = Palette.Telegraph,
 			Visible = false
@@ -53,7 +54,7 @@ public partial class AttackArc : Area2D
 			return;
 		_active = true;
 
-		Position = facing.Normalized() * 16f;
+		Position = facing.Normalized() * Tiles.Px(1f);
 		Rotation = facing.Angle();
 
 		// Keep _visual hidden — filled telegraph rect was the QA cream/orange block.
@@ -100,7 +101,7 @@ public partial class BellowsCone : Area2D
 
 		_shape = new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(36, 20) },
+			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(2.25f), Tiles.Px(1.25f)) },
 			Disabled = true
 		};
 		AddChild(_shape);
@@ -109,7 +110,8 @@ public partial class BellowsCone : Area2D
 		{
 			Polygon = new Vector2[]
 			{
-				new(-2, -8), new(26, -8), new(26, 8), new(-2, 8)
+				new(Tiles.Px(-0.125f), Tiles.Px(-0.5f)), new(Tiles.Px(1.625f), Tiles.Px(-0.5f)),
+				new(Tiles.Px(1.625f), Tiles.Px(0.5f)), new(Tiles.Px(-0.125f), Tiles.Px(0.5f))
 			},
 			Color = new Color(Palette.BellowsPuff, 0.7f),
 			Visible = false
@@ -123,7 +125,7 @@ public partial class BellowsCone : Area2D
 			return;
 		_active = true;
 
-		Position = facing.Normalized() * 20f;
+		Position = facing.Normalized() * Tiles.Px(1.25f);
 		Rotation = facing.Angle();
 
 		_visual.Visible = false; // same as AttackArc — no filled puff block
