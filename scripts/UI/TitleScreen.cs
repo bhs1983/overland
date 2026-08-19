@@ -4,6 +4,14 @@ namespace Overland;
 
 public partial class TitleScreen : Control
 {
+	/// <summary>Last-frame Shift — click releases Shift before Pressed, so sample here.</summary>
+	private bool _shiftLatched;
+
+	public override void _Process(double delta)
+	{
+		_shiftLatched = Input.IsPhysicalKeyPressed(Key.Shift);
+	}
+
 	public override void _Ready()
 	{
 		SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
@@ -53,8 +61,8 @@ public partial class TitleScreen : Control
 		newBtn.Pressed += () =>
 		{
 			GameState.Instance.ResetNewGame();
-			// Hold Shift: skip Kilnwalk — Stack Mouth from_town with hire + Crackiron.
-			if (Input.IsPhysicalKeyPressed(Key.Shift))
+			// Use latched Shift (last _Process), not IsPhysicalKeyPressed at click.
+			if (_shiftLatched)
 				GameState.Instance.ApplyDebugStackMouthStart();
 			GetTree().ChangeSceneToFile("res://scenes/Game.tscn");
 		};
