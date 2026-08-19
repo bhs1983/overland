@@ -2,7 +2,10 @@ using Godot;
 
 namespace Overland;
 
-/// <summary>Slice 0 — Kilnwalk + Cold Stack rooms 1–10.</summary>
+/// <summary>
+/// Slice 0 — Kilnwalk + Cold Stack rooms 1–10.
+/// Authored openings live in <see cref="SocketCatalog"/>. This is not a RoomModule.
+/// </summary>
 public partial class WorldRoot : Node2D
 {
 	private Node2D _roomLayer = null!;

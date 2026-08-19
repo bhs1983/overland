@@ -18,6 +18,7 @@ public partial class QaCp3Runner : Node
 		try
 		{
 			CheckArt();
+			CheckSockets();
 			CheckLegalStrings();
 			await CheckTownGate();
 			await CheckDungeonWalk();
@@ -120,6 +121,63 @@ public partial class QaCp3Runner : Node
 			"packed cold_tiles.png must stay absent");
 
 		GD.Print("OK art — one tree under assets/; packed sheets and CP2 leftovers absent");
+	}
+
+	private void CheckSockets()
+	{
+		Must(typeof(WorldRoot).BaseType == typeof(Node2D), "WorldRoot must stay Node2D, not RoomModule");
+		Must(SocketCatalog.WidthTiles == 2, "Slice 0 sockets are width 2");
+		Must(SocketCatalog.WidthPx == 2 * Tiles.Size, "socket width 64px at Size 32");
+		Must(SocketCatalog.Rooms.Count == 11, "11 authored rooms in the dump");
+		Must(SocketCatalog.All.Count == 22, "22 authored openings");
+		Must(SocketCatalog.For(RoomId.SideFlue).Count == 0, "Side Flue is not in the Slice 0 dump");
+
+		foreach (var s in SocketCatalog.All)
+		{
+			Must(s.Width == 2, $"{s.Room} {s.Side} width");
+			Must(s.CellB == s.CellA + 1, $"{s.Room} {s.Side} cells not consecutive");
+			Must(s.CellA >= 0, $"{s.Room} {s.Side} cell");
+			if (s.Kind == SocketKind.Gated)
+				Must(!string.IsNullOrEmpty(s.Gate), $"{s.Room} {s.Side} gated with no gate name");
+			else
+				Must(string.IsNullOrEmpty(s.Gate), $"{s.Room} {s.Side} standard must not name a gate");
+		}
+
+		var kilnN = SocketCatalog.Opening(RoomId.Kilnwalk, SocketSide.North);
+		Must(kilnN is { CellA: 9, CellB: 10, Kind: SocketKind.Gated, Gate: "hire" },
+			"Kilnwalk N is 9–10 gated hire");
+
+		var fanS = SocketCatalog.Opening(RoomId.DeadFanWalk, SocketSide.South);
+		Must(fanS is { CellA: 8, CellB: 9, Kind: SocketKind.Gated, Gate: "fan" },
+			"Dead Fan south is 8–9 gated fan, not 9–10");
+
+		var fanE = SocketCatalog.Opening(RoomId.DeadFanWalk, SocketSide.East);
+		Must(fanE is { CellA: 5, CellB: 6, Kind: SocketKind.Gated, Gate: "fan" },
+			"Dead Fan east is y 5–6 gated fan");
+
+		var key = SocketCatalog.Footprint(RoomId.KeyLanding);
+		Must(key.W == 14 && key.H == 12, "Key Landing stays 14×12");
+		var keyN = SocketCatalog.Opening(RoomId.KeyLanding, SocketSide.North);
+		Must(keyN is { CellA: 9, CellB: 10 },
+			"Key Landing N stays 9–10 (near east wall, not recentered)");
+
+		var sealedN = SocketCatalog.Opening(RoomId.SealedFlue, SocketSide.North);
+		Must(sealedN is { CellA: 9, CellB: 10, Kind: SocketKind.Gated, Gate: "iron" },
+			"Sealed Flue N 9–10 gated iron");
+
+		var drop = SocketCatalog.Footprint(RoomId.LongDrop);
+		Must(drop.W == 14 && drop.H == 18, "Long Drop stays 14×18");
+		Must(SocketCatalog.Opening(RoomId.LongDrop, SocketSide.North) is { CellA: 9, CellB: 10 },
+			"Long Drop N stays 9–10");
+
+		Must(SocketCatalog.Footprint(RoomId.OverfireChamber).Terminal, "Overfire is terminal");
+		Must(SocketCatalog.For(RoomId.OverfireChamber).Count == 1, "Overfire only south opening");
+
+		var clinkerN = SocketCatalog.Opening(RoomId.ClinkerYard, SocketSide.North);
+		Must(clinkerN is { Kind: SocketKind.Gated, Gate: "clinker", CellA: 9, CellB: 10 },
+			"Clinker Yard N 9–10 gated clinker");
+
+		GD.Print("OK sockets — 22 openings dumped as authored; 14-wide rooms not recentered");
 	}
 
 	private void CheckLegalStrings()
