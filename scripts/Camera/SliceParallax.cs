@@ -4,9 +4,9 @@ namespace Overland;
 
 /// <summary>
 /// Orthographic 2D parallax for Kilnwalk / Cold Stack per assets/ART.md.
-/// Far 0.2 Repeat, mid 0.5 Repeat, fog 0.25, FG 1.2 sparse (lock 1.2–1.5).
+/// Far 0.2 Repeat, mid 0.5 Repeat, fog 0.25.
+/// No camera-space FG props — 32px lamps/signs at zoom 2 sat on the lens.
 /// Main plane (hero/tiles) stays at 1.0 — never parented here. No 3D camera.
-/// Uses Godot 4.7 Parallax2D (not 3D).
 /// </summary>
 public partial class SliceParallax : Node2D
 {
@@ -14,8 +14,6 @@ public partial class SliceParallax : Node2D
 	public const int FarH = 144;
 	public const int MidW = 720;
 	public const int MidH = 192;
-	public const float FgScroll = 1.2f;
-
 	/// <summary>
 	/// Cookie coverage in tiles ≈ TextureScale (32px cookie / 32px tile).
 	/// Zoom 2 made the old 5–10 scales read as a lamp on the lens; keep energy, shrink the disc.
@@ -52,9 +50,15 @@ public partial class SliceParallax : Node2D
 
 	private void Rebuild()
 	{
-		while (GetChildCount() > 0)
-			GetChild(0).Free();
 		_fogRoot = null;
+		SetProcess(false);
+		var kids = GetChildren();
+		for (var i = kids.Count - 1; i >= 0; i--)
+		{
+			var n = kids[i];
+			RemoveChild(n);
+			n.Free();
+		}
 
 		// 16 / 8 were zoom-3 world px. 24 / 12 keep the same screen offset at zoom 2.
 		AddTiled("Far", 0.2f, Assets.Parallax(_theme, "far_bg"), tileW: FarW, tileH: FarH, y: 24);
@@ -76,15 +80,7 @@ public partial class SliceParallax : Node2D
 		}
 		fog.AddChild(_fogRoot);
 		AddChild(fog);
-
-		var fg = new Parallax2D
-		{
-			Name = "Parallax_Fore",
-			ScrollScale = new Vector2(FgScroll, FgScroll),
-			ZIndex = 20
-		};
-		AddSparseFg(fg);
-		AddChild(fg);
+		SetProcess(true);
 	}
 
 	private void AddTiled(string name, float rate, Texture2D tex, int tileW, int tileH, float y)
@@ -110,31 +106,6 @@ public partial class SliceParallax : Node2D
 		};
 		layer.AddChild(spr);
 		AddChild(layer);
-	}
-
-	private void AddSparseFg(Parallax2D fg)
-	{
-		if (_theme == "kilnwalk")
-		{
-			// Top strip only — a 32×64 lamp in the walk band is taller than the hero at zoom 2.
-			PlaceFg(fg, Assets.Parallax("kilnwalk", "fg_overhang"), new Vector2(140, 4));
-			PlaceFg(fg, Assets.Parallax("kilnwalk", "fg_lamp"), new Vector2(20, -8));
-			PlaceFg(fg, Assets.Parallax("kilnwalk", "fg_sign"), new Vector2(280, 2));
-		}
-		else
-		{
-			PlaceFg(fg, Assets.Parallax("cold_stack", "fg_overhang"), new Vector2(180, 4));
-			PlaceFg(fg, Assets.Parallax("cold_stack", "fg_pipe"), new Vector2(16, -6));
-			PlaceFg(fg, Assets.Parallax("cold_stack", "fg_pipe"), new Vector2(300, 0));
-		}
-	}
-
-	private static void PlaceFg(Parallax2D fg, Texture2D tex, Vector2 pos)
-	{
-		var s = Assets.Sprite(tex);
-		s.Position = pos;
-		s.ZIndex = 20;
-		fg.AddChild(s);
 	}
 
 	/// <summary>Main-plane tall crown at 1.0× with −4..−8 Y offset. Not a 3D camera.</summary>

@@ -240,8 +240,9 @@ public partial class GameUi : CanvasLayer
 				Texture = Assets.Ui("health_pip"),
 				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
 				CustomMinimumSize = new Vector2(16, 16),
+				Size = new Vector2(16, 16),
 				ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-				StretchMode = TextureRect.StretchModeEnum.Scale
+				StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
 			};
 			_hpRow.AddChild(pip);
 		}
@@ -256,8 +257,9 @@ public partial class GameUi : CanvasLayer
 				Texture = Assets.Item(texName),
 				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
 				CustomMinimumSize = new Vector2(16, 16),
+				Size = new Vector2(16, 16),
 				ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-				StretchMode = TextureRect.StretchModeEnum.Scale
+				StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
 			});
 		}
 		if (gs.HasCrackiron) AddItem("crackiron");
