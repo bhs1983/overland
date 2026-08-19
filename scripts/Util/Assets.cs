@@ -12,9 +12,20 @@ public static class Assets
 	{
 		if (Cache.TryGetValue(path, out var t) && t != null)
 			return t;
-		t = GD.Load<Texture2D>(path);
-		Cache[path] = t;
-		return t;
+		if (ResourceLoader.Exists(path))
+		{
+			t = GD.Load<Texture2D>(path);
+			if (t != null)
+			{
+				Cache[path] = t;
+				return t;
+			}
+		}
+		// Fallback: decode PNG bytes (Nearest applied on CanvasItem; no mipmaps).
+		if (path.EndsWith(".png") && Godot.FileAccess.FileExists(path))
+			return LoadPngNearest(path);
+		Cache[path] = null!;
+		return null!;
 	}
 
 	/// <summary>
