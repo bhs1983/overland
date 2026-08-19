@@ -147,7 +147,10 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		{
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
-			if (_hitCd <= 0)
+			var busy = player.AttackBusy
+				|| Input.IsActionJustPressed("attack")
+				|| Input.IsActionJustPressed("bellows");
+			if (_hitCd <= 0 && !busy)
 			{
 				_hitCd = 0.9f;
 				player.ApplyHit(to.Normalized());

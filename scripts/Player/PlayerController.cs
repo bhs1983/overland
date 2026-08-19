@@ -264,4 +264,5 @@ public partial class PlayerController : CharacterBody2D
 	}
 
 	public Vector2 Facing => _facing;
+	public bool AttackBusy => _attacking;
 }

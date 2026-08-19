@@ -128,7 +128,8 @@ public partial class BellowsCone : Area2D
 		_shape.Disabled = false;
 		Monitoring = true;
 
-		// Wait one physics frame so Area2D overlap queries see world bodies (DeadFan, ash).
+		// Wait two physics frames so Area2D overlap queries see StaticBody2D on layer 0 (DeadFan).
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 
 		foreach (var body in GetOverlappingBodies())
