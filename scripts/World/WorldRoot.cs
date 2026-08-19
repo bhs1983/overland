@@ -11,6 +11,7 @@ public partial class WorldRoot : Node2D
 	private Node2D _roomLayer = null!;
 	private PlayerController _player = null!;
 	private SliceParallax _parallax = null!;
+	private Camera2D _cam = null!;
 	private MouthGate? _mouthGate;
 	private FanEastDoor? _fanEastDoor;
 	private TileMapLayer? _floor;
@@ -30,14 +31,14 @@ public partial class WorldRoot : Node2D
 		_player = new PlayerController { Name = "Player" };
 		AddChild(_player);
 
-		var cam = new Camera2D
+		_cam = new Camera2D
 		{
 			Enabled = true,
 			Zoom = new Vector2(Tiles.Zoom, Tiles.Zoom),
 			PositionSmoothingEnabled = true,
 			PositionSmoothingSpeed = 8f
 		};
-		_player.AddChild(cam);
+		_player.AddChild(_cam);
 
 		var startRoom = GameState.Instance.LastSaveRoom;
 		var spawn = GameState.Instance.LastSavePosition;
@@ -206,7 +207,7 @@ public partial class WorldRoot : Node2D
 			}
 		}
 
-		AddBorderWalls(root, W, H, town: true);
+		AddBorderWalls(root, W, H, town: true, northSprite: false);
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
 
@@ -246,6 +247,7 @@ public partial class WorldRoot : Node2D
 			RequiresMouthOpen = true,
 			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(0.75f))
 		});
+		FrameRoom(W, H, ridgeSky: true);
 	}
 
 	private void BuildStackMouth()
@@ -736,6 +738,30 @@ public partial class WorldRoot : Node2D
 			for (int x = 1; x < w - 1; x++)
 				PlaceColdFloor(x, y);
 		AddBorderWalls(root, w, h, town: false);
+		FrameRoom(w, h, ridgeSky: false);
+	}
+
+	/// <summary>
+	/// Kilnwalk looks north over the ridge so far/mid sky reads.
+	/// Dungeon flues stay boxed — no sky.
+	/// </summary>
+	private void FrameRoom(int w, int h, bool ridgeSky)
+	{
+		_cam.LimitEnabled = true;
+		_cam.LimitLeft = 0;
+		_cam.LimitRight = w * Tiles.Size;
+		_cam.LimitBottom = h * Tiles.Size;
+		if (ridgeSky)
+		{
+			_cam.LimitTop = -Tiles.Size * 4;
+			_cam.Offset = new Vector2(0, -Tiles.Px(3.5f));
+		}
+		else
+		{
+			_cam.LimitTop = 0;
+			_cam.Offset = Vector2.Zero;
+		}
+		_cam.ResetSmoothing();
 	}
 
 	private void AddFloorLayer(Node2D root, bool town)
@@ -774,11 +800,11 @@ public partial class WorldRoot : Node2D
 		_floor!.SetCell(new Vector2I(x, y), source, Vector2I.Zero);
 	}
 
-	private static void AddBorderWalls(Node2D root, int w, int h, bool town)
+	private static void AddBorderWalls(Node2D root, int w, int h, bool town, bool northSprite = true)
 	{
 		for (int x = 0; x < w; x++)
 		{
-			AddWall(root, x, 0, town);
+			AddWall(root, x, 0, town, sprite: northSprite);
 			AddWall(root, x, h - 1, town);
 		}
 		for (int y = 1; y < h - 1; y++)
@@ -788,7 +814,7 @@ public partial class WorldRoot : Node2D
 		}
 	}
 
-	private static void AddWall(Node2D root, int x, int y, bool town)
+	private static void AddWall(Node2D root, int x, int y, bool town, bool sprite = true)
 	{
 		var body = new StaticBody2D
 		{
@@ -800,7 +826,8 @@ public partial class WorldRoot : Node2D
 		{
 			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Size, Tiles.Size) }
 		});
-		body.AddChild(town ? Assets.TileSprite("brick_wall") : Assets.ColdStackSprite("flue_wall"));
+		if (sprite)
+			body.AddChild(town ? Assets.TileSprite("brick_wall") : Assets.ColdStackSprite("flue_wall"));
 		root.AddChild(body);
 	}
 

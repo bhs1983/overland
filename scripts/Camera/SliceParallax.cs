@@ -4,7 +4,8 @@ namespace Overland;
 
 /// <summary>
 /// Orthographic 2D parallax for Kilnwalk / Cold Stack per assets/ART.md.
-/// Far 0.2 Repeat, mid 0.5 Repeat, fog 0.25.
+/// Kilnwalk far/mid sit in world Y above the street (room is one screen wide).
+/// Cold Stack far/mid stay Parallax2D 0.2 / 0.5 Repeat. Fog 0.25.
 /// No camera-space FG props — 32px lamps/signs at zoom 2 sat on the lens.
 /// Main plane (hero/tiles) stays at 1.0 — never parented here. No 3D camera.
 /// </summary>
@@ -60,9 +61,22 @@ public partial class SliceParallax : Node2D
 			n.Free();
 		}
 
-		// 16 / 8 were zoom-3 world px. 24 / 12 keep the same screen offset at zoom 2.
-		AddTiled("Far", 0.2f, Assets.Parallax(_theme, "far_bg"), tileW: FarW, tileH: FarH, y: 24);
-		AddTiled("Mid", 0.5f, Assets.Parallax(_theme, "mid_bg"), tileW: MidW, tileH: MidH, y: 12);
+		// Kilnwalk is one screen wide — lock far/mid in world Y above the street so the
+		// ridge is hills + chimney line, not a Parallax2D sliver behind a brick closet.
+		// Cold Stack rooms stay boxed; keep the scrolling strips for side-fill.
+		if (_theme == "kilnwalk")
+		{
+			// far_bg: dark 0–24, teal 24–88, hills 88–144. Sit so teal+hills fill the ridge band.
+			AddRidge("Far", Assets.Parallax(_theme, "far_bg"), FarW, FarH, y: -(FarH - 30), z: -20, dim: true);
+			// mid_bg brick mass starts at texel 111; pin that row to the first floor so the
+			// north gap is chimney silhouettes over hills, not another brick closet.
+			AddRidge("Mid", Assets.Parallax(_theme, "mid_bg"), MidW, MidH, y: Tiles.Size - 111, z: -10, dim: false);
+		}
+		else
+		{
+			AddTiled("Far", 0.2f, Assets.Parallax(_theme, "far_bg"), tileW: FarW, tileH: FarH, y: 24);
+			AddTiled("Mid", 0.5f, Assets.Parallax(_theme, "mid_bg"), tileW: MidW, tileH: MidH, y: 12);
+		}
 
 		var fog = new Parallax2D
 		{
@@ -81,6 +95,23 @@ public partial class SliceParallax : Node2D
 		fog.AddChild(_fogRoot);
 		AddChild(fog);
 		SetProcess(true);
+	}
+
+	private void AddRidge(string name, Texture2D tex, int tileW, int tileH, float y, int z, bool dim)
+	{
+		AddChild(new Sprite2D
+		{
+			Name = $"Ridge_{name}",
+			Texture = tex,
+			Centered = false,
+			TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+			TextureRepeat = CanvasItem.TextureRepeatEnum.Enabled,
+			RegionEnabled = true,
+			RegionRect = new Rect2(0, 0, tileW, tileH),
+			Position = new Vector2(0, y),
+			ZIndex = z,
+			Modulate = dim ? new Color(1, 1, 1, 0.85f) : new Color(0.92f, 0.95f, 1f, 0.9f)
+		});
 	}
 
 	private void AddTiled(string name, float rate, Texture2D tex, int tileW, int tileH, float y)
