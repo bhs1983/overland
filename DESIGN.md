@@ -43,6 +43,13 @@ It does four things, and only these:
 
 It does not fly you, grapple, bomb walls, or light a separate magic meter.
 
+
+## Environment talks
+
+Rooms speak. Ash patterns, broken fans, residual heat, reversed draft. Each Cold Stack room shows a piece of why the firing failed. This is tile and prop polish, not a new system: no day/night cycle, no talking walls, no extra paths.
+
+Hero is a flue-walker. Rejected phrasing: “Whimble style.” Names stay locked.
+
 ## What is not in this bible
 
-No continent, no second town, no second dungeon, no horses, no shops-as-systems, no crafting, no dialogue trees, no weather, no day/night cycle, no generated rooms. If it is not in SLICE-0.md, it is not in the game yet.
+No continent, no second town, no second dungeon, no extra side-dungeon paths, no horses, no shops-as-systems, no crafting, no dialogue trees, no weather, no day/night cycle, no runtime generator, no “Whimble.” If it is not in SLICE-0.md, it is not in the game yet.
