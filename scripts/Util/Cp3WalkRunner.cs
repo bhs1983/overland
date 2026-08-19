@@ -40,6 +40,10 @@ public partial class Cp3WalkRunner : Node
 				await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 				if (GameState.Instance.CurrentRoom != room)
 					Fail($"Expected {room}, got {GameState.Instance.CurrentRoom}");
+				if (room == RoomId.SettersAlcove && CountGroup("enemy") < 2)
+					Fail("Setter's Alcove missing Claywalkers");
+				if (room == RoomId.ClinkerYard && CountGroup("enemy") < 1)
+					Fail("Clinker Yard missing Clinker");
 				GD.Print($"OK room {room}");
 			}
 
@@ -49,7 +53,7 @@ public partial class Cp3WalkRunner : Node
 			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 			if (GameState.Instance.CurrentRoom != RoomId.KeyLanding)
-				Fail("Key Landing failed");
+				Fail($"Key Landing failed (in {GameState.Instance.CurrentRoom})");
 			GameState.Instance.HasStackKey = true;
 			GameState.Instance.StackKeyTaken = true;
 			GD.Print("OK Key Landing + Stack Key");
@@ -82,6 +86,17 @@ public partial class Cp3WalkRunner : Node
 			GD.PrintErr("CP3 walk failed: ", ex);
 			GetTree().Quit(1);
 		}
+	}
+
+	private int CountGroup(string group)
+	{
+		var n = 0;
+		foreach (var node in GetTree().GetNodesInGroup(group))
+		{
+			if (node is Node living && !living.IsQueuedForDeletion())
+				n++;
+		}
+		return n;
 	}
 
 	private void Fail(string msg)

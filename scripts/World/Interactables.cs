@@ -100,11 +100,12 @@ public partial class NpcInteractable : Interactable
 public partial class SavePoint : Interactable
 {
 	public RoomId SaveRoom { get; set; } = RoomId.Kilnwalk;
+	public bool NightFire { get; set; } = true;
 
 	public override void _Ready()
 	{
 		base._Ready();
-		AddChild(Assets.TileSprite("night_fire"));
+		AddChild(NightFire ? Assets.TileSprite("night_fire") : Assets.Sprite(Assets.Ui("save_mark")));
 		Prompt = "Save";
 	}
 
@@ -171,6 +172,8 @@ public partial class RoomTransition : Area2D
 	private void OnBodyEntered(Node2D body)
 	{
 		if (_cooldown || body is not PlayerController)
+			return;
+		if (GetTree().GetFirstNodeInGroup("world") is WorldRoot world && !world.TransitionsReady)
 			return;
 		if (RequiresMouthOpen && !GameState.Instance.MouthOpen)
 		{
@@ -315,7 +318,7 @@ public partial class FanEastDoor : StaticBody2D
 		CollisionLayer = 1 << 0;
 		_col = new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(16, 32) }
+			Shape = new RectangleShape2D { Size = new Vector2(24, 40) }
 		};
 		AddChild(_col);
 		_sprite = Assets.ColdStackSprite("iron_door_closed");
@@ -438,7 +441,7 @@ public partial class IronDoorGate : StaticBody2D
 		CollisionLayer = 1 << 0;
 		_col = new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(16, 32) }
+			Shape = new RectangleShape2D { Size = new Vector2(24, 48) }
 		};
 		AddChild(_col);
 		_sprite = Assets.ColdStackSprite("iron_door_closed");

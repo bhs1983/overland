@@ -12,6 +12,9 @@ public static class Assets
 	{
 		if (Cache.TryGetValue(path, out var t) && t != null)
 			return t;
+		// Prefer PNG bytes. Checked-in .import files often point at missing .ctex after a fresh clone.
+		if (path.EndsWith(".png") && Godot.FileAccess.FileExists(path))
+			return LoadPngNearest(path);
 		if (ResourceLoader.Exists(path))
 		{
 			t = GD.Load<Texture2D>(path);
@@ -21,9 +24,6 @@ public static class Assets
 				return t;
 			}
 		}
-		// Fallback: decode PNG bytes (Nearest applied on CanvasItem; no mipmaps).
-		if (path.EndsWith(".png") && Godot.FileAccess.FileExists(path))
-			return LoadPngNearest(path);
 		Cache[path] = null!;
 		return null!;
 	}
@@ -56,7 +56,7 @@ public static class Assets
 		var path = $"res://assets/tiles/cold_stack/{name}.png";
 		if (Cache.TryGetValue(path, out var cached) && cached != null)
 			return cached;
-		if (!ResourceLoader.Exists(path))
+		if (!Godot.FileAccess.FileExists(path))
 			return null;
 		return Tex(path);
 	}
@@ -66,7 +66,7 @@ public static class Assets
 		var path = $"res://assets/sprites/hero/{name}.png";
 		if (Cache.TryGetValue(path, out var cached) && cached != null)
 			return cached;
-		if (!ResourceLoader.Exists(path))
+		if (!Godot.FileAccess.FileExists(path))
 			return null;
 		return Tex(path);
 	}

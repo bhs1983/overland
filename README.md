@@ -50,7 +50,7 @@ First place: **Kilnwalk**. First dungeon: **the Cold Stack** (Checkpoint 2+).
 
 v3 hero atlas (`fluewalker_*`, pivot 16,47) + parallax layers (far 0.2 / mid 0.5 / FG 1.35 / fog 0.25). No 3D camera.
 
-Rooms 9–10 are **not** in this PR.
+Rooms 9–10 (Long Drop, Overfire) are **not built yet**.
 
 ## Credits
 

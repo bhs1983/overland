@@ -4,12 +4,14 @@ namespace Overland;
 
 public partial class TitleScreen : Control
 {
-	/// <summary>Last-frame Shift — click releases Shift before Pressed, so sample here.</summary>
+	/// <summary>Last-frame modifiers — click releases keys before Pressed, so sample here.</summary>
 	private bool _shiftLatched;
+	private bool _ctrlLatched;
 
 	public override void _Process(double delta)
 	{
 		_shiftLatched = Input.IsPhysicalKeyPressed(Key.Shift);
+		_ctrlLatched = Input.IsPhysicalKeyPressed(Key.Ctrl);
 	}
 
 	public override void _Ready()
@@ -64,7 +66,7 @@ public partial class TitleScreen : Control
 			// Use latched Shift (last _Process), not IsPhysicalKeyPressed at click.
 			if (_shiftLatched)
 			{
-				if (Input.IsPhysicalKeyPressed(Key.Ctrl))
+				if (_ctrlLatched)
 					GameState.Instance.ApplyDebugCp3Start();
 				else
 					GameState.Instance.ApplyDebugStackMouthStart();

@@ -11,6 +11,7 @@ public partial class WorldRoot : Node2D
 	private MouthGate? _mouthGate;
 	private FanEastDoor? _fanEastDoor;
 	private bool _transitioning;
+	public bool TransitionsReady { get; private set; }
 
 	public override void _Ready()
 	{
@@ -117,10 +118,23 @@ public partial class WorldRoot : Node2D
 		}
 
 		_player.GlobalPosition = spawn;
+		var firstVisit = !GameState.Instance.RoomsEntered.Contains(room.ToString());
 		GameState.Instance.MarkRoomEntered(room);
 		GameState.Instance.CurrentRoom = room;
+		TransitionsReady = false;
 		CallDeferred(nameof(RefreshGates));
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+		if (firstVisit)
+			CallDeferred(nameof(SpeakRoom), (int)room);
+		GetTree().CreateTimer(0.2f).Timeout += () => TransitionsReady = true;
+	}
+
+	private void SpeakRoom(int room)
+	{
+		var line = RoomTalk.Line((RoomId)room);
+		if (string.IsNullOrEmpty(line))
+			return;
+		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast(line);
 	}
 
 	private static Vector2 SpawnFor(RoomId room, string spawnId) => room switch
@@ -145,10 +159,10 @@ public partial class WorldRoot : Node2D
 		RoomId.ClinkerYard when spawnId == "from_quench" => new Vector2(2.5f * Tiles.Size, 7 * Tiles.Size),
 		RoomId.ClinkerYard when spawnId == "from_key" => new Vector2(10 * Tiles.Size, 2.5f * Tiles.Size),
 		RoomId.ClinkerYard => new Vector2(5 * Tiles.Size, 7 * Tiles.Size),
-		RoomId.KeyLanding when spawnId == "from_clinker" => new Vector2(10 * Tiles.Size, 11 * Tiles.Size),
-		RoomId.KeyLanding when spawnId == "from_sealed" => new Vector2(10 * Tiles.Size, 2.5f * Tiles.Size),
+		RoomId.KeyLanding when spawnId == "from_clinker" => new Vector2(10 * Tiles.Size, 9 * Tiles.Size),
+		RoomId.KeyLanding when spawnId == "from_sealed" => new Vector2(10 * Tiles.Size, 3.5f * Tiles.Size),
 		RoomId.KeyLanding => new Vector2(10 * Tiles.Size, 8 * Tiles.Size),
-		RoomId.SealedFlue when spawnId == "from_key" => new Vector2(10 * Tiles.Size, 11 * Tiles.Size),
+		RoomId.SealedFlue when spawnId == "from_key" => new Vector2(10 * Tiles.Size, 9 * Tiles.Size),
 		RoomId.SealedFlue => new Vector2(10 * Tiles.Size, 8 * Tiles.Size),
 		RoomId.Kilnwalk when spawnId == "from_mouth" => new Vector2(10 * Tiles.Size, 3 * Tiles.Size),
 		_ => new Vector2(10 * Tiles.Size, 11 * Tiles.Size)
@@ -238,7 +252,8 @@ public partial class WorldRoot : Node2D
 		root.AddChild(new SavePoint
 		{
 			Position = new Vector2(6 * Tiles.Size, 10 * Tiles.Size),
-			SaveRoom = RoomId.StackMouth
+			SaveRoom = RoomId.StackMouth,
+			NightFire = false
 		});
 
 		root.AddChild(new Sootling
@@ -359,6 +374,7 @@ public partial class WorldRoot : Node2D
 			Position = new Vector2(9 * Tiles.Size, (H - 1) * Tiles.Size + 4),
 			Target = RoomId.QuenchTrench,
 			SpawnId = "from_fan",
+			RequiresFanOpen = true,
 			TriggerSize = new Vector2(28, 12)
 		});
 	}

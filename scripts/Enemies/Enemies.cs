@@ -27,13 +27,14 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		CollisionMask = 0;
 		AddChild(new CollisionShape2D
 		{
-			Shape = new CircleShape2D { Radius = 2 }
+			Shape = new CircleShape2D { Radius = 6 }
 		});
 		_body = Assets.Sprite(Assets.Enemy("sootling"));
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();
 		AddChild(_flash);
+		AddToGroup("enemy");
 		_hitCd = 0.55f;
 	}
 
@@ -69,10 +70,14 @@ public partial class Sootling : CharacterBody2D, IDamageable
 			Velocity = Vector2.Zero;
 			var facing = player.Facing;
 			if (facing.LengthSquared() > 0.0001f)
-				GlobalPosition = player.GlobalPosition + facing.Normalized() * 8f;
+				GlobalPosition = player.GlobalPosition + facing.Normalized() * 12f;
 			MoveAndSlide();
-			if (GameState.Instance.HasCrackiron && Input.IsActionJustPressed("attack"))
-				TakeSwordHit(player.Facing);
+			// Delayed contact bite — skip while the hero is swinging/puffing.
+			if (_hitCd <= 0 && !player.AttackBusy)
+			{
+				_hitCd = 0.85f;
+				player.ApplyHit((player.GlobalPosition - GlobalPosition).Normalized());
+			}
 			return;
 		}
 
@@ -123,12 +128,13 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		}
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
-		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 6 } });
+		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 8 } });
 		_body = Assets.Sprite(Assets.EnemyV3("claywalker"));
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();
 		AddChild(_flash);
+		AddToGroup("enemy");
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -213,12 +219,13 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		}
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
-		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 5 } });
+		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 6 } });
 		_body = Assets.Sprite(Assets.EnemyV3("brickleech"));
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();
 		AddChild(_flash);
+		AddToGroup("enemy");
 		if (ClingPos != Vector2.Zero)
 			GlobalPosition = ClingPos;
 	}
@@ -312,12 +319,13 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		}
 		CollisionLayer = 1 << 2;
 		CollisionMask = 0;
-		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 10 } });
+		AddChild(new CollisionShape2D { Shape = new CircleShape2D { Radius = 12 } });
 		_body = Assets.Sprite(Assets.EnemyV3("clinker"));
 		_body.ZIndex = 10;
 		AddChild(_body);
 		_flash = new FlashFx();
 		AddChild(_flash);
+		AddToGroup("enemy");
 		var label = new Label
 		{
 			Text = "the Clinker",

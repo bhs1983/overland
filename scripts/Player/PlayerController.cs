@@ -195,16 +195,14 @@ public partial class PlayerController : CharacterBody2D
 		_iframe = true;
 		var dir = _facing.LengthSquared() > 0.01f ? _facing : Vector2.Down;
 		PlayAnim($"fluewalker_hop_{_facingName}");
-		var start = GlobalPosition;
-		var target = start + dir * DodgeDistance;
+		var speed = DodgeDistance / Mathf.Max(DodgeTime, 0.01f);
 		var t = 0f;
 		while (t < DodgeTime)
 		{
 			t += (float)GetProcessDeltaTime();
-			GlobalPosition = start.Lerp(target, Mathf.Clamp(t / DodgeTime, 0f, 1f));
-			Velocity = Vector2.Zero;
+			Velocity = dir * speed;
 			MoveAndSlide();
-			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+			await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 		}
 		_dodging = false;
 		PlayAnim($"fluewalker_idle_{_facingName}");

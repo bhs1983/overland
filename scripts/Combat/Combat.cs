@@ -29,7 +29,8 @@ public partial class AttackArc : Area2D
 
 		_shape = new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(18, 14) },
+			// Reach Claywalker (18px) and Clinker (22px) standoff, not just Sootling park.
+			Shape = new RectangleShape2D { Size = new Vector2(32, 20) },
 			Disabled = true
 		};
 		AddChild(_shape);
@@ -52,7 +53,7 @@ public partial class AttackArc : Area2D
 			return;
 		_active = true;
 
-		Position = facing.Normalized() * 12f;
+		Position = facing.Normalized() * 16f;
 		Rotation = facing.Angle();
 
 		// Keep _visual hidden — filled telegraph rect was the QA cream/orange block.
@@ -65,7 +66,8 @@ public partial class AttackArc : Area2D
 		_shape.Disabled = false;
 		Monitoring = true;
 
-		// Wait one physics frame so Area2D overlap queries see enemy bodies (Sootling).
+		// Two physics frames so overlap queries see CharacterBody2D on layer 2.
+		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
 
 		foreach (var body in GetOverlappingBodies())
@@ -98,7 +100,7 @@ public partial class BellowsCone : Area2D
 
 		_shape = new CollisionShape2D
 		{
-			Shape = new RectangleShape2D { Size = new Vector2(28, 16) },
+			Shape = new RectangleShape2D { Size = new Vector2(36, 20) },
 			Disabled = true
 		};
 		AddChild(_shape);
@@ -121,7 +123,7 @@ public partial class BellowsCone : Area2D
 			return;
 		_active = true;
 
-		Position = facing.Normalized() * 18f;
+		Position = facing.Normalized() * 20f;
 		Rotation = facing.Angle();
 
 		_visual.Visible = false; // same as AttackArc — no filled puff block
