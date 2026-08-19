@@ -36,8 +36,8 @@ Slice 0 on-disk world art is **individual PNGs**, one file per name. Packed shee
 | Item / UI icon | **32×32** after the UI PR; **16×16 on disk until then** | n/a (Control) | Crackiron, Folded Bellows, Stack Key, health pip, map nodes |
 | VFX particle | **16×16** | center | spark, ember, smoke, ash_fall — **never ×2** |
 | Light cookie | **32×32** | center | lantern, kiln, quench, overfire — grandfathered alpha |
-| Parallax far | 480×96 until the sky PR; then **720×144** | n/a, repeat X | same screen width as today at zoom 2 |
-| Parallax mid | 480×128 until the sky PR; then **720×192** | n/a, repeat X | same |
+| Parallax far | **720×144** | n/a, repeat X | 720 × zoom 2 = 1440 screen px |
+| Parallax mid | **720×192** | n/a, repeat X | same |
 | FG prop | 32×64 / 64×32 / 32×32 | as today | **do not 2×**; already 32px family |
 
 Gutters on *optional* packed sheets (post-Slice 0): **2px transparent** between cells, **0 on the outer edge**.

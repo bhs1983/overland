@@ -10,6 +10,22 @@ namespace Overland;
 /// </summary>
 public partial class SliceParallax : Node2D
 {
+	public const int FarW = 720;
+	public const int FarH = 144;
+	public const int MidW = 720;
+	public const int MidH = 192;
+
+	/// <summary>
+	/// PR-3 doubled 2.2–5 → 4.4–10 so a 32px cookie still covers ~6 tiles.
+	/// PR-10 polish: lantern 4.4→5 so night fire still reads against the 720 sky.
+	/// </summary>
+	public const float CookieLantern = 5f;
+	public const float CookieKiln = 6f;
+	public const float CookieQuench = 6.5f;
+	public const float CookieAsh = 8f;
+	public const float CookieClinker = 9f;
+	public const float CookieOverfire = 10f;
+
 	private string _theme = "kilnwalk";
 	private Node2D? _fogRoot;
 	private float _fogDrift;
@@ -39,8 +55,9 @@ public partial class SliceParallax : Node2D
 			GetChild(0).Free();
 		_fogRoot = null;
 
-		AddTiled("Far", 0.2f, Assets.Parallax(_theme, "far_bg"), tileW: 480, tileH: 96, y: 16);
-		AddTiled("Mid", 0.5f, Assets.Parallax(_theme, "mid_bg"), tileW: 480, tileH: 128, y: 8);
+		// 16 / 8 were zoom-3 world px. 24 / 12 keep the same screen offset at zoom 2.
+		AddTiled("Far", 0.2f, Assets.Parallax(_theme, "far_bg"), tileW: FarW, tileH: FarH, y: 24);
+		AddTiled("Mid", 0.5f, Assets.Parallax(_theme, "mid_bg"), tileW: MidW, tileH: MidH, y: 12);
 
 		var fog = new Parallax2D
 		{
@@ -129,7 +146,7 @@ public partial class SliceParallax : Node2D
 		return s;
 	}
 
-	public static PointLight2D Cookie(string theme, string lightName, Vector2 pos, float energy = 1.1f, float scale = 5f)
+	public static PointLight2D Cookie(string theme, string lightName, Vector2 pos, float energy = 1.1f, float scale = CookieLantern)
 	{
 		var tex = Assets.Parallax(theme, lightName);
 		return new PointLight2D

@@ -103,9 +103,9 @@ def infer_cell(role: str, src: Path, explicit: str | None) -> tuple[int, int]:
     name = src.stem.lower()
     if role == "parallax":
         if name == "far_bg":
-            return 480, 96
+            return 720, 144
         if name == "mid_bg":
-            return 480, 128
+            return 720, 192
         if name == "fog_wisp":
             return 48, 16
         raise SystemExit("parallax requires --cell WxH (or a known filename: far_bg, mid_bg, fog_wisp)")

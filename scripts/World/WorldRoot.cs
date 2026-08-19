@@ -215,9 +215,9 @@ public partial class WorldRoot : Node2D
 		root.AddChild(SliceParallax.TallTop("kilnwalk", new Vector2(8 * Tiles.Size, 3.2f * Tiles.Size)));
 		root.AddChild(SliceParallax.TallTop("kilnwalk", new Vector2(11 * Tiles.Size, 3.2f * Tiles.Size)));
 
-		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(8 * Tiles.Size, 4 * Tiles.Size), 1.2f, 6f));
-		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(11 * Tiles.Size, 4 * Tiles.Size), 1.2f, 6f));
-		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_lantern", new Vector2(10 * Tiles.Size, 9 * Tiles.Size), 0.9f, 4.4f));
+		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(8 * Tiles.Size, 4 * Tiles.Size), 1.2f, SliceParallax.CookieKiln));
+		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(11 * Tiles.Size, 4 * Tiles.Size), 1.2f, SliceParallax.CookieKiln));
+		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_lantern", new Vector2(10 * Tiles.Size, 9 * Tiles.Size), 0.9f, SliceParallax.CookieLantern));
 
 		AddNpc(root, new Vector2(4 * Tiles.Size, 5 * Tiles.Size), "Tamsin Cole", Palette.NpcTamsin);
 		AddNpc(root, new Vector2(4 * Tiles.Size, 9 * Tiles.Size), "Holt Vetch", Palette.NpcHolt);
@@ -262,7 +262,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 10, 0);
 
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(4 * Tiles.Size, 1.5f * Tiles.Size)));
-		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(10 * Tiles.Size, 5 * Tiles.Size), 0.7f, 8f));
+		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(10 * Tiles.Size, 5 * Tiles.Size), 0.7f, SliceParallax.CookieAsh));
 
 		root.AddChild(new SavePoint
 		{
@@ -461,7 +461,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 0, 6);
 		ClearWallAt(root, 0, 7);
 
-		root.AddChild(SliceParallax.Cookie("cold_stack", "light_quench", new Vector2(10 * Tiles.Size, 6 * Tiles.Size), 1.0f, 6.4f));
+		root.AddChild(SliceParallax.Cookie("cold_stack", "light_quench", new Vector2(10 * Tiles.Size, 6 * Tiles.Size), 1.0f, SliceParallax.CookieQuench));
 
 		root.AddChild(new Brickleech
 		{
@@ -515,7 +515,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 9, 0);
 		ClearWallAt(root, 10, 0);
 
-		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 0.85f, 9f));
+		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 0.85f, SliceParallax.CookieClinker));
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(5 * Tiles.Size, 1.5f * Tiles.Size)));
 
 		root.AddChild(new Clinker
@@ -692,7 +692,7 @@ public partial class WorldRoot : Node2D
 		ClearWallAt(root, 9, H - 1);
 		ClearWallAt(root, 10, H - 1);
 
-		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 1.1f, 10f));
+		root.AddChild(SliceParallax.Cookie("cold_stack", "light_overfire", new Vector2(8 * Tiles.Size, 7 * Tiles.Size), 1.1f, SliceParallax.CookieOverfire));
 		root.AddChild(SliceParallax.TallTop("cold_stack", new Vector2(6 * Tiles.Size, 1.4f * Tiles.Size)));
 
 		root.AddChild(new Overfire
