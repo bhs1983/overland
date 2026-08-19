@@ -10,9 +10,8 @@ First place: **Kilnwalk**. First dungeon: **the Cold Stack** (Checkpoint 2+).
 
 1. Install **Godot 4.x .NET** (Mono) from https://godotengine.org — not the standard non-.NET build.
 2. Install **.NET SDK 8** (or whatever your Godot 4.x release expects).
-3. Open this repo folder in Godot (**Import** / **Open** → select `project.godot`).
-4. Wait for C# restore / first build (Build button or build on play).
-5. Press **Play** (F5). Title → New Game.
+3. Double-click **`run_editor.bat`** (editor) or **`run_game.bat`** (play Kilnwalk, skip title). Both force **GL Compatibility** — Forward+ crashes on window present with RTX 50-series.
+4. Or Import `project.godot` in the Project Manager, wait for the C# build, then **F6** on `Game.tscn` (F5 plays the title).
 
 ### Keys
 
