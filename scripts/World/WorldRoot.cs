@@ -218,8 +218,8 @@ public partial class WorldRoot : Node2D
 		root.AddChild(SliceParallax.TallTop("kilnwalk", new Vector2(8 * Tiles.Size, 3.2f * Tiles.Size)));
 		root.AddChild(SliceParallax.TallTop("kilnwalk", new Vector2(11 * Tiles.Size, 3.2f * Tiles.Size)));
 
-		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(8 * Tiles.Size, 4 * Tiles.Size), 1.2f, SliceParallax.CookieKiln));
-		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(11 * Tiles.Size, 4 * Tiles.Size), 1.2f, SliceParallax.CookieKiln));
+		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(8 * Tiles.Size, 4 * Tiles.Size), 0.55f, SliceParallax.CookieKiln));
+		root.AddChild(SliceParallax.Cookie("kilnwalk", "light_kiln", new Vector2(11 * Tiles.Size, 4 * Tiles.Size), 0.55f, SliceParallax.CookieKiln));
 
 		AddNpc(root, new Vector2(4 * Tiles.Size, 5 * Tiles.Size), "Tamsin Cole", Palette.NpcTamsin);
 		AddNpc(root, new Vector2(4 * Tiles.Size, 9 * Tiles.Size), "Holt Vetch", Palette.NpcHolt);

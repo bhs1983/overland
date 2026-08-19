@@ -123,7 +123,7 @@ public partial class SavePoint : Interactable
 			var fire = Assets.TileSprite("night_fire_0");
 			Assets.ApplyFeetPivot(fire);
 			AddChild(fire);
-			AddChild(SliceParallax.Cookie("kilnwalk", "light_lantern", Vector2.Zero, 0.9f, SliceParallax.CookieLantern));
+			AddChild(SliceParallax.Cookie("kilnwalk", "light_lantern", Vector2.Zero, 0.45f, SliceParallax.CookieLantern));
 		}
 		else
 		{

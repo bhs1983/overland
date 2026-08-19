@@ -18,8 +18,8 @@ public partial class SliceParallax : Node2D
 	/// Cookie coverage in tiles ≈ TextureScale (32px cookie / 32px tile).
 	/// Zoom 2 made the old 5–10 scales read as a lamp on the lens; keep energy, shrink the disc.
 	/// </summary>
-	public const float CookieLantern = 2.5f;
-	public const float CookieKiln = 3f;
+	public const float CookieLantern = 1.6f;
+	public const float CookieKiln = 2f;
 	public const float CookieQuench = 3.2f;
 	public const float CookieAsh = 4f;
 	public const float CookieClinker = 4.5f;
