@@ -27,7 +27,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		CollisionMask = 1 << 0;
 		AddChild(new CollisionShape2D
 		{
-			Shape = new CircleShape2D { Radius = 6 }
+			Shape = new CircleShape2D { Radius = 2 }
 		});
 		_body = Assets.Sprite(Assets.Enemy("sootling"));
 		_body.ZIndex = 10; // draw above player so chase does not vanish under the hero
