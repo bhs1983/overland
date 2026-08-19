@@ -1,0 +1,85 @@
+{
+  "colors": [
+    {
+      "index": 0,
+      "hex": "#0B0A0C",
+      "name": "soot_black"
+    },
+    {
+      "index": 1,
+      "hex": "#1C1714",
+      "name": "deep_soot"
+    },
+    {
+      "index": 2,
+      "hex": "#3A2A22",
+      "name": "dark_brick"
+    },
+    {
+      "index": 3,
+      "hex": "#6B3A28",
+      "name": "fired_clay"
+    },
+    {
+      "index": 4,
+      "hex": "#A85A32",
+      "name": "kiln_terracotta"
+    },
+    {
+      "index": 5,
+      "hex": "#D4783A",
+      "name": "kiln_orange"
+    },
+    {
+      "index": 6,
+      "hex": "#E8A05A",
+      "name": "ember"
+    },
+    {
+      "index": 7,
+      "hex": "#F0C98A",
+      "name": "canvas_highlight"
+    },
+    {
+      "index": 8,
+      "hex": "#2A2C30",
+      "name": "ash_dark"
+    },
+    {
+      "index": 9,
+      "hex": "#5A5E62",
+      "name": "ash_grey"
+    },
+    {
+      "index": 10,
+      "hex": "#8B9094",
+      "name": "ash_light"
+    },
+    {
+      "index": 11,
+      "hex": "#C4C2BA",
+      "name": "canvas"
+    },
+    {
+      "index": 12,
+      "hex": "#E8E4D8",
+      "name": "wrap_bone"
+    },
+    {
+      "index": 13,
+      "hex": "#1A3A48",
+      "name": "cold_draft_deep"
+    },
+    {
+      "index": 14,
+      "hex": "#3D6A78",
+      "name": "cold_draft"
+    },
+    {
+      "index": 15,
+      "hex": "#7A9AA4",
+      "name": "cold_draft_light"
+    }
+  ],
+  "note": "Locked 16-color Overland Slice 0 palette. Use only these hex values. Transparent is not a palette color."
+}
