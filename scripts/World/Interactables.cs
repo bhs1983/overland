@@ -126,7 +126,11 @@ public partial class SavePoint : Interactable
 			AddChild(SliceParallax.Cookie("kilnwalk", "light_lantern", Vector2.Zero, 0.9f, SliceParallax.CookieLantern));
 		}
 		else
-			AddChild(Assets.Sprite(Assets.Ui("save_mark")));
+		{
+			var mark = Assets.Sprite(Assets.Ui("save_mark"));
+			mark.Scale = new Vector2(0.5f, 0.5f);
+			AddChild(mark);
+		}
 		Prompt = "Save";
 	}
 
@@ -454,7 +458,8 @@ public partial class StackKeyPickup : Interactable
 		base._Ready();
 		Prompt = "Take";
 		var key = Assets.Sprite(Assets.Item("stack_key"));
-		Assets.ApplyFeetPivot(key);
+		key.Scale = new Vector2(0.5f, 0.5f);
+		Assets.ApplyFeetPivot(key, 32, 32);
 		AddChild(key);
 		if (GameState.Instance.StackKeyTaken)
 			Visible = false;

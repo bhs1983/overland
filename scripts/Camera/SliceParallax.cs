@@ -4,7 +4,7 @@ namespace Overland;
 
 /// <summary>
 /// Orthographic 2D parallax for Kilnwalk / Cold Stack per assets/ART.md.
-/// Far 0.2 Repeat, mid 0.5 Repeat, fog 0.25, FG 1.35 sparse.
+/// Far 0.2 Repeat, mid 0.5 Repeat, fog 0.25, FG 1.2 sparse (lock 1.2–1.5).
 /// Main plane (hero/tiles) stays at 1.0 — never parented here. No 3D camera.
 /// Uses Godot 4.7 Parallax2D (not 3D).
 /// </summary>
@@ -14,17 +14,18 @@ public partial class SliceParallax : Node2D
 	public const int FarH = 144;
 	public const int MidW = 720;
 	public const int MidH = 192;
+	public const float FgScroll = 1.2f;
 
 	/// <summary>
-	/// PR-3 doubled 2.2–5 → 4.4–10 so a 32px cookie still covers ~6 tiles.
-	/// PR-10 polish: lantern 4.4→5 so night fire still reads against the 720 sky.
+	/// Cookie coverage in tiles ≈ TextureScale (32px cookie / 32px tile).
+	/// Zoom 2 made the old 5–10 scales read as a lamp on the lens; keep energy, shrink the disc.
 	/// </summary>
-	public const float CookieLantern = 5f;
-	public const float CookieKiln = 6f;
-	public const float CookieQuench = 6.5f;
-	public const float CookieAsh = 8f;
-	public const float CookieClinker = 9f;
-	public const float CookieOverfire = 10f;
+	public const float CookieLantern = 2.5f;
+	public const float CookieKiln = 3f;
+	public const float CookieQuench = 3.2f;
+	public const float CookieAsh = 4f;
+	public const float CookieClinker = 4.5f;
+	public const float CookieOverfire = 5f;
 
 	private string _theme = "kilnwalk";
 	private Node2D? _fogRoot;
@@ -79,7 +80,7 @@ public partial class SliceParallax : Node2D
 		var fg = new Parallax2D
 		{
 			Name = "Parallax_Fore",
-			ScrollScale = new Vector2(1.35f, 1.35f),
+			ScrollScale = new Vector2(FgScroll, FgScroll),
 			ZIndex = 20
 		};
 		AddSparseFg(fg);
@@ -115,15 +116,16 @@ public partial class SliceParallax : Node2D
 	{
 		if (_theme == "kilnwalk")
 		{
-			PlaceFg(fg, Assets.Parallax("kilnwalk", "fg_lamp"), new Vector2(48, 40));
-			PlaceFg(fg, Assets.Parallax("kilnwalk", "fg_sign"), new Vector2(220, 90));
-			PlaceFg(fg, Assets.Parallax("kilnwalk", "fg_overhang"), new Vector2(140, 8));
+			// Top strip only — a 32×64 lamp in the walk band is taller than the hero at zoom 2.
+			PlaceFg(fg, Assets.Parallax("kilnwalk", "fg_overhang"), new Vector2(140, 4));
+			PlaceFg(fg, Assets.Parallax("kilnwalk", "fg_lamp"), new Vector2(20, -8));
+			PlaceFg(fg, Assets.Parallax("kilnwalk", "fg_sign"), new Vector2(280, 2));
 		}
 		else
 		{
-			PlaceFg(fg, Assets.Parallax("cold_stack", "fg_pipe"), new Vector2(36, 36));
-			PlaceFg(fg, Assets.Parallax("cold_stack", "fg_overhang"), new Vector2(180, 6));
-			PlaceFg(fg, Assets.Parallax("cold_stack", "fg_pipe"), new Vector2(280, 50));
+			PlaceFg(fg, Assets.Parallax("cold_stack", "fg_overhang"), new Vector2(180, 4));
+			PlaceFg(fg, Assets.Parallax("cold_stack", "fg_pipe"), new Vector2(16, -6));
+			PlaceFg(fg, Assets.Parallax("cold_stack", "fg_pipe"), new Vector2(300, 0));
 		}
 	}
 

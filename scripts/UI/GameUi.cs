@@ -55,16 +55,16 @@ public partial class GameUi : CanvasLayer
 		Layer = 10;
 
 		_hpRow = new HBoxContainer { Position = new Vector2(16, 10) };
-		_hpRow.AddThemeConstantOverride("separation", 4);
+		_hpRow.AddThemeConstantOverride("separation", 2);
 		AddChild(_hpRow);
 
-		_itemRow = new HBoxContainer { Position = new Vector2(16, 48) };
-		_itemRow.AddThemeConstantOverride("separation", 4);
+		_itemRow = new HBoxContainer { Position = new Vector2(16, 30) };
+		_itemRow.AddThemeConstantOverride("separation", 2);
 		AddChild(_itemRow);
 
 		_hud = new Label
 		{
-			Position = new Vector2(16, 88),
+			Position = new Vector2(16, 50),
 			Size = new Vector2(900, 24)
 		};
 		_hud.AddThemeFontSizeOverride("font_size", 14);
@@ -239,8 +239,9 @@ public partial class GameUi : CanvasLayer
 			{
 				Texture = Assets.Ui("health_pip"),
 				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-				CustomMinimumSize = new Vector2(32, 32),
-				StretchMode = TextureRect.StretchModeEnum.Keep
+				CustomMinimumSize = new Vector2(16, 16),
+				ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+				StretchMode = TextureRect.StretchModeEnum.Scale
 			};
 			_hpRow.AddChild(pip);
 		}
@@ -254,8 +255,9 @@ public partial class GameUi : CanvasLayer
 			{
 				Texture = Assets.Item(texName),
 				TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-				CustomMinimumSize = new Vector2(32, 32),
-				StretchMode = TextureRect.StretchModeEnum.Keep
+				CustomMinimumSize = new Vector2(16, 16),
+				ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+				StretchMode = TextureRect.StretchModeEnum.Scale
 			});
 		}
 		if (gs.HasCrackiron) AddItem("crackiron");
