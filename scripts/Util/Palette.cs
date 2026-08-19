@@ -2,25 +2,41 @@ using Godot;
 
 namespace Overland;
 
+/// <summary>Locked Slice 0 32-color table. Hex must match assets/palette.json byte-for-byte.</summary>
 public static class Palette
 {
-	// Locked Slice 0 palette (assets/palette.json)
-	public static readonly Color SootBlack = new("0B0A0C");
-	public static readonly Color DeepSoot = new("1C1714");
-	public static readonly Color DarkBrick = new("3A2A22");
-	public static readonly Color FiredClay = new("6B3A28");
-	public static readonly Color KilnTerracotta = new("A85A32");
-	public static readonly Color KilnOrange = new("D4783A");
-	public static readonly Color Ember = new("E8A05A");
-	public static readonly Color CanvasHighlight = new("F0C98A");
-	public static readonly Color AshDark = new("2A2C30");
-	public static readonly Color AshGrey = new("5A5E62");
-	public static readonly Color AshLight = new("8B9094");
-	public static readonly Color Canvas = new("C4C2BA");
-	public static readonly Color WrapBone = new("E8E4D8");
-	public static readonly Color ColdDraftDeep = new("1A3A48");
-	public static readonly Color ColdDraft = new("3D6A78");
-	public static readonly Color ColdDraftLight = new("7A9AA4");
+	public static readonly Color SootBlack = new("0A090B");
+	public static readonly Color DeepSoot = new("1B1613");
+	public static readonly Color DarkBrick = new("3C2B21");
+	public static readonly Color FiredClay = new("72402C");
+	public static readonly Color KilnTerracotta = new("B05C32");
+	public static readonly Color KilnOrange = new("DC7A38");
+	public static readonly Color Ember = new("ECA45A");
+	public static readonly Color CanvasHighlight = new("F2CA8C");
+	public static readonly Color AshDark = new("282A2E");
+	public static readonly Color AshGrey = new("5C6064");
+	public static readonly Color AshLight = new("8E9397");
+	public static readonly Color Canvas = new("C6C4BA");
+	public static readonly Color WrapBone = new("EAE6DA");
+	public static readonly Color ColdDraftDeep = new("163848");
+	public static readonly Color ColdDraft = new("3A6C7C");
+	public static readonly Color ColdDraftLight = new("7C9EAA");
+	public static readonly Color SootVoid = new("110D0B");
+	public static readonly Color MidBrick = new("523628");
+	public static readonly Color ClayMid = new("945032");
+	public static readonly Color KilnBloom = new("F4B464");
+	public static readonly Color FireLip = new("F8D8A4");
+	public static readonly Color CanvasMid = new("B6B2A8");
+	public static readonly Color AshBright = new("9EA4A8");
+	public static readonly Color ColdMid = new("224858");
+	public static readonly Color BadAir = new("8CB0B8");
+	public static readonly Color TerracottaHot = new("C86C38");
+	public static readonly Color BrickShadow = new("2C201A");
+	public static readonly Color AshWarm = new("726C64");
+	public static readonly Color CanvasDust = new("D4A072");
+	public static readonly Color HairDeep = new("18120E");
+	public static readonly Color Iron = new("3A4046");
+	public static readonly Color IronLight = new("6E7478");
 
 	public static readonly Color Floor = DarkBrick;
 	public static readonly Color FloorAlt = FiredClay;
@@ -30,7 +46,6 @@ public static class Palette
 	public static readonly Color Ash = AshGrey;
 	public static readonly Color AshDarkColor = AshDark;
 	public static readonly Color Soot = SootBlack;
-	public static readonly Color Iron = AshDark;
 	public static readonly Color Water = ColdDraftDeep;
 	public static readonly Color NightFire = KilnOrange;
 	public static readonly Color NightFireCore = Ember;

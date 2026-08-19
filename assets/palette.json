@@ -1,85 +1,37 @@
 {
+  "note": "Locked 32-color Overland Slice 0 palette (v3). Source of truth for Palette.cs and tools/art_pack.py. Transparent is not a palette color. No gold. No green.",
   "colors": [
-    {
-      "index": 0,
-      "hex": "#0B0A0C",
-      "name": "soot_black"
-    },
-    {
-      "index": 1,
-      "hex": "#1C1714",
-      "name": "deep_soot"
-    },
-    {
-      "index": 2,
-      "hex": "#3A2A22",
-      "name": "dark_brick"
-    },
-    {
-      "index": 3,
-      "hex": "#6B3A28",
-      "name": "fired_clay"
-    },
-    {
-      "index": 4,
-      "hex": "#A85A32",
-      "name": "kiln_terracotta"
-    },
-    {
-      "index": 5,
-      "hex": "#D4783A",
-      "name": "kiln_orange"
-    },
-    {
-      "index": 6,
-      "hex": "#E8A05A",
-      "name": "ember"
-    },
-    {
-      "index": 7,
-      "hex": "#F0C98A",
-      "name": "canvas_highlight"
-    },
-    {
-      "index": 8,
-      "hex": "#2A2C30",
-      "name": "ash_dark"
-    },
-    {
-      "index": 9,
-      "hex": "#5A5E62",
-      "name": "ash_grey"
-    },
-    {
-      "index": 10,
-      "hex": "#8B9094",
-      "name": "ash_light"
-    },
-    {
-      "index": 11,
-      "hex": "#C4C2BA",
-      "name": "canvas"
-    },
-    {
-      "index": 12,
-      "hex": "#E8E4D8",
-      "name": "wrap_bone"
-    },
-    {
-      "index": 13,
-      "hex": "#1A3A48",
-      "name": "cold_draft_deep"
-    },
-    {
-      "index": 14,
-      "hex": "#3D6A78",
-      "name": "cold_draft"
-    },
-    {
-      "index": 15,
-      "hex": "#7A9AA4",
-      "name": "cold_draft_light"
-    }
-  ],
-  "note": "Locked 16-color Overland Slice 0 palette. Use only these hex values. Transparent is not a palette color."
+    { "index": 0, "hex": "#0A090B", "name": "soot_black" },
+    { "index": 1, "hex": "#1B1613", "name": "deep_soot" },
+    { "index": 2, "hex": "#3C2B21", "name": "dark_brick" },
+    { "index": 3, "hex": "#72402C", "name": "fired_clay" },
+    { "index": 4, "hex": "#B05C32", "name": "kiln_terracotta" },
+    { "index": 5, "hex": "#DC7A38", "name": "kiln_orange" },
+    { "index": 6, "hex": "#ECA45A", "name": "ember" },
+    { "index": 7, "hex": "#F2CA8C", "name": "canvas_highlight" },
+    { "index": 8, "hex": "#282A2E", "name": "ash_dark" },
+    { "index": 9, "hex": "#5C6064", "name": "ash_grey" },
+    { "index": 10, "hex": "#8E9397", "name": "ash_light" },
+    { "index": 11, "hex": "#C6C4BA", "name": "canvas" },
+    { "index": 12, "hex": "#EAE6DA", "name": "wrap_bone" },
+    { "index": 13, "hex": "#163848", "name": "cold_draft_deep" },
+    { "index": 14, "hex": "#3A6C7C", "name": "cold_draft" },
+    { "index": 15, "hex": "#7C9EAA", "name": "cold_draft_light" },
+    { "index": 16, "hex": "#110D0B", "name": "soot_void" },
+    { "index": 17, "hex": "#523628", "name": "mid_brick" },
+    { "index": 18, "hex": "#945032", "name": "clay_mid" },
+    { "index": 19, "hex": "#F4B464", "name": "kiln_bloom" },
+    { "index": 20, "hex": "#F8D8A4", "name": "fire_lip" },
+    { "index": 21, "hex": "#B6B2A8", "name": "canvas_mid" },
+    { "index": 22, "hex": "#9EA4A8", "name": "ash_bright" },
+    { "index": 23, "hex": "#224858", "name": "cold_mid" },
+    { "index": 24, "hex": "#8CB0B8", "name": "bad_air" },
+    { "index": 25, "hex": "#C86C38", "name": "terracotta_hot" },
+    { "index": 26, "hex": "#2C201A", "name": "brick_shadow" },
+    { "index": 27, "hex": "#726C64", "name": "ash_warm" },
+    { "index": 28, "hex": "#D4A072", "name": "canvas_dust" },
+    { "index": 29, "hex": "#18120E", "name": "hair_deep" },
+    { "index": 30, "hex": "#3A4046", "name": "iron" },
+    { "index": 31, "hex": "#6E7478", "name": "iron_light" }
+  ]
 }
