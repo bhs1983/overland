@@ -24,7 +24,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		}
 
 		CollisionLayer = 1 << 2;
-		CollisionMask = 1 << 0;
+		CollisionMask = 0; // park MoveAndSlide must not resolve vs world / shove the hero
 		AddChild(new CollisionShape2D
 		{
 			Shape = new CircleShape2D { Radius = 2 }
