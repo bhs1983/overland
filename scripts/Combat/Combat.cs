@@ -30,7 +30,7 @@ public partial class AttackArc : Area2D
 		_shape = new CollisionShape2D
 		{
 			// Reach a committed lunge / step-in, not a body-parked enemy.
-			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(2f), Tiles.Px(1.25f)) },
+			Shape = new RectangleShape2D { Size = new Vector2(Tiles.Px(2.6f), Tiles.Px(1.6f)) },
 			Disabled = true
 		};
 		AddChild(_shape);
@@ -54,27 +54,22 @@ public partial class AttackArc : Area2D
 			return;
 		_active = true;
 
-		Position = facing.Normalized() * Tiles.Px(1f);
+		Position = facing.Normalized() * Tiles.Px(1.1f);
 		Rotation = facing.Angle();
-
-		// Keep _visual hidden — filled telegraph rect was the QA cream/orange block.
-		_shape.Disabled = true;
-		Monitoring = false;
-
-		// 3–4 frame telegraph at ~60fps
-		await ToSignal(GetTree().CreateTimer(0.06f), SceneTreeTimer.SignalName.Timeout);
 
 		_shape.Disabled = false;
 		Monitoring = true;
 
-		// Two physics frames so overlap queries see CharacterBody2D on layer 2.
-		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
-		await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
-
-		foreach (var body in GetOverlappingBodies())
+		var struck = new System.Collections.Generic.HashSet<ulong>();
+		for (var i = 0; i < 5; i++)
 		{
-			if (body is IDamageable dmg && dmg.IsAlive)
+			await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
+			foreach (var body in GetOverlappingBodies())
 			{
+				if (body is not IDamageable dmg || !dmg.IsAlive)
+					continue;
+				if (!struck.Add(body.GetInstanceId()))
+					continue;
 				if (body is Node2D hit)
 					SparkBurst.SpawnHit(owner.GetParent() ?? owner, hit.GlobalPosition);
 				dmg.TakeSwordHit(facing);

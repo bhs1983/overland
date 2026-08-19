@@ -216,7 +216,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		GameState.Instance.DefeatedEnemyIds.Add(EnemyId);
 		_flash.Flash(_body, Palette.HitFlash, 0.08f);
 		Hitstop.Pulse(this, 0.04f);
-		GetTree().CreateTimer(0.08f).Timeout += () => QueueFree();
+		GetTree().CreateTimer(0.08f, true, false, true).Timeout += () => QueueFree();
 	}
 
 	public void TakeBellowsPuff(Vector2 fromDirection)
@@ -365,7 +365,7 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		GameState.Instance.DefeatedEnemyIds.Add(EnemyId);
 		_flash.Flash(_body, Palette.HitFlash, 0.08f);
 		Hitstop.Pulse(this, 0.05f);
-		GetTree().CreateTimer(0.1f).Timeout += () => QueueFree();
+		GetTree().CreateTimer(0.1f, true, false, true).Timeout += () => QueueFree();
 	}
 
 	public void TakeBellowsPuff(Vector2 fromDirection)
@@ -525,7 +525,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		{
 			_alive = false;
 			GameState.Instance.DefeatedEnemyIds.Add(EnemyId);
-			GetTree().CreateTimer(0.08f).Timeout += () => QueueFree();
+			GetTree().CreateTimer(0.08f, true, false, true).Timeout += () => QueueFree();
 		}
 	}
 
@@ -690,7 +690,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			{
 				GetParent()?.AddChild(new BackironPickup { Position = GlobalPosition });
 			}
-			GetTree().CreateTimer(0.15f).Timeout += () => QueueFree();
+			GetTree().CreateTimer(0.15f, true, false, true).Timeout += () => QueueFree();
 		}
 	}
 
@@ -882,7 +882,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 			{
 				Position = new Vector2(10 * Tiles.Size, 3.2f * Tiles.Size)
 			});
-			GetTree().CreateTimer(0.2f).Timeout += () => QueueFree();
+			GetTree().CreateTimer(0.2f, true, false, true).Timeout += () => QueueFree();
 		}
 	}
 

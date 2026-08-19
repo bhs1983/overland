@@ -98,7 +98,11 @@ public partial class PlayerController : CharacterBody2D
 		}
 
 		if (_dodging || _animBusy)
+		{
+			Velocity = Vector2.Zero;
+			MoveAndSlide();
 			return;
+		}
 
 		var input = Input.GetVector("move_left", "move_right", "move_up", "move_down");
 		if (input.LengthSquared() > 0.01f)
@@ -159,10 +163,8 @@ public partial class PlayerController : CharacterBody2D
 
 	private async Task DoAttack()
 	{
-		if (GameState.Instance.HasBackiron)
+		if (GameState.Instance.HasBackiron && !GameState.Instance.BackironOut)
 		{
-			if (GameState.Instance.BackironOut)
-				return;
 			_attacking = true;
 			_animBusy = true;
 			Velocity = Vector2.Zero;

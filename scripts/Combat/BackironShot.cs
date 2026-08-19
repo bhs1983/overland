@@ -68,11 +68,20 @@ public partial class BackironShot : Area2D
 		var dt = (float)delta;
 		_spr.Rotation += 14f * dt;
 
+		Vector2 next;
 		if (!_returning)
 		{
 			var step = _outDir * Tiles.Px(Speed) * dt;
-			GlobalPosition += step;
+			next = GlobalPosition + step;
+			if (Blocked(next))
+			{
+				TurnBack();
+				StrikeNearby();
+				return;
+			}
+			GlobalPosition = next;
 			_traveled += step.Length();
+			StrikeNearby();
 			if (_traveled >= Tiles.Px(RangeTiles))
 				TurnBack();
 			return;
@@ -86,23 +95,54 @@ public partial class BackironShot : Area2D
 			Catch();
 			return;
 		}
-		GlobalPosition += to / dist * Tiles.Px(Speed) * 1.12f * dt;
+		next = GlobalPosition + to / dist * Tiles.Px(Speed) * 1.12f * dt;
+		GlobalPosition = next;
+		StrikeNearby();
+	}
+
+	private void StrikeNearby()
+	{
+		var tree = GetTree();
+		if (tree == null)
+			return;
+		var reach = Tiles.Px(0.95f);
+		foreach (var n in tree.GetNodesInGroup("enemy"))
+		{
+			if (n is not Node2D node || n is not IDamageable dmg || !dmg.IsAlive)
+				continue;
+			if (node.GlobalPosition.DistanceSquaredTo(GlobalPosition) > reach * reach)
+				continue;
+			var id = node.GetInstanceId();
+			if (!_hit.Add(id))
+				continue;
+			var dir = _returning ? (node.GlobalPosition - GlobalPosition) : _outDir;
+			if (dir.LengthSquared() < 0.0001f)
+				dir = _outDir;
+			dmg.TakeSwordHit(dir.Normalized());
+			SparkBurst.SpawnHit(GetParent() ?? this, node.GlobalPosition);
+		}
+	}
+
+	private bool Blocked(Vector2 next)
+	{
+		var space = GetWorld2D().DirectSpaceState;
+		if (space == null)
+			return false;
+		var q = PhysicsRayQueryParameters2D.Create(GlobalPosition, next);
+		q.CollisionMask = 1 << 0;
+		q.CollideWithAreas = false;
+		q.CollideWithBodies = true;
+		var hit = space.IntersectRay(q);
+		return hit.Count > 0;
 	}
 
 	private void OnBody(Node2D body)
 	{
 		if (body == _owner)
 			return;
-		if (body is IDamageable dmg && dmg.IsAlive)
-		{
-			var id = body.GetInstanceId();
-			if (!_hit.Add(id))
-				return;
-			dmg.TakeSwordHit(_returning ? (body.GlobalPosition - GlobalPosition) : _outDir);
-			SparkBurst.SpawnHit(GetParent() ?? this, body.GlobalPosition);
-			return;
-		}
-		if (!_returning && body is StaticBody2D)
+		if (body is IDamageable)
+			StrikeNearby();
+		else if (!_returning && body is StaticBody2D)
 			TurnBack();
 	}
 
