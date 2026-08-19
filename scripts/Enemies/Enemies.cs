@@ -68,8 +68,10 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		if (distSq < 16f * 16f)
 		{
 			Velocity = Vector2.Zero;
-			if (distSq > 0.0001f)
-				GlobalPosition = player.GlobalPosition - to.Normalized() * 8f;
+			// Park in front of Facing so AttackArc (same Facing) overlaps; not on chase vector.
+			var facing = player.Facing;
+			if (facing.LengthSquared() > 0.0001f)
+				GlobalPosition = player.GlobalPosition + facing.Normalized() * 8f;
 			MoveAndSlide(); // sync physics body so AttackArc overlap sees the park
 			if (_hitCd <= 0)
 			{
