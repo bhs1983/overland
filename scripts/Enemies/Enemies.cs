@@ -70,6 +70,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 			Velocity = Vector2.Zero;
 			if (distSq > 0.0001f)
 				GlobalPosition = player.GlobalPosition - to.Normalized() * 8f;
+			MoveAndSlide(); // sync physics body so AttackArc overlap sees the park
 			if (_hitCd <= 0)
 			{
 				_hitCd = 0.55f;
