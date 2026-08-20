@@ -412,8 +412,8 @@ public partial class FanEastDoor : StaticBody2D
 	public void Refresh()
 	{
 		var open = GameState.Instance.FanOpened;
-		_col.Disabled = open;
-		CollisionLayer = open ? 0u : 1u;
+		_col.SetDeferred("disabled", open);
+		SetDeferred("collision_layer", open ? 0u : 1u);
 		_sprite.Texture = Assets.ColdStack(open ? "iron_door_open" : "iron_door_closed");
 		_sprite.Modulate = Colors.White;
 	}
