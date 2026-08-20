@@ -2,7 +2,7 @@
 
 **Status: LOCKED** (Orchestrator + Director, 2026-08-18). Room list does not reopen.
 
-One town. One dungeon. Ten authored rooms. Sword + one tool + one item gate. One miniboss. One boss.
+One town. One dungeon. Ten authored rooms. Sword + bellows + Backiron after the Clinker. One item gate. One miniboss. One boss.
 Side Flue is a heal sink only. No extra side-dungeon paths. No continent. No runtime generator.
 
 ## Town — Kilnwalk
@@ -16,7 +16,7 @@ A ridge street, a kiln yard, a night-fire, the sealed stack mouth. Walk, talk, t
 | **Tamsin Cole** | Kilnhand steward. Gives the hire: go into the Cold Stack, find why the draft reversed, shut it. |
 | **Holt Vetch** | Retired setter. Gives **Crackiron**. Points at the sealed mouth. |
 | **Wren Quill** | Keeps the night fire. Marks the Cold Stack on the pause map after you accept. |
-| **Rook Darnel** | Door-warden. Unlocks the stack mouth after the hire is taken. |
+| **Rook Darnel** | Door-warden. Flavor at the mouth after the hire. Does not unlock it. |
 
 No other named townsfolk in Slice 0. Hero is a flue-walker. Not “Whimble.” Names stay locked.
 
@@ -41,7 +41,7 @@ Optional 11th room if Engineer needs a heal sink: **Side Flue**, off room 5, one
 
 ## Gates
 
-1. **Hire gate (town):** Rook will not open the mouth until Tamsin gives the hire.
+1. **Hire gate (town):** Tamsin’s hire opens the mouth. Rook is flavor, not a second key.
 2. **Tool gate (room 3):** Folded Bellows → dead fan → east door.
 3. **Item gate (room 8):** Stack Key → iron door → Long Drop / boss.
 
@@ -76,14 +76,14 @@ Post-accept only: treat these 10 rooms as high-quality modules with consistent d
 
 ## Accept checklist
 
-- [x] Walk Kilnwalk
-- [x] Enter the Cold Stack
-- [x] Get Folded Bellows
-- [x] Open the Dead Fan Walk gate
-- [x] Beat the Clinker, get Stack Key
-- [x] Open Sealed Flue
-- [x] Beat the Overfire
-- [x] Pause map
-- [x] Save / load
-- [x] Original names only
-- [x] QA PASS (headless rooms 1–10 green; sky 720; leftovers fail-closed)
+- [ ] Walk Kilnwalk
+- [ ] Enter the Cold Stack
+- [ ] Get Folded Bellows
+- [ ] Open the Dead Fan Walk gate
+- [ ] Beat the Clinker, get Stack Key
+- [ ] Open Sealed Flue
+- [ ] Beat the Overfire
+- [ ] Pause map
+- [ ] Save / load
+- [ ] Original names only
+- [ ] QA PASS
