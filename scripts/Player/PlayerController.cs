@@ -118,6 +118,9 @@ public partial class PlayerController : CharacterBody2D
 			PlayAnim($"fluewalker_idle_{_facingName}");
 		}
 
+		if (GameState.Instance.HasFoldedBellows && Input.IsActionJustPressed("bellows"))
+			LastBellowsMsec = Time.GetTicksMsec();
+
 		if (!_attacking)
 		{
 			if (Input.IsActionJustPressed("attack") && (GameState.Instance.HasBackiron || GameState.Instance.HasCrackiron))
