@@ -302,7 +302,8 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 			case Phase.StepIn:
 				Velocity = _stepDir * Tiles.Px(3.6f);
 				if (!_stepHit && dist < Tiles.Px(1.05f) && !player.AttackBusy
-					&& !Input.IsActionPressed("bellows") && !Input.IsActionPressed("attack"))
+					&& !Input.IsActionPressed("bellows") && !Input.IsActionPressed("attack")
+					&& !player.PuffIframe)
 				{
 					_stepHit = true;
 					player.ApplyHit(_stepDir);

@@ -197,6 +197,7 @@ public partial class PlayerController : CharacterBody2D
 
 	private async Task DoBellows()
 	{
+		LastBellowsMsec = Time.GetTicksMsec();
 		_attacking = true;
 		_animBusy = true;
 		Velocity = Vector2.Zero;
@@ -286,4 +287,6 @@ public partial class PlayerController : CharacterBody2D
 
 	public Vector2 Facing => _facing;
 	public bool AttackBusy => _attacking;
+	public ulong LastBellowsMsec { get; private set; }
+	public bool PuffIframe => LastBellowsMsec != 0 && Time.GetTicksMsec() - LastBellowsMsec < 400;
 }
