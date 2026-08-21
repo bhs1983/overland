@@ -79,6 +79,16 @@ public partial class PlayerController : CharacterBody2D
 			Instance = null;
 	}
 
+	public override void _UnhandledInput(InputEvent e)
+	{
+		if (GameState.Instance.Paused || GameState.Instance.InputLocked)
+			return;
+		if (!GameState.Instance.HasFoldedBellows)
+			return;
+		if (e.IsActionPressed("bellows") && !e.IsEcho())
+			LastBellowsMsec = Time.GetTicksMsec();
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
 		if (GameState.Instance.Paused || GameState.Instance.InputLocked)
