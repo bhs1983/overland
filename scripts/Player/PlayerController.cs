@@ -92,7 +92,7 @@ public partial class PlayerController : CharacterBody2D
 
 	private void StampBellows(InputEvent e)
 	{
-		if (GameState.Instance.Paused || GameState.Instance.InputLocked)
+		if (GameState.Instance.Paused)
 			return;
 		if (!GameState.Instance.HasFoldedBellows)
 			return;
@@ -102,7 +102,7 @@ public partial class PlayerController : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (!GameState.Instance.Paused && !GameState.Instance.InputLocked
+		if (!GameState.Instance.Paused
 			&& GameState.Instance.HasFoldedBellows
 			&& Input.IsActionJustPressed("bellows"))
 			LastBellowsMsec = Time.GetTicksMsec();

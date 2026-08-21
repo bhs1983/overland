@@ -701,8 +701,9 @@ public partial class Clinker : CharacterBody2D, IDamageable
 				break;
 			case Phase.Slam:
 				_phaseT = 0.22f;
-				if (!Input.IsActionPressed("bellows") && !Input.IsActionJustPressed("bellows")
-					&& (player == null || !player.PuffIframe))
+				var puffLive = Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows")
+					|| (player != null && player.PuffIframe);
+				if (!puffLive)
 					_slamHit = false;
 				_body.Modulate = Palette.Ember;
 				break;
