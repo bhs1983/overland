@@ -462,7 +462,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		{
 			case Phase.Strike:
 				Velocity = _strikeDir * Tiles.Px(5.2f);
-				if (!_strikeHit && dist < Tiles.Px(0.9f) && !player.AttackBusy && !player.PuffIframe)
+				if (!_strikeHit && dist < Tiles.Px(0.9f) && !player.AttackBusy && !player.PuffIframe && !Input.IsActionPressed("bellows") && !Input.IsActionJustPressed("bellows"))
 				{
 					_strikeHit = true;
 					player.ApplyHit(_strikeDir);
