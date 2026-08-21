@@ -404,6 +404,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 	private Vector2 _home;
 	private Vector2 _strikeDir = Vector2.Down;
 	private bool _strikeHit;
+	private int _strikeGrace;
 
 	public override void _Ready()
 	{
@@ -465,6 +466,11 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		{
 			case Phase.Strike:
 				Velocity = _strikeDir * Tiles.Px(5.2f);
+				if (_strikeGrace > 0)
+				{
+					_strikeGrace--;
+					break;
+				}
 				if (!_strikeHit && dist < Tiles.Px(0.9f) && !player.AttackBusy && !player.PuffIframe && !Input.IsActionPressed("bellows") && !Input.IsActionJustPressed("bellows"))
 				{
 					_strikeHit = true;
@@ -507,6 +513,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 			case Phase.Strike:
 				_phaseT = 0.24f;
 				_strikeHit = false;
+				_strikeGrace = 1;
 				_body.Modulate = Palette.FiredClay;
 				if (player != null)
 				{
