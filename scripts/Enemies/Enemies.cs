@@ -879,7 +879,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 		switch (_phase)
 		{
 			case Phase.Idle:
-				Velocity = EnemySteer.Orbit(GlobalPosition, player.GlobalPosition, Tiles.Px(2.6f), Tiles.Px(1.35f), _orbitSign);
+				Velocity = Vector2.Zero;
 				MoveAndSlide();
 				if (_phaseT <= 0)
 					Enter(Phase.PulseTele);
