@@ -593,8 +593,17 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		AddToGroup("enemy");
 	}
 
+	public override void _Input(InputEvent e)
+	{
+		if (e.IsActionPressed("bellows") && !e.IsEcho())
+			_slamHit = true;
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
+		if (Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
+			_slamHit = true;
+
 		if (!_alive || GameState.Instance.Paused || GameState.Instance.InputLocked)
 		{
 			Velocity = Vector2.Zero;
@@ -604,6 +613,8 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		_phaseT -= dt;
 
 		var player = PlayerController.Instance;
+		if (player != null && player.PuffIframe)
+			_slamHit = true;
 		if (player != null && !_cracked && (player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows")))
 		{
 			TakeBellowsPuff(player.GlobalPosition - GlobalPosition);
@@ -647,10 +658,10 @@ public partial class Clinker : CharacterBody2D, IDamageable
 				break;
 
 			case Phase.Slam:
-				Velocity = _slamDir * Tiles.Px(3.2f);
-				if (!_slamHit && (player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows")))
+				if (player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
 					_slamHit = true;
-				else if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy)
+				Velocity = _slamDir * Tiles.Px(3.2f);
+				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy)
 				{
 					_slamHit = true;
 					player.ApplyHit(_slamDir);
@@ -685,7 +696,9 @@ public partial class Clinker : CharacterBody2D, IDamageable
 				break;
 			case Phase.Slam:
 				_phaseT = 0.22f;
-				_slamHit = false;
+				if (!Input.IsActionPressed("bellows") && !Input.IsActionJustPressed("bellows")
+					&& (player == null || !player.PuffIframe))
+					_slamHit = false;
 				_body.Modulate = Palette.Ember;
 				break;
 		}
