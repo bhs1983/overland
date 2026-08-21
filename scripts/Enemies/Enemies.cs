@@ -606,7 +606,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
+		if (_cracked || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
 			_slamHit = true;
 
 		if (!_alive || GameState.Instance.Paused || GameState.Instance.InputLocked)
@@ -663,9 +663,11 @@ public partial class Clinker : CharacterBody2D, IDamageable
 				break;
 
 			case Phase.Slam:
-				if (player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
+				if (_cracked || player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
 					_slamHit = true;
 				Velocity = _slamDir * Tiles.Px(3.2f);
+				if (_cracked)
+					break;
 				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy)
 				{
 					_slamHit = true;
@@ -702,7 +704,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			case Phase.Slam:
 				_phaseT = 0.22f;
 				var puffLive = Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows")
-					|| (player != null && player.PuffIframe);
+					|| (player != null && player.PuffIframe) || _cracked;
 				if (!puffLive)
 					_slamHit = false;
 				_body.Modulate = Palette.Ember;
