@@ -677,19 +677,19 @@ public partial class WorldRoot : Node2D
 		{
 			Position = new Vector2(5 * Tiles.Size, 8 * Tiles.Size),
 			EnemyId = "sootling_longdrop_a",
-			ReadyGrace = 1.5f
+			ReadyGrace = 3f
 		});
 		root.AddChild(new Sootling
 		{
 			Position = new Vector2(10 * Tiles.Size, 10 * Tiles.Size),
 			EnemyId = "sootling_longdrop_b",
-			ReadyGrace = 1.5f
+			ReadyGrace = 3f
 		});
 		root.AddChild(new Sootling
 		{
 			Position = new Vector2(4 * Tiles.Size, 10 * Tiles.Size),
 			EnemyId = "sootling_longdrop_c",
-			ReadyGrace = 1.5f
+			ReadyGrace = 3f
 		});
 
 		root.AddChild(new RoomTransition
