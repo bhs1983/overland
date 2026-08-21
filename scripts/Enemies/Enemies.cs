@@ -469,6 +469,8 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 				if (_strikeGrace > 0)
 				{
 					_strikeGrace--;
+					if (Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
+						_strikeHit = true;
 					break;
 				}
 				if (!_strikeHit && dist < Tiles.Px(0.9f) && !player.AttackBusy && !player.PuffIframe && !Input.IsActionPressed("bellows") && !Input.IsActionJustPressed("bellows"))
