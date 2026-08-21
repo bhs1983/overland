@@ -219,12 +219,40 @@ public partial class RoomTransition : Area2D
 		CollisionLayer = 0;
 		CollisionMask = 1 << 1;
 		Monitoring = true;
+		AddToGroup("room_transition");
 		AddChild(new CollisionShape2D
 		{
 			Shape = new RectangleShape2D { Size = TriggerSize }
 		});
 		BodyEntered += OnBodyEntered;
 		BodyExited += OnBodyExited;
+		CallDeferred(nameof(LatchSpawnOverlap));
+	}
+
+	private void LatchSpawnOverlap()
+	{
+		foreach (var b in GetOverlappingBodies())
+		{
+			if (b is PlayerController)
+			{
+				_cooldown = true;
+				return;
+			}
+		}
+	}
+
+	public void FlushIfOverlapping()
+	{
+		if (_cooldown)
+			return;
+		foreach (var b in GetOverlappingBodies())
+		{
+			if (b is PlayerController)
+			{
+				OnBodyEntered(b);
+				return;
+			}
+		}
 	}
 
 	private void OnBodyEntered(Node2D body)
@@ -414,8 +442,30 @@ public partial class FanEastDoor : StaticBody2D
 		var open = GameState.Instance.FanOpened;
 		_col.Disabled = open;
 		CollisionLayer = open ? 0u : 1u;
+		_col.SetDeferred("disabled", open);
+		SetDeferred("collision_layer", open ? 0u : 1u);
 		_sprite.Texture = Assets.ColdStack(open ? "iron_door_open" : "iron_door_closed");
 		_sprite.Modulate = Colors.White;
+		if (open)
+			DisableEastGapWalls();
+	}
+
+	private void DisableEastGapWalls()
+	{
+		var parent = GetParent();
+		if (parent == null)
+			return;
+		foreach (var name in new[] { "Wall_17_4", "Wall_17_5", "Wall_17_6", "Wall_17_7" })
+		{
+			if (parent.GetNodeOrNull<StaticBody2D>(name) is not { } wall)
+				continue;
+			wall.CollisionLayer = 0;
+			foreach (var child in wall.GetChildren())
+			{
+				if (child is CollisionShape2D col)
+					col.Disabled = true;
+			}
+		}
 	}
 }
 

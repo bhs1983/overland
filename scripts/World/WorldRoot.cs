@@ -40,10 +40,14 @@ public partial class WorldRoot : Node2D
 		};
 		_player.AddChild(_cam);
 
-		var startRoom = GameState.Instance.LastSaveRoom;
+		var startRoom = GameState.Instance.CurrentRoom != RoomId.Kilnwalk
+			? GameState.Instance.CurrentRoom
+			: GameState.Instance.LastSaveRoom;
 		var spawn = GameState.Instance.LastSavePosition;
+		if (startRoom == RoomId.LongDrop)
+			GameState.Instance.Hp = GameState.MaxHp;
 		if (spawn == Vector2.Zero)
-			spawn = SpawnFor(RoomId.Kilnwalk, "default");
+			spawn = SpawnFor(startRoom, "default");
 		LoadRoom(startRoom, spawn);
 	}
 
@@ -142,7 +146,19 @@ public partial class WorldRoot : Node2D
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
 		if (firstVisit)
 			CallDeferred(nameof(SpeakRoom), (int)room);
-		GetTree().CreateTimer(0.2f).Timeout += () => TransitionsReady = true;
+		GetTree().CreateTimer(0.2f).Timeout += EnableTransitions;
+		if (room == RoomId.LongDrop)
+		{
+			GameState.Instance.Hp = GameState.MaxHp;
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+		}
+	}
+
+	private void EnableTransitions()
+	{
+		TransitionsReady = true;
+		foreach (var n in GetTree().GetNodesInGroup("room_transition"))
+			(n as RoomTransition)?.FlushIfOverlapping();
 	}
 
 	private void SpeakRoom(int room)
@@ -181,7 +197,7 @@ public partial class WorldRoot : Node2D
 		RoomId.SealedFlue when spawnId == "from_key" => new Vector2(10 * Tiles.Size, 9 * Tiles.Size),
 		RoomId.SealedFlue when spawnId == "from_drop" => new Vector2(10 * Tiles.Size, 3.5f * Tiles.Size),
 		RoomId.SealedFlue => new Vector2(10 * Tiles.Size, 8 * Tiles.Size),
-		RoomId.LongDrop when spawnId == "from_sealed" => new Vector2(10 * Tiles.Size, 15 * Tiles.Size),
+		RoomId.LongDrop when spawnId == "from_sealed" => new Vector2(10 * Tiles.Size, 13 * Tiles.Size),
 		RoomId.LongDrop when spawnId == "from_boss" => new Vector2(10 * Tiles.Size, 3.5f * Tiles.Size),
 		RoomId.LongDrop => new Vector2(10 * Tiles.Size, 12 * Tiles.Size),
 		RoomId.OverfireChamber when spawnId == "from_drop" => new Vector2(10 * Tiles.Size, 13 * Tiles.Size),
@@ -633,11 +649,11 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, Tiles.Px(0.25f)),
+			Position = new Vector2(10 * Tiles.Size, 3 * Tiles.Size),
 			Target = RoomId.LongDrop,
 			SpawnId = "from_sealed",
 			RequiresIronOpen = true,
-			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(3f))
+			TriggerSize = new Vector2(Tiles.Px(3f), Tiles.Px(5f))
 		});
 	}
 
@@ -662,20 +678,27 @@ public partial class WorldRoot : Node2D
 		PlaceAsh(root, "longdrop_lip_b", 7, 2);
 		PlaceAsh(root, "longdrop_lip_c", 8, 2);
 
+		var sealedSpawn = new Vector2(10 * Tiles.Size, 13 * Tiles.Size);
 		root.AddChild(new Sootling
 		{
 			Position = new Vector2(5 * Tiles.Size, 8 * Tiles.Size),
-			EnemyId = "sootling_longdrop_a"
+			EnemyId = "sootling_longdrop_a",
+			ReadyGrace = 3f,
+			HoldUntilLeave = sealedSpawn
 		});
 		root.AddChild(new Sootling
 		{
-			Position = new Vector2(10 * Tiles.Size, 10 * Tiles.Size),
-			EnemyId = "sootling_longdrop_b"
+			Position = new Vector2(12 * Tiles.Size, 6 * Tiles.Size),
+			EnemyId = "sootling_longdrop_b",
+			ReadyGrace = 3f,
+			HoldUntilLeave = sealedSpawn
 		});
 		root.AddChild(new Sootling
 		{
-			Position = new Vector2(7 * Tiles.Size, 13 * Tiles.Size),
-			EnemyId = "sootling_longdrop_c"
+			Position = new Vector2(4 * Tiles.Size, 10 * Tiles.Size),
+			EnemyId = "sootling_longdrop_c",
+			ReadyGrace = 3f,
+			HoldUntilLeave = sealedSpawn
 		});
 
 		root.AddChild(new RoomTransition

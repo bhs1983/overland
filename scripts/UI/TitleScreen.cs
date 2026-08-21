@@ -66,11 +66,14 @@ public partial class TitleScreen : Control
 		{
 			GameState.Instance.ResetNewGame();
 			// Use latched Shift (last _Process), not IsPhysicalKeyPressed at click.
-			if (_shiftLatched)
+			var shift = _shiftLatched || Input.IsPhysicalKeyPressed(Key.Shift);
+			var alt = _altLatched || Input.IsPhysicalKeyPressed(Key.Alt);
+			var ctrl = _ctrlLatched || Input.IsPhysicalKeyPressed(Key.Ctrl);
+			if (shift)
 			{
-				if (_altLatched)
+				if (alt)
 					GameState.Instance.ApplyDebugBossStart();
-				else if (_ctrlLatched)
+				else if (ctrl)
 					GameState.Instance.ApplyDebugCp3Start();
 				else
 					GameState.Instance.ApplyDebugStackMouthStart();

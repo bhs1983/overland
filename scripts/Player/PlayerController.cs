@@ -70,6 +70,7 @@ public partial class PlayerController : CharacterBody2D
 		_flash = new FlashFx();
 		AddChild(_flash);
 		AddToGroup("player");
+		ProcessPhysicsPriority = -100;
 		PlayAnim($"fluewalker_idle_{_facingName}");
 	}
 
@@ -79,8 +80,33 @@ public partial class PlayerController : CharacterBody2D
 			Instance = null;
 	}
 
+	public override void _Input(InputEvent e)
+	{
+		StampBellows(e);
+	}
+
+	public override void _UnhandledInput(InputEvent e)
+	{
+		StampBellows(e);
+	}
+
+	private void StampBellows(InputEvent e)
+	{
+		if (GameState.Instance.Paused)
+			return;
+		if (!GameState.Instance.HasFoldedBellows)
+			return;
+		if (e.IsActionPressed("bellows") && !e.IsEcho())
+			LastBellowsMsec = Time.GetTicksMsec();
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
+		if (!GameState.Instance.Paused
+			&& GameState.Instance.HasFoldedBellows
+			&& Input.IsActionJustPressed("bellows"))
+			LastBellowsMsec = Time.GetTicksMsec();
+
 		if (GameState.Instance.Paused || GameState.Instance.InputLocked)
 		{
 			Velocity = Vector2.Zero;
@@ -197,6 +223,7 @@ public partial class PlayerController : CharacterBody2D
 
 	private async Task DoBellows()
 	{
+		LastBellowsMsec = Time.GetTicksMsec();
 		_attacking = true;
 		_animBusy = true;
 		Velocity = Vector2.Zero;
@@ -266,7 +293,7 @@ public partial class PlayerController : CharacterBody2D
 
 	public void ApplyHit(Vector2 fromDirection, int damage = 1)
 	{
-		if (_iframe || GameState.Instance.Hp <= 0)
+		if (_iframe || PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows") || GameState.Instance.Hp <= 0)
 			return;
 		GameState.Instance.Damage(damage);
 		_flash.Flash(_sprite, Palette.HurtFlash, 0.12f);
@@ -286,4 +313,6 @@ public partial class PlayerController : CharacterBody2D
 
 	public Vector2 Facing => _facing;
 	public bool AttackBusy => _attacking;
+	public ulong LastBellowsMsec { get; private set; }
+	public bool PuffIframe => LastBellowsMsec != 0 && Time.GetTicksMsec() - LastBellowsMsec < 2200;
 }

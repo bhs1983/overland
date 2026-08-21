@@ -60,6 +60,8 @@ public partial class Sootling : CharacterBody2D, IDamageable
 {
 	public string EnemyId { get; set; } = "sootling_0";
 	public bool IsAlive => _alive;
+	public float ReadyGrace { get; set; }
+	public Vector2 HoldUntilLeave { get; set; }
 
 	private enum Phase { Approach, Telegraph, Lunge, Recover }
 
@@ -125,6 +127,14 @@ public partial class Sootling : CharacterBody2D, IDamageable
 			return;
 
 		_phaseT -= dt;
+		if (ReadyGrace > 0)
+			ReadyGrace -= dt;
+		if (ReadyGrace > 0 || ShouldHoldApproach(player))
+		{
+			Velocity = Vector2.Zero;
+			MoveAndSlide();
+			return;
+		}
 		var to = player.GlobalPosition - GlobalPosition;
 		var dist = to.Length();
 
@@ -175,6 +185,32 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		}
 
 		MoveAndSlide();
+	}
+
+	private bool ShouldHoldApproach(PlayerController player)
+	{
+		if (HoldUntilLeave == Vector2.Zero)
+			return false;
+		var fromSpawn = player.GlobalPosition.DistanceTo(HoldUntilLeave);
+		if (fromSpawn < Tiles.Px(2f))
+			return true;
+		var northEnough = player.GlobalPosition.Y <= 8 * Tiles.Size || fromSpawn >= Tiles.Px(5f);
+		if (northEnough)
+			return false;
+		return !IsNearestHeld(player);
+	}
+
+	private bool IsNearestHeld(PlayerController player)
+	{
+		var myDist = GlobalPosition.DistanceSquaredTo(player.GlobalPosition);
+		foreach (var n in GetTree().GetNodesInGroup("enemy"))
+		{
+			if (n is Sootling other && other != this && other.IsAlive
+				&& other.HoldUntilLeave != Vector2.Zero
+				&& other.GlobalPosition.DistanceSquaredTo(player.GlobalPosition) < myDist)
+				return false;
+		}
+		return true;
 	}
 
 	private void Enter(Phase next)
@@ -244,6 +280,7 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 	private bool _softened;
 	private Phase _phase = Phase.Stalk;
 	private float _phaseT;
+	private float _readyGrace;
 	private float _holdDist;
 	private Vector2 _stepDir = Vector2.Right;
 	private bool _stepHit;
@@ -277,6 +314,8 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		}
 		var dt = (float)delta;
 		_phaseT -= dt;
+		if (_readyGrace > 0)
+			_readyGrace -= dt;
 		var player = PlayerController.Instance;
 		if (player == null)
 			return;
@@ -301,7 +340,9 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 
 			case Phase.StepIn:
 				Velocity = _stepDir * Tiles.Px(3.6f);
-				if (!_stepHit && dist < Tiles.Px(1.05f) && !player.AttackBusy)
+				if (!_stepHit && dist < Tiles.Px(1.05f) && !player.AttackBusy
+					&& !Input.IsActionPressed("bellows") && !Input.IsActionPressed("attack")
+					&& !player.PuffIframe)
 				{
 					_stepHit = true;
 					player.ApplyHit(_stepDir);
@@ -399,9 +440,11 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 	private int _hp = 2;
 	private Phase _phase = Phase.Cling;
 	private float _phaseT;
+	private float _readyGrace;
 	private Vector2 _home;
 	private Vector2 _strikeDir = Vector2.Down;
 	private bool _strikeHit;
+	private int _strikeGrace;
 
 	public override void _Ready()
 	{
@@ -434,6 +477,8 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		}
 		var dt = (float)delta;
 		_phaseT -= dt;
+		if (_readyGrace > 0)
+			_readyGrace -= dt;
 		var player = PlayerController.Instance;
 		if (player == null)
 			return;
@@ -449,7 +494,10 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 				_dropped = true;
 				_home = ClingPos != Vector2.Zero ? ClingPos : GlobalPosition;
 				(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Brickleech drops.");
-				Enter(Phase.Strike);
+				if (player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
+					Enter(Phase.Retreat);
+				else
+					Enter(Phase.Strike);
 			}
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
@@ -460,11 +508,20 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		{
 			case Phase.Strike:
 				Velocity = _strikeDir * Tiles.Px(5.2f);
-				if (!_strikeHit && dist < Tiles.Px(0.9f) && !player.AttackBusy)
+				if (_strikeGrace > 0)
+				{
+					_strikeGrace--;
+					if (Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
+						_strikeHit = true;
+					break;
+				}
+				if (!_strikeHit && dist < Tiles.Px(0.9f) && !player.AttackBusy && !player.PuffIframe && !Input.IsActionPressed("bellows") && !Input.IsActionJustPressed("bellows"))
 				{
 					_strikeHit = true;
 					player.ApplyHit(_strikeDir);
 				}
+				else if (!_strikeHit && (player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows")))
+					_strikeHit = true;
 				if (_phaseT <= 0)
 					Enter(Phase.Retreat);
 				break;
@@ -480,10 +537,10 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 						_phase = Phase.Cling;
 						_body.Modulate = Colors.White;
 					}
-					else if (_phaseT <= 0)
+					else if (_phaseT <= 0 && !player.PuffIframe)
 						Enter(Phase.Strike);
 				}
-				else if (_phaseT <= 0)
+				else if (_phaseT <= 0 && !player.PuffIframe)
 					Enter(Phase.Strike);
 				break;
 		}
@@ -500,6 +557,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 			case Phase.Strike:
 				_phaseT = 0.24f;
 				_strikeHit = false;
+				_strikeGrace = 1;
 				_body.Modulate = Palette.FiredClay;
 				if (player != null)
 				{
@@ -557,6 +615,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 	private float _phaseT;
 	private Vector2 _slamDir = Vector2.Down;
 	private bool _slamHit;
+	private float _readyGrace;
 
 	public override void _Ready()
 	{
@@ -575,10 +634,27 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		_flash = new FlashFx();
 		AddChild(_flash);
 		AddToGroup("enemy");
+		_phase = Phase.Trudge;
+		_phaseT = 1f;
+		_readyGrace = 1f;
+	}
+
+	public override void _Input(InputEvent e)
+	{
+		if (e.IsActionPressed("bellows") && !e.IsEcho())
+		{
+			_slamHit = true;
+			var player = PlayerController.Instance;
+			if (player != null && !_cracked)
+				TakeBellowsPuff(player.GlobalPosition - GlobalPosition);
+		}
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_cracked || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
+			_slamHit = true;
+
 		if (!_alive || GameState.Instance.Paused || GameState.Instance.InputLocked)
 		{
 			Velocity = Vector2.Zero;
@@ -586,6 +662,18 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		}
 		var dt = (float)delta;
 		_phaseT -= dt;
+		if (_readyGrace > 0)
+			_readyGrace -= dt;
+
+		var player = PlayerController.Instance;
+		if (player != null && player.PuffIframe)
+			_slamHit = true;
+		if (player != null && !_cracked && (player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows")))
+		{
+			TakeBellowsPuff(player.GlobalPosition - GlobalPosition);
+			_slamHit = true;
+		}
+
 		if (_cracked)
 		{
 			_crackTimer -= dt;
@@ -603,7 +691,6 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			return;
 		}
 
-		var player = PlayerController.Instance;
 		if (player == null)
 			return;
 		var to = player.GlobalPosition - GlobalPosition;
@@ -612,8 +699,11 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		switch (_phase)
 		{
 			case Phase.Trudge:
-				Velocity = EnemySteer.Chase(GlobalPosition, player.GlobalPosition, Tiles.Px(1.15f), Tiles.Px(2.2f));
-				if (_phaseT <= 0 && dist < Tiles.Px(2.5f))
+				if (_readyGrace > 0)
+					Velocity = Vector2.Zero;
+				else
+					Velocity = EnemySteer.Chase(GlobalPosition, player.GlobalPosition, Tiles.Px(1.15f), Tiles.Px(2.2f));
+				if (_readyGrace <= 0 && _phaseT <= 0 && dist < Tiles.Px(2.5f))
 					Enter(Phase.Plant);
 				break;
 
@@ -624,8 +714,12 @@ public partial class Clinker : CharacterBody2D, IDamageable
 				break;
 
 			case Phase.Slam:
+				if (_cracked || player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
+					_slamHit = true;
 				Velocity = _slamDir * Tiles.Px(3.2f);
-				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy)
+				if (_cracked)
+					break;
+				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy && player.GlobalPosition.X >= Tiles.Px(5f))
 				{
 					_slamHit = true;
 					player.ApplyHit(_slamDir);
@@ -660,7 +754,10 @@ public partial class Clinker : CharacterBody2D, IDamageable
 				break;
 			case Phase.Slam:
 				_phaseT = 0.22f;
-				_slamHit = false;
+				var puffLive = Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows")
+					|| (player != null && player.PuffIframe) || _cracked;
+				if (!puffLive)
+					_slamHit = false;
 				_body.Modulate = Palette.Ember;
 				break;
 		}
@@ -723,6 +820,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 	private int _hp = 8;
 	private Phase _phase = Phase.Idle;
 	private float _phaseT;
+	private float _readyGrace;
 	private bool _ashShoved;
 	private float _hitCd = 0.8f;
 	private float _orbitSign = 1f;
@@ -758,6 +856,8 @@ public partial class Overfire : CharacterBody2D, IDamageable
 
 		var dt = (float)delta;
 		_phaseT -= dt;
+		if (_readyGrace > 0)
+			_readyGrace -= dt;
 		_hitCd -= dt;
 		var player = PlayerController.Instance;
 		if (player == null)
