@@ -900,10 +900,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 				break;
 
 			case Phase.SwipeTele:
-				if (dist > Tiles.Px(1.5f))
-					Velocity = to.Normalized() * Tiles.Px(2.1f);
-				else
-					Velocity = Vector2.Zero;
+				Velocity = Vector2.Zero;
 				MoveAndSlide();
 				if (_phaseT <= 0)
 					Enter(Phase.Swipe);
