@@ -75,6 +75,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 	private Vector2 _lungeDir = Vector2.Right;
 	private bool _lungedHit;
 	private float _wobble;
+	private bool _bellowsPeeled;
 
 	public override void _Ready()
 	{
@@ -141,6 +142,8 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		switch (_phase)
 		{
 			case Phase.Approach:
+				if (_bellowsPeeled && dist > Tiles.Px(3f))
+					_bellowsPeeled = false;
 				if (dist < Tiles.Px(0.7f))
 				{
 					Enter(Phase.Recover);
@@ -148,6 +151,11 @@ public partial class Sootling : CharacterBody2D, IDamageable
 				}
 				if (dist < Tiles.Px(2.2f))
 				{
+					if (_bellowsPeeled && HoldUntilLeave != Vector2.Zero && dist <= Tiles.Px(3f))
+					{
+						Velocity = EnemySteer.Away(GlobalPosition, player.GlobalPosition, Tiles.Px(2.4f));
+						break;
+					}
 					Enter(Phase.Telegraph);
 					break;
 				}
@@ -238,7 +246,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 				_body.Modulate = Palette.KilnBloom;
 				break;
 			case Phase.Recover:
-				_phaseT = 0.42f;
+				_phaseT = _bellowsPeeled && HoldUntilLeave != Vector2.Zero ? 2f : 0.42f;
 				_body.Modulate = Colors.White;
 				break;
 		}
@@ -261,6 +269,8 @@ public partial class Sootling : CharacterBody2D, IDamageable
 			return;
 		_staggered = true;
 		_staggerT = 0.45f;
+		if (HoldUntilLeave != Vector2.Zero)
+			_bellowsPeeled = true;
 		_flash.Flash(_body, Palette.BellowsPuff, 0.12f);
 		GlobalPosition += fromDirection.Normalized() * Tiles.Px(0.625f);
 	}
