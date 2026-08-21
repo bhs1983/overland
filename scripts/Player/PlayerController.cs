@@ -293,7 +293,7 @@ public partial class PlayerController : CharacterBody2D
 
 	public void ApplyHit(Vector2 fromDirection, int damage = 1)
 	{
-		if (_iframe || PuffIframe || GameState.Instance.Hp <= 0)
+		if (_iframe || PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows") || GameState.Instance.Hp <= 0)
 			return;
 		GameState.Instance.Damage(damage);
 		_flash.Flash(_sprite, Palette.HurtFlash, 0.12f);
