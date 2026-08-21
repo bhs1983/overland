@@ -116,7 +116,7 @@ public partial class GameState : Node
 		RoomsEntered.Add(RoomId.DeadFanWalk.ToString());
 	}
 
-	/// <summary>QA skip: iron open, land Long Drop ready for rooms 9–10.</summary>
+	/// <summary>QA skip: iron open, land Overfire Chamber from_drop at 6 HP.</summary>
 	public void ApplyDebugBossStart()
 	{
 		ApplyDebugCp3Start();
@@ -126,8 +126,8 @@ public partial class GameState : Node
 		HasBackiron = true;
 		BackironTaken = true;
 		IronDoorOpen = true;
-		CurrentRoom = RoomId.LongDrop;
-		LastSaveRoom = RoomId.LongDrop;
+		CurrentRoom = RoomId.OverfireChamber;
+		LastSaveRoom = RoomId.OverfireChamber;
 		LastSavePosition = new Vector2(10 * Tiles.Size, 13 * Tiles.Size);
 		RoomsEntered.Add(RoomId.SettersAlcove.ToString());
 		RoomsEntered.Add(RoomId.QuenchTrench.ToString());
@@ -135,6 +135,7 @@ public partial class GameState : Node
 		RoomsEntered.Add(RoomId.KeyLanding.ToString());
 		RoomsEntered.Add(RoomId.SealedFlue.ToString());
 		RoomsEntered.Add(RoomId.LongDrop.ToString());
+		RoomsEntered.Add(RoomId.OverfireChamber.ToString());
 		Hp = MaxHp;
 	}
 
