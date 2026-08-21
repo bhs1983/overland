@@ -604,7 +604,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		_phaseT -= dt;
 
 		var player = PlayerController.Instance;
-		if (player != null && !_cracked && player.PuffIframe)
+		if (player != null && !_cracked && (player.PuffIframe || Input.IsActionJustPressed("bellows")))
 			TakeBellowsPuff(player.GlobalPosition - GlobalPosition);
 
 		if (_cracked)
@@ -645,7 +645,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 
 			case Phase.Slam:
 				Velocity = _slamDir * Tiles.Px(3.2f);
-				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy && !player.PuffIframe && !Input.IsActionPressed("bellows"))
+				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy && !player.PuffIframe && !Input.IsActionPressed("bellows") && !Input.IsActionJustPressed("bellows"))
 				{
 					_slamHit = true;
 					player.ApplyHit(_slamDir);
