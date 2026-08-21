@@ -277,6 +277,8 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 		}
 		var dt = (float)delta;
 		_phaseT -= dt;
+		if (_readyGrace > 0)
+			_readyGrace -= dt;
 		var player = PlayerController.Instance;
 		if (player == null)
 			return;
@@ -437,6 +439,8 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		}
 		var dt = (float)delta;
 		_phaseT -= dt;
+		if (_readyGrace > 0)
+			_readyGrace -= dt;
 		var player = PlayerController.Instance;
 		if (player == null)
 			return;
@@ -573,6 +577,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 	private float _phaseT;
 	private Vector2 _slamDir = Vector2.Down;
 	private bool _slamHit;
+	private float _readyGrace;
 
 	public override void _Ready()
 	{
@@ -593,6 +598,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		AddToGroup("enemy");
 		_phase = Phase.Trudge;
 		_phaseT = 1f;
+		_readyGrace = 1f;
 	}
 
 	public override void _Input(InputEvent e)
@@ -618,6 +624,8 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		}
 		var dt = (float)delta;
 		_phaseT -= dt;
+		if (_readyGrace > 0)
+			_readyGrace -= dt;
 
 		var player = PlayerController.Instance;
 		if (player != null && player.PuffIframe)
@@ -653,8 +661,11 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		switch (_phase)
 		{
 			case Phase.Trudge:
-				Velocity = EnemySteer.Chase(GlobalPosition, player.GlobalPosition, Tiles.Px(1.15f), Tiles.Px(2.2f));
-				if (_phaseT <= 0 && dist < Tiles.Px(2.5f))
+				if (_readyGrace > 0)
+					Velocity = Vector2.Zero;
+				else
+					Velocity = EnemySteer.Chase(GlobalPosition, player.GlobalPosition, Tiles.Px(1.15f), Tiles.Px(2.2f));
+				if (_readyGrace <= 0 && _phaseT <= 0 && dist < Tiles.Px(2.5f))
 					Enter(Phase.Plant);
 				break;
 
@@ -670,7 +681,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 				Velocity = _slamDir * Tiles.Px(3.2f);
 				if (_cracked)
 					break;
-				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy && player.GlobalPosition.X >= Tiles.Px(3f))
+				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy && player.GlobalPosition.X >= Tiles.Px(5f))
 				{
 					_slamHit = true;
 					player.ApplyHit(_slamDir);
@@ -806,6 +817,8 @@ public partial class Overfire : CharacterBody2D, IDamageable
 
 		var dt = (float)delta;
 		_phaseT -= dt;
+		if (_readyGrace > 0)
+			_readyGrace -= dt;
 		_hitCd -= dt;
 		var player = PlayerController.Instance;
 		if (player == null)
