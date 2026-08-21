@@ -61,6 +61,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 	public string EnemyId { get; set; } = "sootling_0";
 	public bool IsAlive => _alive;
 	public float ReadyGrace { get; set; }
+	public Vector2 HoldUntilLeave { get; set; }
 
 	private enum Phase { Approach, Telegraph, Lunge, Recover }
 
@@ -128,7 +129,9 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		_phaseT -= dt;
 		if (ReadyGrace > 0)
 			ReadyGrace -= dt;
-		if (ReadyGrace > 0)
+		var holdNearSpawn = HoldUntilLeave != Vector2.Zero
+			&& player.GlobalPosition.DistanceTo(HoldUntilLeave) < Tiles.Px(2f);
+		if (ReadyGrace > 0 || holdNearSpawn)
 		{
 			Velocity = Vector2.Zero;
 			MoveAndSlide();

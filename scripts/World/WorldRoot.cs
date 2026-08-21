@@ -678,23 +678,27 @@ public partial class WorldRoot : Node2D
 		PlaceAsh(root, "longdrop_lip_b", 7, 2);
 		PlaceAsh(root, "longdrop_lip_c", 8, 2);
 
+		var sealedSpawn = new Vector2(10 * Tiles.Size, 13 * Tiles.Size);
 		root.AddChild(new Sootling
 		{
 			Position = new Vector2(5 * Tiles.Size, 8 * Tiles.Size),
 			EnemyId = "sootling_longdrop_a",
-			ReadyGrace = 3f
+			ReadyGrace = 3f,
+			HoldUntilLeave = sealedSpawn
 		});
 		root.AddChild(new Sootling
 		{
 			Position = new Vector2(12 * Tiles.Size, 6 * Tiles.Size),
 			EnemyId = "sootling_longdrop_b",
-			ReadyGrace = 3f
+			ReadyGrace = 3f,
+			HoldUntilLeave = sealedSpawn
 		});
 		root.AddChild(new Sootling
 		{
 			Position = new Vector2(4 * Tiles.Size, 10 * Tiles.Size),
 			EnemyId = "sootling_longdrop_c",
-			ReadyGrace = 3f
+			ReadyGrace = 3f,
+			HoldUntilLeave = sealedSpawn
 		});
 
 		root.AddChild(new RoomTransition
