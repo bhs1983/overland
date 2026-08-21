@@ -244,6 +244,7 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 	private bool _softened;
 	private Phase _phase = Phase.Stalk;
 	private float _phaseT;
+	private float _readyGrace;
 	private float _holdDist;
 	private Vector2 _stepDir = Vector2.Right;
 	private bool _stepHit;
@@ -403,6 +404,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 	private int _hp = 2;
 	private Phase _phase = Phase.Cling;
 	private float _phaseT;
+	private float _readyGrace;
 	private Vector2 _home;
 	private Vector2 _strikeDir = Vector2.Down;
 	private bool _strikeHit;
@@ -782,6 +784,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 	private int _hp = 8;
 	private Phase _phase = Phase.Idle;
 	private float _phaseT;
+	private float _readyGrace;
 	private bool _ashShoved;
 	private float _hitCd = 0.8f;
 	private float _orbitSign = 1f;
