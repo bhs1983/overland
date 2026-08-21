@@ -627,7 +627,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 
 			case Phase.Slam:
 				Velocity = _slamDir * Tiles.Px(3.2f);
-				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy)
+				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy && !player.PuffIframe && !Input.IsActionPressed("bellows"))
 				{
 					_slamHit = true;
 					player.ApplyHit(_slamDir);
