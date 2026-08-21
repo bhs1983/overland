@@ -674,7 +674,7 @@ public partial class WorldRoot : Node2D
 		});
 		root.AddChild(new Sootling
 		{
-			Position = new Vector2(7 * Tiles.Size, 13 * Tiles.Size),
+			Position = new Vector2(4 * Tiles.Size, 10 * Tiles.Size),
 			EnemyId = "sootling_longdrop_c"
 		});
 
