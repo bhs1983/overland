@@ -219,12 +219,40 @@ public partial class RoomTransition : Area2D
 		CollisionLayer = 0;
 		CollisionMask = 1 << 1;
 		Monitoring = true;
+		AddToGroup("room_transition");
 		AddChild(new CollisionShape2D
 		{
 			Shape = new RectangleShape2D { Size = TriggerSize }
 		});
 		BodyEntered += OnBodyEntered;
 		BodyExited += OnBodyExited;
+		CallDeferred(nameof(LatchSpawnOverlap));
+	}
+
+	private void LatchSpawnOverlap()
+	{
+		foreach (var b in GetOverlappingBodies())
+		{
+			if (b is PlayerController)
+			{
+				_cooldown = true;
+				return;
+			}
+		}
+	}
+
+	public void FlushIfOverlapping()
+	{
+		if (_cooldown)
+			return;
+		foreach (var b in GetOverlappingBodies())
+		{
+			if (b is PlayerController)
+			{
+				OnBodyEntered(b);
+				return;
+			}
+		}
 	}
 
 	private void OnBodyEntered(Node2D body)

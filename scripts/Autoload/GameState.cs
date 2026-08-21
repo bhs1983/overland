@@ -135,6 +135,7 @@ public partial class GameState : Node
 		RoomsEntered.Add(RoomId.KeyLanding.ToString());
 		RoomsEntered.Add(RoomId.SealedFlue.ToString());
 		RoomsEntered.Add(RoomId.LongDrop.ToString());
+		Hp = MaxHp;
 	}
 
 	public void MarkRoomEntered(RoomId room)
