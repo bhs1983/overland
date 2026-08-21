@@ -202,7 +202,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		var fromSpawn = player.GlobalPosition.DistanceTo(HoldUntilLeave);
 		if (fromSpawn < Tiles.Px(2f))
 			return true;
-		var northEnough = player.GlobalPosition.Y <= 8 * Tiles.Size || fromSpawn >= Tiles.Px(5f);
+		var northEnough = player.GlobalPosition.Y <= 3 * Tiles.Size;
 		if (northEnough)
 			return false;
 		return !IsNearestHeld(player);
