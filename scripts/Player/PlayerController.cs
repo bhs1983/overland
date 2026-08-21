@@ -23,6 +23,7 @@ public partial class PlayerController : CharacterBody2D
 	private bool _attacking;
 	private bool _dodging;
 	private bool _iframe;
+	private float _entryIframe;
 	private bool _animBusy;
 	private float _knockbackTime;
 	private Vector2 _knockbackVel;
@@ -102,6 +103,8 @@ public partial class PlayerController : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_entryIframe > 0)
+			_entryIframe = Mathf.Max(0, _entryIframe - (float)delta);
 		if (!GameState.Instance.Paused
 			&& GameState.Instance.HasFoldedBellows
 			&& Input.IsActionJustPressed("bellows"))
@@ -293,7 +296,7 @@ public partial class PlayerController : CharacterBody2D
 
 	public void ApplyHit(Vector2 fromDirection, int damage = 1)
 	{
-		if (_iframe || PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows") || GameState.Instance.Hp <= 0)
+		if (_iframe || _entryIframe > 0 || PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows") || GameState.Instance.Hp <= 0)
 			return;
 		GameState.Instance.Damage(damage);
 		_flash.Flash(_sprite, Palette.HurtFlash, 0.12f);
@@ -315,4 +318,9 @@ public partial class PlayerController : CharacterBody2D
 	public bool AttackBusy => _attacking;
 	public ulong LastBellowsMsec { get; private set; }
 	public bool PuffIframe => LastBellowsMsec != 0 && Time.GetTicksMsec() - LastBellowsMsec < 2200;
+
+	public void GrantIframe(float seconds)
+	{
+		_entryIframe = seconds;
+	}
 }

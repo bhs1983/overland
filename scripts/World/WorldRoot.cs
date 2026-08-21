@@ -152,6 +152,12 @@ public partial class WorldRoot : Node2D
 			GameState.Instance.Hp = GameState.MaxHp;
 			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
 		}
+		if (room == RoomId.StackMouth)
+		{
+			GameState.Instance.Hp = GameState.MaxHp;
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+			_player.GrantIframe(2f);
+		}
 	}
 
 	private void EnableTransitions()
