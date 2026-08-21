@@ -600,6 +600,11 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		}
 		var dt = (float)delta;
 		_phaseT -= dt;
+
+		var player = PlayerController.Instance;
+		if (player != null && !_cracked && player.PuffIframe)
+			TakeBellowsPuff(player.GlobalPosition - GlobalPosition);
+
 		if (_cracked)
 		{
 			_crackTimer -= dt;
@@ -617,7 +622,6 @@ public partial class Clinker : CharacterBody2D, IDamageable
 			return;
 		}
 
-		var player = PlayerController.Instance;
 		if (player == null)
 			return;
 		var to = player.GlobalPosition - GlobalPosition;
