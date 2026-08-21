@@ -451,7 +451,10 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 				_dropped = true;
 				_home = ClingPos != Vector2.Zero ? ClingPos : GlobalPosition;
 				(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Brickleech drops.");
-				Enter(Phase.Strike);
+				if (player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows"))
+					Enter(Phase.Retreat);
+				else
+					Enter(Phase.Strike);
 			}
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
@@ -467,6 +470,8 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 					_strikeHit = true;
 					player.ApplyHit(_strikeDir);
 				}
+				else if (!_strikeHit && (player.PuffIframe || Input.IsActionPressed("bellows") || Input.IsActionJustPressed("bellows")))
+					_strikeHit = true;
 				if (_phaseT <= 0)
 					Enter(Phase.Retreat);
 				break;
@@ -482,10 +487,10 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 						_phase = Phase.Cling;
 						_body.Modulate = Colors.White;
 					}
-					else if (_phaseT <= 0)
+					else if (_phaseT <= 0 && !player.PuffIframe)
 						Enter(Phase.Strike);
 				}
-				else if (_phaseT <= 0)
+				else if (_phaseT <= 0 && !player.PuffIframe)
 					Enter(Phase.Strike);
 				break;
 		}

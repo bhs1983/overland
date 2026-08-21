@@ -79,7 +79,17 @@ public partial class PlayerController : CharacterBody2D
 			Instance = null;
 	}
 
+	public override void _Input(InputEvent e)
+	{
+		StampBellows(e);
+	}
+
 	public override void _UnhandledInput(InputEvent e)
+	{
+		StampBellows(e);
+	}
+
+	private void StampBellows(InputEvent e)
 	{
 		if (GameState.Instance.Paused || GameState.Instance.InputLocked)
 			return;
