@@ -60,6 +60,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 {
 	public string EnemyId { get; set; } = "sootling_0";
 	public bool IsAlive => _alive;
+	public float ReadyGrace { get; set; }
 
 	private enum Phase { Approach, Telegraph, Lunge, Recover }
 
@@ -125,6 +126,14 @@ public partial class Sootling : CharacterBody2D, IDamageable
 			return;
 
 		_phaseT -= dt;
+		if (ReadyGrace > 0)
+			ReadyGrace -= dt;
+		if (ReadyGrace > 0)
+		{
+			Velocity = Vector2.Zero;
+			MoveAndSlide();
+			return;
+		}
 		var to = player.GlobalPosition - GlobalPosition;
 		var dist = to.Length();
 
