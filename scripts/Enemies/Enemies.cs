@@ -591,6 +591,8 @@ public partial class Clinker : CharacterBody2D, IDamageable
 		_flash = new FlashFx();
 		AddChild(_flash);
 		AddToGroup("enemy");
+		_phase = Phase.Trudge;
+		_phaseT = 1f;
 	}
 
 	public override void _Input(InputEvent e)
@@ -668,7 +670,7 @@ public partial class Clinker : CharacterBody2D, IDamageable
 				Velocity = _slamDir * Tiles.Px(3.2f);
 				if (_cracked)
 					break;
-				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy)
+				if (!_slamHit && dist < Tiles.Px(1.55f) && !player.AttackBusy && player.GlobalPosition.X >= Tiles.Px(3f))
 				{
 					_slamHit = true;
 					player.ApplyHit(_slamDir);
