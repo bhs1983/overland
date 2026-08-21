@@ -70,6 +70,7 @@ public partial class PlayerController : CharacterBody2D
 		_flash = new FlashFx();
 		AddChild(_flash);
 		AddToGroup("player");
+		ProcessPhysicsPriority = -100;
 		PlayAnim($"fluewalker_idle_{_facingName}");
 	}
 
@@ -101,6 +102,11 @@ public partial class PlayerController : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (!GameState.Instance.Paused && !GameState.Instance.InputLocked
+			&& GameState.Instance.HasFoldedBellows
+			&& Input.IsActionJustPressed("bellows"))
+			LastBellowsMsec = Time.GetTicksMsec();
+
 		if (GameState.Instance.Paused || GameState.Instance.InputLocked)
 		{
 			Velocity = Vector2.Zero;
@@ -137,9 +143,6 @@ public partial class PlayerController : CharacterBody2D
 			Velocity = Vector2.Zero;
 			PlayAnim($"fluewalker_idle_{_facingName}");
 		}
-
-		if (GameState.Instance.HasFoldedBellows && Input.IsActionJustPressed("bellows"))
-			LastBellowsMsec = Time.GetTicksMsec();
 
 		if (!_attacking)
 		{
