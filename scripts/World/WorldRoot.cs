@@ -297,8 +297,9 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new Sootling
 		{
-			Position = new Vector2(12 * Tiles.Size, 6 * Tiles.Size),
-			EnemyId = "sootling_stack_mouth"
+			Position = new Vector2(16 * Tiles.Size, 5 * Tiles.Size),
+			EnemyId = "sootling_stack_mouth",
+			ReadyGrace = 3f
 		});
 
 		root.AddChild(new RoomTransition
