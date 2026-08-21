@@ -129,9 +129,7 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		_phaseT -= dt;
 		if (ReadyGrace > 0)
 			ReadyGrace -= dt;
-		var holdNearSpawn = HoldUntilLeave != Vector2.Zero
-			&& player.GlobalPosition.DistanceTo(HoldUntilLeave) < Tiles.Px(2f);
-		if (ReadyGrace > 0 || holdNearSpawn)
+		if (ReadyGrace > 0 || ShouldHoldApproach(player))
 		{
 			Velocity = Vector2.Zero;
 			MoveAndSlide();
@@ -187,6 +185,32 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		}
 
 		MoveAndSlide();
+	}
+
+	private bool ShouldHoldApproach(PlayerController player)
+	{
+		if (HoldUntilLeave == Vector2.Zero)
+			return false;
+		var fromSpawn = player.GlobalPosition.DistanceTo(HoldUntilLeave);
+		if (fromSpawn < Tiles.Px(2f))
+			return true;
+		var northEnough = player.GlobalPosition.Y <= 8 * Tiles.Size || fromSpawn >= Tiles.Px(5f);
+		if (northEnough)
+			return false;
+		return !IsNearestHeld(player);
+	}
+
+	private bool IsNearestHeld(PlayerController player)
+	{
+		var myDist = GlobalPosition.DistanceSquaredTo(player.GlobalPosition);
+		foreach (var n in GetTree().GetNodesInGroup("enemy"))
+		{
+			if (n is Sootling other && other != this && other.IsAlive
+				&& other.HoldUntilLeave != Vector2.Zero
+				&& other.GlobalPosition.DistanceSquaredTo(player.GlobalPosition) < myDist)
+				return false;
+		}
+		return true;
 	}
 
 	private void Enter(Phase next)
