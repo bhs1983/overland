@@ -128,7 +128,7 @@ public partial class GameState : Node
 		IronDoorOpen = true;
 		CurrentRoom = RoomId.LongDrop;
 		LastSaveRoom = RoomId.LongDrop;
-		LastSavePosition = new Vector2(10 * Tiles.Size, 15 * Tiles.Size);
+		LastSavePosition = new Vector2(10 * Tiles.Size, 13 * Tiles.Size);
 		RoomsEntered.Add(RoomId.SettersAlcove.ToString());
 		RoomsEntered.Add(RoomId.QuenchTrench.ToString());
 		RoomsEntered.Add(RoomId.ClinkerYard.ToString());

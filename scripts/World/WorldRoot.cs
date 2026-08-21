@@ -147,6 +147,11 @@ public partial class WorldRoot : Node2D
 		if (firstVisit)
 			CallDeferred(nameof(SpeakRoom), (int)room);
 		GetTree().CreateTimer(0.2f).Timeout += EnableTransitions;
+		if (room == RoomId.LongDrop)
+		{
+			GameState.Instance.Hp = GameState.MaxHp;
+			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
+		}
 	}
 
 	private void EnableTransitions()
@@ -192,7 +197,7 @@ public partial class WorldRoot : Node2D
 		RoomId.SealedFlue when spawnId == "from_key" => new Vector2(10 * Tiles.Size, 9 * Tiles.Size),
 		RoomId.SealedFlue when spawnId == "from_drop" => new Vector2(10 * Tiles.Size, 3.5f * Tiles.Size),
 		RoomId.SealedFlue => new Vector2(10 * Tiles.Size, 8 * Tiles.Size),
-		RoomId.LongDrop when spawnId == "from_sealed" => new Vector2(10 * Tiles.Size, 15 * Tiles.Size),
+		RoomId.LongDrop when spawnId == "from_sealed" => new Vector2(10 * Tiles.Size, 13 * Tiles.Size),
 		RoomId.LongDrop when spawnId == "from_boss" => new Vector2(10 * Tiles.Size, 3.5f * Tiles.Size),
 		RoomId.LongDrop => new Vector2(10 * Tiles.Size, 12 * Tiles.Size),
 		RoomId.OverfireChamber when spawnId == "from_drop" => new Vector2(10 * Tiles.Size, 13 * Tiles.Size),
