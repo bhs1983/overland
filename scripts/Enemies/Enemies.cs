@@ -942,7 +942,7 @@ public partial class Overfire : CharacterBody2D, IDamageable
 					var d = player.GlobalPosition.DistanceTo(GlobalPosition);
 					if (_ashShoved)
 						ui?.ShowToast("Ash shoved. Pulse misses.");
-					else if (d < Tiles.Px(2f))
+					else if (d < Tiles.Px(1.25f))
 						player.ApplyHit((player.GlobalPosition - GlobalPosition).Normalized(), 1);
 				}
 				break;
