@@ -596,7 +596,12 @@ public partial class Clinker : CharacterBody2D, IDamageable
 	public override void _Input(InputEvent e)
 	{
 		if (e.IsActionPressed("bellows") && !e.IsEcho())
+		{
 			_slamHit = true;
+			var player = PlayerController.Instance;
+			if (player != null && !_cracked)
+				TakeBellowsPuff(player.GlobalPosition - GlobalPosition);
+		}
 	}
 
 	public override void _PhysicsProcess(double delta)
