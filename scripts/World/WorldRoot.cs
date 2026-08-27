@@ -347,10 +347,10 @@ public partial class WorldRoot : Node2D
 		});
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(10 * Tiles.Size, Tiles.Px(0.25f)),
+			Position = new Vector2(10 * Tiles.Size, 1 * Tiles.Size),
 			Target = RoomId.AshdriftHall,
 			SpawnId = "from_mouth",
-			TriggerSize = new Vector2(Tiles.Px(1.75f), Tiles.Px(3f))
+			TriggerSize = new Vector2(Tiles.Px(1.25f), Tiles.Px(1.75f))
 		});
 	}
 
@@ -391,10 +391,10 @@ public partial class WorldRoot : Node2D
 		});
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2((W - 1) * Tiles.Size + Tiles.Px(0.25f), 7 * Tiles.Size),
+			Position = new Vector2(18 * Tiles.Size, 7 * Tiles.Size),
 			Target = RoomId.DeadFanWalk,
 			SpawnId = "from_ash",
-			TriggerSize = new Vector2(Tiles.Px(0.75f), Tiles.Px(1.75f))
+			TriggerSize = new Vector2(Tiles.Px(1.25f), Tiles.Px(1.75f))
 		});
 	}
 
@@ -426,10 +426,10 @@ public partial class WorldRoot : Node2D
 
 		root.AddChild(new RoomTransition
 		{
-			Position = new Vector2(Tiles.Px(0.25f), 6 * Tiles.Size),
+			Position = new Vector2(1 * Tiles.Size, 6 * Tiles.Size),
 			Target = RoomId.AshdriftHall,
 			SpawnId = "from_fan",
-			TriggerSize = new Vector2(Tiles.Px(0.75f), Tiles.Px(1.75f))
+			TriggerSize = new Vector2(Tiles.Px(1.25f), Tiles.Px(1.75f))
 		});
 
 		// East → Setter's Alcove (CP3) when fan open
