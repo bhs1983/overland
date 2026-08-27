@@ -91,7 +91,10 @@ public partial class WorldRoot : Node2D
 		GameState.Instance.BackironOut = false;
 
 		foreach (var c in _roomLayer.GetChildren())
+		{
+			HaltPhysics(c);
 			c.Free();
+		}
 		_mouthGate = null;
 		_fanEastDoor = null;
 		_floor = null;
@@ -164,6 +167,13 @@ public partial class WorldRoot : Node2D
 					LatchKilnwalkExit(n);
 			}
 		}
+	}
+
+	private static void HaltPhysics(Node n)
+	{
+		n.SetPhysicsProcess(false);
+		foreach (var c in n.GetChildren())
+			HaltPhysics(c);
 	}
 
 	private static void LatchKilnwalkExit(Node n)
