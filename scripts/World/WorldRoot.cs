@@ -54,6 +54,11 @@ public partial class WorldRoot : Node2D
 	public void RespawnAtSave()
 	{
 		GameState.Instance.InputLocked = false;
+		CallDeferred(nameof(LoadRoomAtSave));
+	}
+
+	private void LoadRoomAtSave()
+	{
 		LoadRoom(GameState.Instance.LastSaveRoom, GameState.Instance.LastSavePosition);
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.ShowToast("Woke at last save.");
 		(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
