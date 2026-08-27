@@ -369,6 +369,8 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 				break;
 		}
 
+		if (!GodotObject.IsInstanceValid(this))
+			return;
 		MoveAndSlide();
 	}
 
