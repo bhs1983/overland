@@ -192,6 +192,8 @@ public partial class Sootling : CharacterBody2D, IDamageable
 				break;
 		}
 
+		if (!GodotObject.IsInstanceValid(this))
+			return;
 		MoveAndSlide();
 	}
 
