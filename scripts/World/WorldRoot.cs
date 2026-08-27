@@ -159,6 +159,7 @@ public partial class WorldRoot : Node2D
 			_player.GrantIframe(2f);
 			if (spawn == SpawnFor(RoomId.StackMouth, "from_town"))
 			{
+				GameState.Instance.RecordSave(RoomId.StackMouth, spawn);
 				foreach (var n in _roomLayer.GetChildren())
 					LatchKilnwalkExit(n);
 			}
