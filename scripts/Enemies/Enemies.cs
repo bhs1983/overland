@@ -261,7 +261,6 @@ public partial class Sootling : CharacterBody2D, IDamageable
 		_alive = false;
 		GameState.Instance.DefeatedEnemyIds.Add(EnemyId);
 		_flash.Flash(_body, Palette.HitFlash, 0.08f);
-		Hitstop.Pulse(this, 0.04f);
 		GetTree().CreateTimer(0.08f, true, false, true).Timeout += () => QueueFree();
 	}
 
