@@ -502,7 +502,7 @@ public partial class Brickleech : CharacterBody2D, IDamageable
 		if (!_dropped)
 		{
 			if (Mathf.Abs(player.GlobalPosition.X - GlobalPosition.X) < Tiles.Px(1.125f)
-			    && player.GlobalPosition.Y > GlobalPosition.Y - Tiles.Px(0.5f))
+			    && player.GlobalPosition.Y > ClingPos.Y + Tiles.Px(1f))
 			{
 				_dropped = true;
 				_home = ClingPos != Vector2.Zero ? ClingPos : GlobalPosition;
