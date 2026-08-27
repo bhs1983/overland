@@ -91,7 +91,7 @@ public partial class WorldRoot : Node2D
 		GameState.Instance.BackironOut = false;
 
 		foreach (var c in _roomLayer.GetChildren())
-			c.QueueFree();
+			c.Free();
 		_mouthGate = null;
 		_fanEastDoor = null;
 		_floor = null;
@@ -157,7 +157,20 @@ public partial class WorldRoot : Node2D
 			GameState.Instance.Hp = GameState.MaxHp;
 			(GetTree().GetFirstNodeInGroup("game_ui") as GameUi)?.RefreshHud();
 			_player.GrantIframe(2f);
+			if (spawn == SpawnFor(RoomId.StackMouth, "from_town"))
+			{
+				foreach (var n in _roomLayer.GetChildren())
+					LatchKilnwalkExit(n);
+			}
 		}
+	}
+
+	private static void LatchKilnwalkExit(Node n)
+	{
+		if (n is RoomTransition rt && rt.Target == RoomId.Kilnwalk)
+			rt.LatchHold(3f);
+		foreach (var c in n.GetChildren())
+			LatchKilnwalkExit(c);
 	}
 
 	private void EnableTransitions()

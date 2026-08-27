@@ -213,6 +213,7 @@ public partial class RoomTransition : Area2D
 	public Vector2 TriggerSize { get; set; } = new(Tiles.Px(1.25f), Tiles.Px(0.75f));
 
 	private bool _cooldown;
+	private bool _holdExit;
 
 	public override void _Ready()
 	{
@@ -227,6 +228,27 @@ public partial class RoomTransition : Area2D
 		BodyEntered += OnBodyEntered;
 		BodyExited += OnBodyExited;
 		CallDeferred(nameof(LatchSpawnOverlap));
+	}
+
+	public void LatchHold(float seconds)
+	{
+		_cooldown = true;
+		_holdExit = true;
+		GetTree().CreateTimer(seconds).Timeout += () =>
+		{
+			_holdExit = false;
+			var still = false;
+			foreach (var b in GetOverlappingBodies())
+			{
+				if (b is PlayerController)
+				{
+					still = true;
+					break;
+				}
+			}
+			if (!still)
+				_cooldown = false;
+		};
 	}
 
 	private void LatchSpawnOverlap()
@@ -290,7 +312,7 @@ public partial class RoomTransition : Area2D
 
 	private void OnBodyExited(Node2D body)
 	{
-		if (body is PlayerController)
+		if (body is PlayerController && !_holdExit)
 			_cooldown = false;
 	}
 }
@@ -477,6 +499,7 @@ public partial class CheckpointToastZone : Area2D
 	public bool RequiresIronOpen { get; set; }
 	public Vector2 TriggerSize { get; set; } = new(Tiles.Px(1f), Tiles.Px(1f));
 	private bool _cooldown;
+	private bool _holdExit;
 
 	public override void _Ready()
 	{
