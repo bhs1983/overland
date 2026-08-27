@@ -329,7 +329,8 @@ public partial class WorldRoot : Node2D
 		{
 			Position = new Vector2(16 * Tiles.Size, 5 * Tiles.Size),
 			EnemyId = "sootling_stack_mouth",
-			ReadyGrace = 3f
+			ReadyGrace = 3f,
+			HoldUntilLeave = new Vector2(10 * Tiles.Size, 8 * Tiles.Size)
 		});
 
 		root.AddChild(new RoomTransition
