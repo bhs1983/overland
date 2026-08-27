@@ -475,12 +475,14 @@ public partial class WorldRoot : Node2D
 		root.AddChild(new Claywalker
 		{
 			Position = new Vector2(7 * Tiles.Size, 6 * Tiles.Size),
-			EnemyId = "claywalker_alcove_a"
+			EnemyId = "claywalker_alcove_a",
+			ReadyGrace = 2f
 		});
 		root.AddChild(new Claywalker
 		{
 			Position = new Vector2(11 * Tiles.Size, 8 * Tiles.Size),
-			EnemyId = "claywalker_alcove_b"
+			EnemyId = "claywalker_alcove_b",
+			ReadyGrace = 2f
 		});
 
 		root.AddChild(new AlcoveHeal

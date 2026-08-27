@@ -292,6 +292,11 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 	private Phase _phase = Phase.Stalk;
 	private float _phaseT;
 	private float _readyGrace;
+	public float ReadyGrace
+	{
+		get => _readyGrace;
+		set => _readyGrace = value;
+	}
 	private float _holdDist;
 	private Vector2 _stepDir = Vector2.Right;
 	private bool _stepHit;
@@ -339,13 +344,13 @@ public partial class Claywalker : CharacterBody2D, IDamageable
 			case Phase.Stalk:
 				Velocity = EnemySteer.Chase(GlobalPosition, player.GlobalPosition, walk, _holdDist);
 				Velocity += EnemySteer.Separate(this, Tiles.Px(1.1f));
-				if (_phaseT <= 0 && dist < _holdDist + Tiles.Px(0.35f) && dist > Tiles.Px(0.5f))
+				if (_readyGrace <= 0 && _phaseT <= 0 && dist < _holdDist + Tiles.Px(0.35f) && dist > Tiles.Px(0.5f))
 					Enter(Phase.Windup);
 				break;
 
 			case Phase.Windup:
 				Velocity = Vector2.Zero;
-				if (_phaseT <= 0)
+				if (_phaseT <= 0 && _readyGrace <= 0)
 					Enter(Phase.StepIn);
 				break;
 
